@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/clientoverloadpositions.jpg")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("external%20classes/riotsharp.dll")]
 
 
