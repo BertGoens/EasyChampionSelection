@@ -1,0 +1,33 @@
+﻿<Window x:Name="frmMainVisual" x:Class="EasyChampionSelection.wndMain"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tb="http://www.hardcodet.net/taskbar" 
+        Title="Easy Champion Selection" Height="467" Width="434" Loaded="frmMain_Loaded" Closing="frmMain_Closing">
+    <Grid>
+
+        <Button x:Name="btnNewGroup" Content="New" HorizontalAlignment="Left" Margin="175,45,0,0" VerticalAlignment="Top" Width="75" Click="btnNewGroup_Click"/>
+
+        <ListBox x:Name="lsbGroups" HorizontalAlignment="Left" Height="112" Margin="10,42,0,0" VerticalAlignment="Top" Width="160" 
+                 SelectionChanged="lsbGroups_SelectionChanged" 
+                 PreviewMouseRightButtonDown="lsbGroups_PreviewMouseRightButtonDown"
+                 />
+
+        <Label x:Name="lblGroupsCount" Content="Groups:" Margin="10,16,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="51"/>
+        <Button x:Name="btnDeleteGroup" Content="Delete" HorizontalAlignment="Left" Margin="175,70,0,0" VerticalAlignment="Top" Width="75" Click="btnDeleteGroup_Click"/>
+
+        <ListBox x:Name="lsbChampionsInGroup" Margin="10,220,5,11" SelectionMode="Multiple" HorizontalAlignment="Left" Width="160" RenderTransformOrigin="0.5,0.5"
+                 PreviewMouseRightButtonDown="lsbChampionsInGroup_PreviewMouseRightButtonDown"
+                 />
+
+        <ListBox x:Name="lsbAllChampions" HorizontalAlignment="Left" Margin="255,220,0,11" Width="160" SelectionMode="Multiple" 
+                 PreviewMouseRightButtonDown="lsbAllChampions_PreviewMouseRightButtonDown"
+                 />
+
+        <Button x:Name="btnRemoveChampionsFromCurrentGroup" Content="&gt;&gt;" Margin="175,315,0,0" Click="btnRemoveChampionsFromCurrentGroup_Click" HorizontalAlignment="Left" Width="75" Height="20" VerticalAlignment="Top"/>
+        <Button x:Name="btnAddChampionsToCurrentGroup" Content="&lt;&lt;" Margin="175,290,0,0" Click="btnAddChampionsToCurrentGroup_Click" HorizontalAlignment="Left" Width="75" Height="20" VerticalAlignment="Top"/>
+        <Label x:Name="lblCurrentGroupChampions" Content="Champions in %group%" HorizontalAlignment="Left" Margin="10,194,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblAllChampionsInfo" Content="All champions" HorizontalAlignment="Left" Margin="255,194,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtFilterForAllChampions" HorizontalAlignment="Left" Height="23" Margin="255,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" BorderBrush="#FF8493BD" MouseEnter="txtFilterForAllChampions_MouseEnter" MouseLeave="txtFilterForAllChampions_MouseLeave" TextChanged="txtFilterForAllChampions_TextChanged" MaxLength="100" MaxLines="1"/>
+        <Label x:Name="lblFilterInfo" Content="Filter" HorizontalAlignment="Left" Margin="255,163,0,0" VerticalAlignment="Top" Foreground="#FF686767"/>
+    </Grid>
+</Window>

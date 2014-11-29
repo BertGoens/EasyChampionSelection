@@ -1,0 +1,33 @@
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\EasyChampionSelection.exe.config
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\EasyChampionSelection.exe
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\EasyChampionSelection.pdb
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.csprojResolveAssemblyReference.cache
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\App.g.cs
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection_MarkupCompile.cache
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.g.resources
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.Properties.Resources.resources
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.csproj.GenerateResource.Cache
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.exe
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.pdb
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\RiotSharp.dll
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\Newtonsoft.Json.dll
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\RiotSharp.pdb
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\Newtonsoft.Json.xml
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\wndMain.baml
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\wndMain.g.cs
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\Hardcodet.Wpf.TaskbarNotification.dll
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\Hardcodet.Wpf.TaskbarNotification.pdb
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\FancyBalloon.baml
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndAddChampion.baml
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndAddGroup.baml
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndClientOverload.baml
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndRenameGroup.baml
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\FancyBalloon.g.cs
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndAddChampion.g.cs
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndAddGroup.g.cs
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndClientOverload.g.cs
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndRenameGroup.g.cs
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\EasyChampionSelection.exe.manifest
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\bin\Debug\EasyChampionSelection.application
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.exe.manifest
+C:\Libraries\Documents\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.application
