@@ -1,7 +1,7 @@
 ﻿<Window x:Class="EasyChampionSelection.wndRenameGroup"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Rename group" Height="151" Width="224" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="wndRenameGroupVisual_Loaded">
+        Title="Rename group" Height="151" Width="224" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="wndRenameGroupVisual_Loaded" Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg">
     <Grid>
         <Button x:Name="btnRenameGroup" Content="Rename" HorizontalAlignment="Left" Margin="20,80,0,0" VerticalAlignment="Top" Width="75" ToolTip="Create a new unique group" Click="btnRenameGroup_Click" IsDefault="True"/>
         <Label x:Name="lblRenameGroupNameInfo" Content="Rename %GROUP% to:" HorizontalAlignment="Left" Margin="15,9,0,0" VerticalAlignment="Top"/>

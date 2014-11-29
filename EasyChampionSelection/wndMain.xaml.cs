@@ -157,6 +157,8 @@ namespace EasyChampionSelection {
                                 if(wndCO.Visibility != System.Windows.Visibility.Visible) { //Is the ClientOverlay visible?
                                     wndCO.Show();
                                 }
+                            } else { // not in champ select, hide overlay
+                                wndCO.Visibility = System.Windows.Visibility.Hidden;
                             }
                         } else { // lolclient not foccussed
                             if(!forceShowClientOverload) {
@@ -244,10 +246,18 @@ namespace EasyChampionSelection {
             notifyIcon.ContextMenu = null;
             System.Windows.Controls.ContextMenu cm = new System.Windows.Controls.ContextMenu();
 
-            MenuItem mniShow = CreateMenuItem("Show", mniShow_Click);
+            if(this.Visibility == System.Windows.Visibility.Visible) {
+                MenuItem mniHideMainWindow = CreateMenuItem("Hide Main window", mniHideMainWindow_Click);
+                cm.Items.Add(mniHideMainWindow);
+            } else {
+                MenuItem mniShowMainWindow = CreateMenuItem("Show Main window", mniShowMainWindow_Click);
+                cm.Items.Add(mniShowMainWindow);
+            }
+
+            MenuItem mniShow = CreateMenuItem("Show Client Overlay", mniShow_Click);
             cm.Items.Add(mniShow);
 
-            MenuItem mniHide = CreateMenuItem("Hide", mniHide_Click);
+            MenuItem mniHide = CreateMenuItem("Hide Client Overlay", mniHide_Click);
             cm.Items.Add(mniHide);
 
             if(wndCO.Visibility != System.Windows.Visibility.Visible) {
@@ -262,6 +272,16 @@ namespace EasyChampionSelection {
             cm.Items.Add(mniExit);
 
             notifyIcon.ContextMenu = cm;
+        }
+
+        private void mniShowMainWindow_Click(object sender, RoutedEventArgs e) {
+            this.Visibility = System.Windows.Visibility.Visible;
+            this.ShowInTaskbar = true;
+        }
+
+        private void mniHideMainWindow_Click(object sender, RoutedEventArgs e) {
+            this.Visibility = System.Windows.Visibility.Hidden;
+            this.ShowInTaskbar = false;
         }
 
         private void mniShow_Click(object sender, RoutedEventArgs e) {
@@ -312,8 +332,9 @@ namespace EasyChampionSelection {
             MenuItem mniMoveGroupDown = CreateMenuItem("Move Group Down", mniMoveGroupDown_Click);
             cm.Items.Add(mniMoveGroupDown);
 
+
             if(!(lsbGroups.SelectedItems.Count > 0) && !(lsbGroups.SelectedIndex > lsbGroups.Items.Count - 1)) {
-                mniMoveGroupUp.IsEnabled = false;
+                mniMoveGroupDown.IsEnabled = false;
             }
 
             lsbGroups.ContextMenu = cm;
@@ -480,8 +501,12 @@ namespace EasyChampionSelection {
         }
 
         void mniReloadLocal_Click(object sender, RoutedEventArgs e) {
-            LoadAllChampionsLocal();
-            DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
+            if(File.Exists(StaticSerializer.PATH_AllChampions)) {
+                LoadAllChampionsLocal();
+                DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
+            } else {
+                MessageBox.Show("No local saves found!", this.Title);
+            }            
         }
 
         void mniManuallyAddChampion_Click(object sender, RoutedEventArgs e) {
@@ -531,7 +556,7 @@ namespace EasyChampionSelection {
 
         private void SetupNotifyIcon() {
             notifyIcon = new TaskbarIcon();
-            notifyIcon.Icon = Properties.Resources.LeagueIcon;
+            notifyIcon.Icon = Properties.Resources.LolIcon;
             notifyIcon.ToolTipText = "Easy Champion Selection";
             notifyIcon.Visibility = Visibility.Visible;
             notifyIcon.MenuActivation = PopupActivationMode.RightClick;
@@ -560,8 +585,10 @@ namespace EasyChampionSelection {
         }
 
         private void LoadAllChampionsLocal() {
-            lstAllChampions = (List<string>)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_AllChampions);
+            if(File.Exists(StaticSerializer.PATH_AllChampions)) {
+                lstAllChampions = (List<string>)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_AllChampions);
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
+            }
         }
 
         private void LoadSerializedGroupManager() {

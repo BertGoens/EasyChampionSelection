@@ -30,6 +30,7 @@ namespace EasyChampionSelection {
         }
 
         private String CreateStringOfChampions() {
+            //The client accepts regex commandos
             List<string> lstChampsToFilter = new List<string>();
             
             for(int i = 0; i < cboGroups.Items.Count; i++) {
@@ -50,6 +51,9 @@ namespace EasyChampionSelection {
             for(int i = 0; i < lstChampsToFilter.Count; i++) {
                 returnValue += lstChampsToFilter[i] + "|";
             }
+
+            //replace whitespace with \s (regex space)
+            returnValue = returnValue.Replace(" ", "\\s");
 
             //remove last |
             returnValue = returnValue.Substring(0, returnValue.Length - 1);

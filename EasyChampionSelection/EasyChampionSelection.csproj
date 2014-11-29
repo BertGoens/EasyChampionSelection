@@ -185,14 +185,10 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\SearchBarPositions.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    <None Include="Resources\SearchBarPositions.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\ClientOverloadPositions.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    <None Include="Resources\ClientOverloadPositions.jpg" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -215,6 +211,15 @@
     <None Include="External classes\Hardcodet.Wpf.TaskbarNotification.dll" />
     <None Include="External classes\Newtonsoft.Json.dll" />
     <None Include="External classes\RiotSharp.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\LolIcon.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\LolIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

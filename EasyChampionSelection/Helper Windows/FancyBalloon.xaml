@@ -100,18 +100,15 @@
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
-        
-        <Image Source="/Resources/LeagueIcon.ico" Width="72" Height="72"
-               HorizontalAlignment="Left" Margin="0,10,0,0"  Stretch="Fill" VerticalAlignment="Top" />
-        
+ 
         <TextBlock  x:Name="txtBalloonMessage" 
                     Margin="72,49.2,10,0" VerticalAlignment="Top" Foreground="#FFECAD25" TextWrapping="Wrap" />
             
-        <Path Fill="#FFFFFFFF" Stretch="Fill" Margin="72,38.2,34,0" VerticalAlignment="Top" Height="1" Data="M26,107 L220.04123,107" SnapsToDevicePixels="True">
+        <Path Fill="#FFFFFFFF" Stretch="Fill" Margin="25,38.2,34,0" VerticalAlignment="Top" Height="1" Data="M26,107 L220.04123,107" SnapsToDevicePixels="True">
             <Path.Stroke>
                 <LinearGradientBrush EndPoint="0.973,0.5" StartPoint="0.005,0.5">
-                    <GradientStop Color="#00ECAD25" Offset="1" />
-                    <GradientStop Color="#87ECAD25" Offset="0" />
+                    <GradientStop Color="#00ECAD25" Offset="2" />
+                    <GradientStop Color="#87ECAD25" Offset="1" />
                 </LinearGradientBrush>
             </Path.Stroke>
         </Path>

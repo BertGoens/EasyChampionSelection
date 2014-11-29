@@ -1,4 +1,1 @@
-Get the fancy balloon working & costumize it
-Update / Change icon
 On league reposition fire event
-Catch this event and reposition the ClientOverload

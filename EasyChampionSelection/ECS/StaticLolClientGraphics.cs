@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Windows.Input;
+using System.Windows.Forms;
 
 namespace EasyChampionSelection.ECS  {
     /// <summary>
@@ -18,7 +20,10 @@ namespace EasyChampionSelection.ECS  {
         /// </summary>
         private Rectangle rectLolBounds;
 
-        /// <summary>Your league client search bar coords inside the client (not absolute)</summary>
+        /// <summary>
+        /// Your league client search bar coords inside the client (not absolute)
+        /// Mines X860, Y120, W140, H40
+        /// </summary>
         private Rectangle rectSearchBar = new Rectangle(860, 120, 140, 40);
 
         /// <remarks>
@@ -31,7 +36,7 @@ namespace EasyChampionSelection.ECS  {
         private Point pntBitmapSearchLeftEdge = new Point(480, 90);
         private Point pntBitmapSearchRightEdge = new Point(550,90);
         /// <remarks>White Team type text searchbox coördinates</remarks>
-        private Point pntBitmapTeamTypeLeftEdge = new Point(160, 530);
+        private Point pntBitmapTeamTypeLeftEdge = new Point(210, 530); // 160 didnt't work
         private Point pntBitmapTeamTypeRightEdge = new Point(490, 530);
 
         private static Process processLolClient;
@@ -120,7 +125,7 @@ namespace EasyChampionSelection.ECS  {
             Point oldPos = System.Windows.Forms.Cursor.Position;
 
             // get screen coordinates
-            Point pntSearchBarAbsolute = new Point(rectLolBounds.Width - (rectLolBounds.Width - rectSearchBar.X ), rectLolBounds.Y + rectSearchBar.Top);
+            Point pntSearchBarAbsolute = new Point(rectLolBounds.Width - (rectLolBounds.Width - rectSearchBar.X ), rectLolBounds.Y + rectSearchBar.Y - 5);
             ClientToScreen(processLolClient.MainWindowHandle, ref pntSearchBarAbsolute);
 
             // set cursor on coords, and press mouse
@@ -141,6 +146,7 @@ namespace EasyChampionSelection.ECS  {
             System.Windows.Forms.SendKeys.SendWait("{BACKSPACE}");
             //Enter new text
             System.Windows.Forms.SendKeys.SendWait(text);
+            System.Windows.Forms.SendKeys.Flush();            
         }
 
         public bool isProcessFocussed(Process p) {
@@ -206,7 +212,7 @@ namespace EasyChampionSelection.ECS  {
             if(!(picOfClient.GetPixel(pntBitmapSearchRightEdge.X, pntBitmapSearchRightEdge.Y).ToArgb().Equals(white.ToArgb()))) {
                 isWhite = false;
             }
-            if(!(picOfClient.GetPixel(pntBitmapTeamTypeLeftEdge.X + 50, pntBitmapTeamTypeLeftEdge.Y + 2).ToArgb().Equals(white.ToArgb()))) {
+            if(!(picOfClient.GetPixel(pntBitmapTeamTypeLeftEdge.X, pntBitmapTeamTypeLeftEdge.Y).ToArgb().Equals(white.ToArgb()))) {
                 isWhite = false;
             }
             if(!(picOfClient.GetPixel(pntBitmapTeamTypeRightEdge.X, pntBitmapTeamTypeRightEdge.Y).ToArgb().Equals(white.ToArgb()))) {
@@ -218,7 +224,8 @@ namespace EasyChampionSelection.ECS  {
 
         public Rectangle GetClientOverlayPosition() {
             //Start value (relative position within window) /Resources/ClientOverloadPositions.jpg for an explanation
-            Rectangle result = new Rectangle(350, 60, 50, 585);  
+            // Old above skins : Rectangle result = new Rectangle(350, 60, 50, 585);  
+            Rectangle result = new Rectangle(513, 114, 50, 585);  
             //Now we need to add the absolute X and Y of client to it
             result.X += rectLolBounds.X;
             result.Y += rectLolBounds.Y;
