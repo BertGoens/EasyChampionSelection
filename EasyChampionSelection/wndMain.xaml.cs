@@ -1,4 +1,5 @@
 ﻿using EasyChampionSelection.ECS;
+using EasyChampionSelection.Helper_Windows;
 using Hardcodet.Wpf.TaskbarNotification;
 using RiotSharp;
 using System;
@@ -176,6 +177,12 @@ namespace EasyChampionSelection {
             }
 
             tmrCheckForChampSelect.Start();
+        }
+
+        private void btnCredits_Click(object sender, RoutedEventArgs e) {
+            wndCredits wndCR = new wndCredits();
+            wndCR.Owner = this;
+            wndCR.Show();
         }
 
         private void btnNewGroup_Click(object sender, RoutedEventArgs e) {

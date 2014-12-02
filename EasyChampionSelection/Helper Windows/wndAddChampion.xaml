@@ -2,7 +2,14 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Add a champion" Height="151" Width="224" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="wndAddChampion_Loaded" Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg">
-    <Grid>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/MyResourceDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Background="{StaticResource windowHelperBackground}">
         <Button x:Name="btnAddChampion" Content="Add" HorizontalAlignment="Left" Margin="20,80,0,0" VerticalAlignment="Top" Width="75" Click="btnAddChampion_Click" IsDefault="True"/>
         <Label x:Name="lblNewChampionInfo" Content="New champion name:" HorizontalAlignment="Left" Margin="15,9,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="txtNewChampionName" HorizontalAlignment="Left" Height="23" Margin="15,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" TextChanged="txtNewChampion_TextChanged"/>

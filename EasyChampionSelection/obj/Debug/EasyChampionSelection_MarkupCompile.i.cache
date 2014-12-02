@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Libraries\Documents\GitHub\EasyChampionSelection\EasyChampionSelection\App.xaml
-6-913186006
+81047390623
 
-18416990342
+19-696601561
 181520466530
-Helper Windows\FancyBalloon.xaml;Helper Windows\wndAddChampion.xaml;wndMain.xaml;Helper Windows\wndAddGroup.xaml;Helper Windows\wndClientOverload.xaml;Helper Windows\wndRenameGroup.xaml;
+Helper Windows\FancyBalloon.xaml;Helper Windows\wndAddChampion.xaml;Helper Windows\wndCredits.xaml;Resources\MyResourceDictionary.xaml;wndMain.xaml;Helper Windows\wndAddGroup.xaml;Helper Windows\wndClientOverload.xaml;Helper Windows\wndRenameGroup.xaml;
 
 False
 

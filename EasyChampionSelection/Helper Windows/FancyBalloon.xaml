@@ -5,6 +5,7 @@
              x:Name="me"
              Height="120"
              Width="240">
+    
     <UserControl.Resources>
         <Storyboard x:Key="FadeIn">
             <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"

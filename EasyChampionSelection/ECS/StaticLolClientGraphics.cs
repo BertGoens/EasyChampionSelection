@@ -135,9 +135,6 @@ namespace EasyChampionSelection.ECS  {
 
             // type
             TypeTextInSearchBar(textToEnter);
-
-            // return mouse 
-            //System.Windows.Forms.Cursor.Position = oldPos;
         }
 
         private void TypeTextInSearchBar(String text) {
@@ -224,7 +221,8 @@ namespace EasyChampionSelection.ECS  {
 
         public Rectangle GetClientOverlayPosition() {
             //Start value (relative position within window) /Resources/ClientOverloadPositions.jpg for an explanation
-            // Old above skins : Rectangle result = new Rectangle(350, 60, 50, 585);  
+            // Riot hardcoded old above skins : Rectangle result = new Rectangle(350, 60, 50, 585);  
+            // Riot hardcoded position next to the skins tab
             Rectangle result = new Rectangle(513, 114, 50, 585);  
             //Now we need to add the absolute X and Y of client to it
             result.X += rectLolBounds.X;

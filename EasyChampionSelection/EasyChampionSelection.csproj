@@ -109,6 +109,9 @@
     <Compile Include="Helper Windows\wndClientOverload.xaml.cs">
       <DependentUpon>wndClientOverload.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helper Windows\wndCredits.xaml.cs">
+      <DependentUpon>wndCredits.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helper Windows\wndRenameGroup.xaml.cs">
       <DependentUpon>wndRenameGroup.xaml</DependentUpon>
     </Compile>
@@ -117,6 +120,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Helper Windows\wndAddChampion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Helper Windows\wndCredits.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\MyResourceDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -61,3 +61,6 @@ C:\Libraries\Documents\GitHub\EasyChampionSelection\EasyChampionSelection\bin\De
 C:\Libraries\Documents\GitHub\EasyChampionSelection\EasyChampionSelection\bin\Debug\Newtonsoft.Json.dll
 C:\Libraries\Documents\GitHub\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.exe.manifest
 C:\Libraries\Documents\GitHub\EasyChampionSelection\EasyChampionSelection\obj\Debug\EasyChampionSelection.application
+C:\Libraries\Documents\GitHub\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndCredits.baml
+C:\Libraries\Documents\GitHub\EasyChampionSelection\EasyChampionSelection\obj\Debug\Helper Windows\wndCredits.g.cs
+C:\Libraries\Documents\GitHub\EasyChampionSelection\EasyChampionSelection\obj\Debug\Resources\MyResourceDictionary.baml
