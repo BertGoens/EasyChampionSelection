@@ -36,9 +36,9 @@ namespace EasyChampionSelection {
             for(int i = 0; i < cboGroups.Items.Count; i++) {
                 CheckBox cb = (CheckBox)cboGroups.Items[i];
                 if(cb.IsChecked == true) {
-                    int newGroupCount = wndMainBoss.gmGroupManager.getChampionList(i).ChampionCount;
+                    int newGroupCount = wndMainBoss.gmGroupManager.getGroup(i).ChampionCount;
                     for(int j = 0; j < newGroupCount; j++) {
-                        string newChampion = wndMainBoss.gmGroupManager.getChampionList(i).getChampion(j);
+                        string newChampion = wndMainBoss.gmGroupManager.getGroup(i).getChampion(j);
                         if(!lstChampsToFilter.Contains(newChampion)) {
                             lstChampsToFilter.Add(newChampion);
                         }
@@ -75,7 +75,7 @@ namespace EasyChampionSelection {
                 cboGroups.Items.Clear();
                 for(int i = 0; i < wndMainBoss.gmGroupManager.GroupCount; i++) {
                     System.Windows.Controls.CheckBox chk = new System.Windows.Controls.CheckBox();
-                    chk.Content = wndMainBoss.gmGroupManager.getChampionList(i).getName();
+                    chk.Content = wndMainBoss.gmGroupManager.getGroup(i).getName();
                     chk.Checked += new RoutedEventHandler(CheckBox_CheckStateChanged);
                     cboGroups.Items.Add(chk);
                 }

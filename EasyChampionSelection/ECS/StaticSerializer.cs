@@ -3,7 +3,12 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace EasyChampionSelection.ECS {
+
+    /// <summary>
+    /// A basic (de)serialization class
+    /// </summary>
     public static class StaticSerializer {
+
         public const string PATH_GroupManager = "Groups.ser";
         public const string PATH_AllChampions = "AllChampions.ser";
 
