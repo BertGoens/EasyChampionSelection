@@ -18,6 +18,97 @@ namespace EasyChampionSelection {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Force redraw the Client Overlay
+        /// </summary>
+        public void Redraw() {
+            if(wndMainBoss._lolClientHelper != null) {
+                if(wndMainBoss._lolClientHelper.GetProcessLolClient() != null) {
+                    Rectangle pos = wndMainBoss._lolClientHelper.GetClientOverlayPosition();
+                    this.Left = pos.X;
+                    this.Top = pos.Y;
+                    //Width and height is already marked in here
+                }
+            }
+
+            cboGroups.Items.Clear();
+            for(int i = 0; i < wndMainBoss.gmGroupManager.GroupCount; i++) {
+                System.Windows.Controls.CheckBox chk = new System.Windows.Controls.CheckBox();
+                chk.Content = wndMainBoss.gmGroupManager.getGroup(i).getName();
+                chk.Checked += new RoutedEventHandler(CheckBox_CheckStateChanged);
+                cboGroups.Items.Add(chk);
+            }
+        }
+
+        public void GroupManager_GroupsChanged(GroupManager sender, GroupManagerEventArgs e) {
+            if(sender != null) {
+                //Try to preserve checked checkboxes
+                switch(e.eventOperation) {
+                    case GroupManagerEventOperation.Add:
+                        //Get index of new added item
+                        int newItemIndex = wndMainBoss.gmGroupManager.indexOf(e.operationItem.getName());
+                        //Insert item here at the correct spot
+                        System.Windows.Controls.CheckBox chk = new System.Windows.Controls.CheckBox();
+                        chk.Content = e.operationItem.getName();
+                        chk.Checked += new RoutedEventHandler(CheckBox_CheckStateChanged);
+                        cboGroups.Items.Insert(newItemIndex, chk);
+                        break;
+
+                    case GroupManagerEventOperation.Remove:
+                        //Remove it here based on e known name
+                        for(int i = 0; i < cboGroups.Items.Count; i++) {
+                            CheckBox cb = (CheckBox)cboGroups.Items[i];
+                            if(cb.Content.ToString() == e.operationItem.getName()) {
+                                cboGroups.Items.RemoveAt(i);
+                                break;
+                            }
+                        }
+                        break;
+
+                    case GroupManagerEventOperation.Reposition:
+                        //Reposition it here based on name
+                        //Get new position
+                        int newPosition = wndMainBoss.gmGroupManager.indexOf(e.operationItem.getName());
+                        int oldPosition = -1;
+                        bool isChecked = false;
+                        //Find old position
+                        for(int i = 0; i < cboGroups.Items.Count; i++) {
+                            CheckBox cb = (CheckBox)cboGroups.Items[i];
+                            if(cb.Content.ToString() == e.operationItem.getName()) {
+                                oldPosition = i;
+                                isChecked = cb.IsChecked.Value;
+                                cboGroups.Items.RemoveAt(i);
+                                break;
+                            }
+                        }
+
+                        //Make new checkbox at that index
+                        System.Windows.Controls.CheckBox chkReplace = new System.Windows.Controls.CheckBox();
+                        chkReplace.Content = e.operationItem.getName();
+                        chkReplace.IsChecked = isChecked;
+                        chkReplace.Checked += new RoutedEventHandler(CheckBox_CheckStateChanged);
+                        cboGroups.Items.Insert(newPosition, chkReplace);
+                        break;
+                }
+
+                cboGroups.UpdateLayout();
+            }
+        }
+
+        public void ChampionList_NameChanged(ChampionList sender, EventArgs e) {
+            if(sender != null) {
+                int indexOfSender = wndMainBoss.gmGroupManager.indexOf(sender.getName());
+
+                //if indexOfSender != -1 update that specific group
+                if(indexOfSender != -1) {
+                    System.Windows.Controls.CheckBox chk = new System.Windows.Controls.CheckBox();
+                    chk = (System.Windows.Controls.CheckBox)cboGroups.Items.GetItemAt(indexOfSender);
+                    chk.Content = sender.getName();
+                    cboGroups.UpdateLayout();
+                }
+            }
+        }
+
         private void CheckBox_CheckStateChanged(object sender, RoutedEventArgs e) {
             String searchFieldText = CreateStringOfChampions();
             if(wndMainBoss._lolClientHelper != null) {
@@ -32,7 +123,7 @@ namespace EasyChampionSelection {
         private String CreateStringOfChampions() {
             //The client accepts regex commandos
             List<string> lstChampsToFilter = new List<string>();
-            
+
             for(int i = 0; i < cboGroups.Items.Count; i++) {
                 CheckBox cb = (CheckBox)cboGroups.Items[i];
                 if(cb.IsChecked == true) {
@@ -56,30 +147,11 @@ namespace EasyChampionSelection {
             returnValue = returnValue.Replace(" ", "\\s");
 
             //remove last |
-            returnValue = returnValue.Substring(0, returnValue.Length - 1);
-
-            return returnValue;
-        }
-
-        private void wndMyClientOverload_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
-            if(this.IsVisible) {
-                if(wndMainBoss._lolClientHelper != null) {
-                    if(wndMainBoss._lolClientHelper.GetProcessLolClient() != null) {
-                        Rectangle pos = wndMainBoss._lolClientHelper.GetClientOverlayPosition();
-                        this.Left = pos.X;
-                        this.Top = pos.Y;
-                        //Width and height is already marked static
-                    }
-                }
-
-                cboGroups.Items.Clear();
-                for(int i = 0; i < wndMainBoss.gmGroupManager.GroupCount; i++) {
-                    System.Windows.Controls.CheckBox chk = new System.Windows.Controls.CheckBox();
-                    chk.Content = wndMainBoss.gmGroupManager.getGroup(i).getName();
-                    chk.Checked += new RoutedEventHandler(CheckBox_CheckStateChanged);
-                    cboGroups.Items.Add(chk);
-                }
+            if(returnValue.Length > 0) {
+                returnValue = returnValue.Substring(0, returnValue.Length - 1);
             }
+            
+            return returnValue;
         }
 
     }

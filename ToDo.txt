@@ -1,5 +1,9 @@
+Fix ChampionsChanged(this, new EventArgs()); NullReferenceException
+
 On league reposition fire event
 On league resize fire event
+
 maybe add an options settings?
+
 use safer aproaches everywhere to distribute
 try lowering dotnet min version as much as possible

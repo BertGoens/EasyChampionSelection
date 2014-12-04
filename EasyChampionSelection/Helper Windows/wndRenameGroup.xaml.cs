@@ -16,7 +16,6 @@ namespace EasyChampionSelection {
             InitializeComponent();
             this.strGroupToRename = strGroupToRename;
             this.wndMainBoss = wndMainBoss;
-            lblRenameGroupNameInfo.Content = strGroupToRename;
         }
 
         private void txtRenameGroup_TextChanged(object sender, TextChangedEventArgs e) {
@@ -44,7 +43,7 @@ namespace EasyChampionSelection {
             if(wndMainBoss.Equals(null) || strGroupToRename.Equals(null)) {
                 MessageBox.Show("Woops, something went wrong!", "wndRenameGroup", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            txtRenameGroup.Text = "Rename " + strGroupToRename + " to:";
+            lblRenameGroupNameInfo.Content = "Rename " + strGroupToRename + " to:";
             txtRenameGroup.SelectAll();
             txtRenameGroup.Focus();
         }

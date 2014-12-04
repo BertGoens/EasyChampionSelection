@@ -95,6 +95,8 @@
     </ApplicationDefinition>
     <Compile Include="ECS\ChampionList.cs" />
     <Compile Include="ECS\GroupManager.cs" />
+    <Compile Include="ECS\GroupManagerEventArgs.cs" />
+    <Compile Include="ECS\GroupManagerEventOperation.cs" />
     <Compile Include="ECS\StaticLolClientGraphics.cs" />
     <Compile Include="ECS\StaticSerializer.cs" />
     <Compile Include="Helper Windows\FancyBalloon.xaml.cs">

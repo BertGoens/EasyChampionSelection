@@ -11,6 +11,18 @@ namespace EasyChampionSelection.ECS {
         private string strName = "";
         private List<string> lstChampions;
 
+        public delegate void ChampionListHandler(ChampionList sender, EventArgs e);
+
+        /// <summary>
+        /// The list has changed name.
+        /// </summary>
+        public event ChampionListHandler NameChanged;
+
+        /// <summary>
+        /// The list has changed it's amount of champions.
+        /// </summary>
+        //public event ChampionListHandler ChampionsChanged;
+
         /// <summary>
         /// Returns the number of champions in the list
         /// </summary>
@@ -31,6 +43,7 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public void setName(string newName) {
             strName = newName;
+            NameChanged(this, new EventArgs());
         }
 
         /// <summary>
@@ -56,7 +69,7 @@ namespace EasyChampionSelection.ECS {
         /// Throws an ArgumentOutOfRangeException if the given index is &lt; 0 or &gt; the amount of champions in the list
         /// </exception>
         public string getChampion(int index) {
-            if(index > 0 && index < ChampionCount) {
+            if(index > -1 && index < ChampionCount) {
                 return lstChampions[index];
             } else {
                 throw new ArgumentOutOfRangeException("Index: " + index.ToString() + " is out of range!");
@@ -85,13 +98,21 @@ namespace EasyChampionSelection.ECS {
             if(!lstChampions.Contains(name)) {
                 lstChampions.Add(name);
                 lstChampions.Sort();
+
+                //ChampionsChanged(this, new EventArgs());
             }
         }
 
-        private void AddChampionNoSort(string name) {
+        /// <summary>
+        /// Adds a champion if not already in the list without sorting afterwards.
+        /// </summary>
+        /// <returns>True = new champion added</returns>
+        private bool AddChampionNoSort(string name) {
             if(!lstChampions.Contains(name)) {
                 lstChampions.Add(name);
+                return true;
             }
+            return false;
         }
 
         /// <summary>
@@ -99,18 +120,42 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         /// <param name="names"></param>
         public void AddChampions(List<string> names) {
+            bool changed = false;
             for (int i = 0; i < names.Count; i++)
 			{
-                AddChampionNoSort(names[i]);
+                if(AddChampionNoSort(names[i])) {
+                    changed = true;
+                }
 			}
-            lstChampions.Sort();
+            if(changed) {
+                lstChampions.Sort();
+                //ChampionsChanged(this, new EventArgs());
+            }
+            
         }
 
         /// <summary>
         /// Remove a champion based on it's name.
         /// </summary>
         public void RemoveChampion(string name) {
+            int champsPreRemove = getCount();
             lstChampions.Remove(name);
+            if(getCount() != champsPreRemove) {
+                //ChampionsChanged(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// Remove a champion based on it's name.
+        /// Private use for removing a list without triggering the event a million times while removing.
+        /// </summary>
+        private bool RemoveChampionNoEvent(string name) {
+            int champsPreRemove = getCount();
+            lstChampions.Remove(name);
+            if(getCount() != champsPreRemove) {
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -118,8 +163,14 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         /// <param name="names"></param>
         public void RemoveChampions(List<string> names) {
+            bool changed = false;
             for(int i = 0; i < names.Count; i++) {
-                RemoveChampion(names[i]);
+                if(RemoveChampionNoEvent(names[i])) {
+                    changed = true;
+                }
+            }
+            if(changed) {
+                //ChampionsChanged(this, new EventArgs());
             }
         }
 
@@ -130,19 +181,26 @@ namespace EasyChampionSelection.ECS {
             return strName;
         }
 
+        /*
         /// <summary>
         /// Determines if the list are equal.
         /// </summary>
         /// <exception cref="ArgumentNullException">Throws an ArgumentNullException if your argument is null</exception>
-        public override bool Equals(ChampionList p) {
+        public override bool Equals(object p) {
             if(p == null) {
                 throw new ArgumentNullException();
             }
 
-            if(this.getName() == p.getName()) { // Name
-                if(this.getCount() == p.getCount()) { // Equal count of champions in list
-                    for(int i = 0; i < p.getCount(); i++) {
-                        if(!(this.getChampion(i) == p.getChampion(i))) { // If not champName(i) == champName(i)
+            if((ChampionList)p == null) {
+                return false;
+            }
+
+            ChampionList cList = (ChampionList)p;
+
+            if(this.getName() == cList.getName()) { // Name
+                if(this.getCount() == cList.getCount()) { // Equal count of champions in list
+                    for(int i = 0; i < cList.getCount(); i++) {
+                        if(!(this.getChampion(i) == cList.getChampion(i))) { // If not champName(i) == champName(i)
                             return false;
                         }
                     }
@@ -155,5 +213,6 @@ namespace EasyChampionSelection.ECS {
             
             return true;
         }
+        */
     }
 }

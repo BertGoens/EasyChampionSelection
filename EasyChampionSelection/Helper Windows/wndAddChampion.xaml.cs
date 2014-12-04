@@ -38,6 +38,7 @@ namespace EasyChampionSelection {
             if(wndMainBoss.Equals(null)) {
                 MessageBox.Show("Woops, something went wrong!", this.Name, MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            txtNewChampionName.Focus();
         }
     }
 }

@@ -118,14 +118,15 @@ namespace EasyChampionSelection {
                 LoadAllChampionsLocal();
             }
 
-            //Load Serialized GroupManager_Groups serialized data
-            LoadSerializedGroupManager();
-
             //Helper window
             wndCO = new wndClientOverload(this);
             wndCO.Owner = this;
 
+            //Load Serialized GroupManager_Groups serialized data
+            LoadSerializedGroupManager();
+
             //Visualize the data
+            wndCO.Redraw();
             DisplayGroups();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
 
@@ -136,6 +137,13 @@ namespace EasyChampionSelection {
         }
 
         private void frmMain_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            //Important: unsubscribe from events to not serializable stuff (etc windows)
+            gmGroupManager.GroupsChanged -= wndCO.GroupManager_GroupsChanged;
+            for(int i = 0; i < gmGroupManager.GroupCount; i++) {
+                gmGroupManager.getGroup(i).NameChanged -= wndCO.ChampionList_NameChanged;
+            }
+
+            //Serialize important stuff
             StaticSerializer.SerializeObject(gmGroupManager, StaticSerializer.PATH_GroupManager);
             if(lstAllChampions.Count > 120) {
                 StaticSerializer.SerializeObject(lstAllChampions, StaticSerializer.PATH_AllChampions);
@@ -170,8 +178,8 @@ namespace EasyChampionSelection {
                         SetLolClientHelper(p[0]);
                     }
                 }
-            } else {  
-               if(p.Count() > 0) {
+            } else {
+                if(p.Count() > 0) {
                     SetLolClientHelper(p[0]);
                 }
             }
@@ -210,7 +218,7 @@ namespace EasyChampionSelection {
 
         private void btnAddChampionsToCurrentGroup_Click(object sender, RoutedEventArgs e) {
             for(int i = 0; i < lsbAllChampions.SelectedItems.Count; i++) {
-                gmGroupManager.getChampionList(lsbGroups.SelectedIndex).AddChampion(lsbAllChampions.SelectedItems[i].ToString());
+                gmGroupManager.getGroup(lsbGroups.SelectedIndex).AddChampion(lsbAllChampions.SelectedItems[i].ToString());
             }
 
             DisplayChampsInSelectedGroup();
@@ -219,7 +227,7 @@ namespace EasyChampionSelection {
 
         private void btnRemoveChampionsFromCurrentGroup_Click(object sender, RoutedEventArgs e) {
             for(int i = 0; i < lsbChampionsInGroup.SelectedItems.Count; i++) {
-                gmGroupManager.getChampionList(lsbGroups.SelectedIndex).RemoveChampion(lsbChampionsInGroup.SelectedItems[i].ToString());
+                gmGroupManager.getGroup(lsbGroups.SelectedIndex).RemoveChampion(lsbChampionsInGroup.SelectedItems[i].ToString());
             }
             DisplayChampsInSelectedGroup();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
@@ -332,7 +340,7 @@ namespace EasyChampionSelection {
             MenuItem mniMoveGroupUp = CreateMenuItem("Move Group Up", mniMoveGroupUp_Click);
             cm.Items.Add(mniMoveGroupUp);
 
-            if(!(lsbGroups.SelectedItems.Count > 0) && !(lsbGroups.SelectedIndex < lsbGroups.Items.Count - 1)) {
+            if((lsbGroups.SelectedItems.Count < 0) || (lsbGroups.SelectedIndex > lsbGroups.Items.Count - 1)) {
                 mniMoveGroupUp.IsEnabled = false;
             }
 
@@ -340,7 +348,7 @@ namespace EasyChampionSelection {
             cm.Items.Add(mniMoveGroupDown);
 
 
-            if(!(lsbGroups.SelectedItems.Count > 0) && !(lsbGroups.SelectedIndex > lsbGroups.Items.Count - 1)) {
+            if((lsbGroups.SelectedItems.Count < 0) || (lsbGroups.SelectedIndex < 1)) {
                 mniMoveGroupDown.IsEnabled = false;
             }
 
@@ -363,17 +371,15 @@ namespace EasyChampionSelection {
         }
 
         void mniMoveGroupUp_Click(object sender, RoutedEventArgs e) {
-            if(lsbGroups.SelectedIndex > -1) {
-                gmGroupManager.ReOrder((ChampionList)lsbGroups.SelectedItem, lsbGroups.SelectedIndex - 1);
-                DisplayGroups();
-            }
+            gmGroupManager.ReOrder((ChampionList)lsbGroups.SelectedItem, lsbGroups.SelectedIndex - 1);
+            DisplayGroups();
+
         }
 
         void mniMoveGroupDown_Click(object sender, RoutedEventArgs e) {
-            if(lsbGroups.SelectedItems.Count > 0) {
-                gmGroupManager.ReOrder((ChampionList)lsbGroups.SelectedItem, lsbGroups.SelectedIndex + 1);
-                DisplayGroups();
-            }
+            gmGroupManager.ReOrder((ChampionList)lsbGroups.SelectedItem, lsbGroups.SelectedIndex + 1);
+            DisplayGroups();
+
         }
 
         //Context Menu lsbChampionsInGroup
@@ -403,7 +409,7 @@ namespace EasyChampionSelection {
             cm.Items.Add(mniCopy);
 
             if(lsbGroups.SelectedItems.Count < 1) {
-                 mniCopy.IsEnabled = false;
+                mniCopy.IsEnabled = false;
             }
 
             MenuItem mniPaste = CreateMenuItem("Paste", mniPaste_Click);
@@ -434,7 +440,7 @@ namespace EasyChampionSelection {
             }
             Clipboard.SetText(clipboardText, TextDataFormat.Text);
         }
-        
+
         void mniPaste_Click(object sender, RoutedEventArgs e) {
             string clipboardText = "";
             clipboardText = Clipboard.GetText(TextDataFormat.Text);
@@ -445,9 +451,9 @@ namespace EasyChampionSelection {
                 if(champsInClipboardText[i].Length > 1) {
                     if(!lstAllChampions.Contains(champsInClipboardText[i])) {
                         lstAllChampions.Add(champsInClipboardText[i]);
-                        gmGroupManager.getChampionList(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
-                    } else if(!gmGroupManager.getChampionList(lsbGroups.SelectedIndex).Contains(champsInClipboardText[i])) {
-                        gmGroupManager.getChampionList(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
+                        gmGroupManager.getGroup(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
+                    } else if(!gmGroupManager.getGroup(lsbGroups.SelectedIndex).Contains(champsInClipboardText[i])) {
+                        gmGroupManager.getGroup(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
                     }
                 }
             }
@@ -513,7 +519,7 @@ namespace EasyChampionSelection {
                 DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
             } else {
                 MessageBox.Show("No local saves found!", this.Title);
-            }            
+            }
         }
 
         void mniManuallyAddChampion_Click(object sender, RoutedEventArgs e) {
@@ -547,7 +553,7 @@ namespace EasyChampionSelection {
             }
             lstAllChampions.Sort();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
-        }       
+        }
 
         #endregion ContextMenus
         #endregion Events
@@ -594,20 +600,31 @@ namespace EasyChampionSelection {
         private void LoadAllChampionsLocal() {
             if(File.Exists(StaticSerializer.PATH_AllChampions)) {
                 lstAllChampions = (List<string>)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_AllChampions);
-            DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
+                DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
             }
         }
 
         private void LoadSerializedGroupManager() {
             if(File.Exists(StaticSerializer.PATH_GroupManager)) {
                 gmGroupManager = (GroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_GroupManager);
-                if(gmGroupManager.GroupCount > 0) {
-                    lsbGroups.SelectedIndex = 0;
+                if(gmGroupManager != null) {
+                    if(gmGroupManager.GroupCount > 0) {
+                        gmGroupManager.GroupsChanged += wndCO.GroupManager_GroupsChanged;
+                        for(int i = 0; i < gmGroupManager.GroupCount; i++) {
+                            gmGroupManager.getGroup(i).NameChanged += wndCO.ChampionList_NameChanged;
+                        }
+                        lsbGroups.SelectedIndex = 0;
+                    } else {
+                        lblCurrentGroupChampions.Content = "Create a group first.";
+                    }
                 } else {
+                    gmGroupManager = new GroupManager();
+                    gmGroupManager.GroupsChanged += wndCO.GroupManager_GroupsChanged;
                     lblCurrentGroupChampions.Content = "Create a group first.";
                 }
             } else {
                 gmGroupManager = new GroupManager();
+                gmGroupManager.GroupsChanged += wndCO.GroupManager_GroupsChanged;
                 lblCurrentGroupChampions.Content = "Create a group first.";
             }
         }
@@ -617,7 +634,9 @@ namespace EasyChampionSelection {
         #region Public Behavior
 
         public void AddGroup(string name) {
-            gmGroupManager.AddGroup(new ChampionList(name));
+            ChampionList cList = new ChampionList(name);
+            cList.NameChanged += wndCO.ChampionList_NameChanged;
+            gmGroupManager.AddGroup(cList);
             DisplayGroups();
         }
 
@@ -639,7 +658,7 @@ namespace EasyChampionSelection {
         public void DisplayGroups() {
             lsbGroups.Items.Clear();
             for(int i = 0; i < gmGroupManager.GroupCount; i++) {
-                lsbGroups.Items.Add(gmGroupManager.getChampionList(i));
+                lsbGroups.Items.Add(gmGroupManager.getGroup(i));
             }
             lblGroupsCount.Content = "Groups: " + lsbGroups.Items.Count + " / " + gmGroupManager.MaxGroups;
             if(gmGroupManager.GroupCount == gmGroupManager.MaxGroups) {
@@ -657,9 +676,9 @@ namespace EasyChampionSelection {
         public void DisplayChampsInSelectedGroup() {
             lsbChampionsInGroup.Items.Clear();
             if(lsbGroups.SelectedIndex > -1) {
-                int championsInList = gmGroupManager.getChampionList(lsbGroups.SelectedIndex).ChampionCount;
+                int championsInList = gmGroupManager.getGroup(lsbGroups.SelectedIndex).ChampionCount;
                 for(int i = 0; i < championsInList; i++) {
-                    lsbChampionsInGroup.Items.Add(gmGroupManager.getChampionList(lsbGroups.SelectedIndex).getChampion(i));
+                    lsbChampionsInGroup.Items.Add(gmGroupManager.getGroup(lsbGroups.SelectedIndex).getChampion(i));
                 }
             }
             lblCurrentGroupChampions.Content = "Champions: " + lsbChampionsInGroup.Items.Count;
@@ -682,7 +701,7 @@ namespace EasyChampionSelection {
             try {
                 FancyBalloon balloon = new FancyBalloon(title, message);
                 notifyIcon.ShowCustomBalloon(balloon, animation, timeout);
-            } catch(Exception) {}
+            } catch(Exception) { }
         }
 
         #endregion Public Behavior

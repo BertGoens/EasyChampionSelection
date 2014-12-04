@@ -11,6 +11,13 @@ namespace EasyChampionSelection.ECS {
         private const int intMaxGroups = 12;
         private List<ChampionList> lstGroupList;
 
+        public delegate void GroupManagerHandler(GroupManager sender, GroupManagerEventArgs e);
+
+        /// <summary>
+        /// Occurs if a group is added, removed or repositioned.
+        /// </summary>
+        public event GroupManagerHandler GroupsChanged;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -37,6 +44,21 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public List<ChampionList> getAllGroups() {
             return lstGroupList;
+        }
+
+        /// <summary>
+        /// Returns the index of the group based on groupName
+        /// </summary>
+        /// <returns>
+        /// Returns -1 if no group is found
+        /// </returns>
+        public int indexOf(string groupName) {
+            for(int i = 0; i < lstGroupList.Count; i++) {
+                if(lstGroupList[i].getName() == groupName) {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         /// <summary>
@@ -68,7 +90,9 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public void RemoveGroup(int index) {
             if(index > -1 && index < GroupCount) {
+                string name = lstGroupList[index].getName();
                 lstGroupList.RemoveAt(index);
+                GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Remove, new ChampionList(name)));
             }
         }
 
@@ -79,6 +103,7 @@ namespace EasyChampionSelection.ECS {
             for(int i = 0; i < lstGroupList.Count; i++) {
                 if(lstGroupList[i].getName() == name) {
                     lstGroupList.RemoveAt(i);
+                    GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Remove, new ChampionList(name)));
                 }
             }
         }
@@ -95,6 +120,7 @@ namespace EasyChampionSelection.ECS {
                     }
                 }
                 lstGroupList.Add(newGroup);
+                GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Add, newGroup));
             }
         }
 
@@ -115,6 +141,7 @@ namespace EasyChampionSelection.ECS {
 
             lstGroupList.Remove(cList); // Removing removable element
             lstGroupList.Insert(newPosition, cList); // Insert it in new position
+            GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Reposition, cList));
         }
 
         public override string ToString() {
