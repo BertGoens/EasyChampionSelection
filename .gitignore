@@ -6,6 +6,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.pfx
+*.csproj
+*.pdb
 
 # Build results
 [Dd]ebug/
