@@ -187,21 +187,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\LeagueIcon.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\Close.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="..\ToDo.txt">
       <Link>ToDo.txt</Link>
     </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SearchBarPositions.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ClientOverloadPositions.jpg" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

@@ -103,7 +103,9 @@ namespace EasyChampionSelection.ECS {
             for(int i = 0; i < lstGroupList.Count; i++) {
                 if(lstGroupList[i].getName() == name) {
                     lstGroupList.RemoveAt(i);
-                    GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Remove, new ChampionList(name)));
+                    if(GroupsChanged != null) {
+                        GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Remove, new ChampionList(name)));
+                    }
                 }
             }
         }
@@ -120,7 +122,9 @@ namespace EasyChampionSelection.ECS {
                     }
                 }
                 lstGroupList.Add(newGroup);
-                GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Add, newGroup));
+                if(GroupsChanged != null) {
+                    GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Add, newGroup));
+                }
             }
         }
 
@@ -141,7 +145,10 @@ namespace EasyChampionSelection.ECS {
 
             lstGroupList.Remove(cList); // Removing removable element
             lstGroupList.Insert(newPosition, cList); // Insert it in new position
-            GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Reposition, cList));
+
+            if(GroupsChanged != null) {
+                GroupsChanged(this, new GroupManagerEventArgs(GroupManagerEventOperation.Reposition, cList));
+            }
         }
 
         public override string ToString() {

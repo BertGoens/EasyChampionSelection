@@ -40,6 +40,20 @@ namespace EasyChampionSelection {
             }
         }
 
+        public void StaticLolClientGraphics_OnLeagueClientResized(StaticLolClientGraphics sender, EventArgs e) {
+            Rectangle rect = sender.GetClientOverlayPosition();
+            this.Left = rect.X;
+            this.Top = rect.Y;
+            //Width and height are currently not being changed
+        }
+
+        public void StaticLolClientGraphics_OnLeagueClientReposition(StaticLolClientGraphics sender, EventArgs e) {
+            Rectangle rect = sender.GetClientOverlayPosition();
+            this.Left = rect.X;
+            this.Top = rect.Y;
+            //Width and height are currently not being changed
+        }
+
         public void GroupManager_GroupsChanged(GroupManager sender, GroupManagerEventArgs e) {
             if(sender != null) {
                 //Try to preserve checked checkboxes
@@ -116,7 +130,7 @@ namespace EasyChampionSelection {
                     wndMainBoss._lolClientHelper.TypeInSearchBar(searchFieldText);
                 }
             } else {
-                wndMainBoss.DisplayPopup(this.Title, "lolClient.exe was not found!", PopupAnimation.Fade, 4000);
+                wndMainBoss.DisplayPopup("lolClient.exe was not found!");
             }
         }
 

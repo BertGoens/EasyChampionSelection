@@ -1,7 +1,6 @@
-Fix ChampionsChanged(this, new EventArgs()); NullReferenceException
+Fix calculated points in StaticLolClientGrahpics.cs
 
-On league reposition fire event
-On league resize fire event
+Make GroupManager A singleton class
 
 maybe add an options settings?
 

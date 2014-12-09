@@ -71,11 +71,7 @@ namespace EasyChampionSelection {
         public wndMain() {
             lstAllGroups = new List<string>();
             lstAllChampions = new List<string>();
-            //Look for the lolClient process
-            Process[] p = Process.GetProcessesByName("LolClient");
-            if(p.Count() > 0) {
-                _lolClientHelper = StaticLolClientGraphics.GetInstance(p[0]);
-            }
+
             InitializeComponent();
         }
         #endregion Constructor
@@ -90,17 +86,11 @@ namespace EasyChampionSelection {
             return lstAllChampions;
         }
 
-        private void SetLolClientHelper(Process lolClient) {
-            if(lolClient != null) {
-                if(_lolClientHelper != null) {
-                    if(lolClient != _lolClientHelper.GetProcessLolClient()) {
-                        _lolClientHelper = StaticLolClientGraphics.GetInstance(lolClient);
-                        DisplayPopup(this.Title, "Your lolClient.exe process just got updated.", PopupAnimation.Fade, 3000);
-                    }
-                } else {
-                    _lolClientHelper = StaticLolClientGraphics.GetInstance(lolClient);
-                    DisplayPopup(this.Title, "Your lolClient.exe process just got updated.", PopupAnimation.Fade, 3000);
-                }
+        private void SetLolClientHelper(Process LeagueOfLegendsClientProcess) {
+            if(LeagueOfLegendsClientProcess != null) {
+                _lolClientHelper = StaticLolClientGraphics.GetInstance(LeagueOfLegendsClientProcess);
+                _lolClientHelper.OnLeagueClientReposition += wndCO.StaticLolClientGraphics_OnLeagueClientReposition;
+                DisplayPopup("Your lolClient.exe process just got updated.");
             }
         }
 
@@ -121,7 +111,7 @@ namespace EasyChampionSelection {
             //Helper window
             wndCO = new wndClientOverload(this);
             wndCO.Owner = this;
-
+            
             //Load Serialized GroupManager_Groups serialized data
             LoadSerializedGroupManager();
 
@@ -200,7 +190,7 @@ namespace EasyChampionSelection {
         }
 
         private void btnDeleteGroup_Click(object sender, RoutedEventArgs e) {
-            if(lsbGroups.SelectedIndex > 0) {
+            if(lsbGroups.SelectedIndex > -1) {
                 if(MessageBoxResult.Yes == MessageBox.Show("Remove: " + lsbGroups.SelectedItem.ToString(), "Remove group", MessageBoxButton.YesNo)) {
                     gmGroupManager.RemoveGroup(lsbGroups.SelectedIndex);
                     lblGroupsCount.Content = "Groups: " + lsbGroups.Items.Count + " / " + gmGroupManager.MaxGroups;
@@ -328,6 +318,10 @@ namespace EasyChampionSelection {
             MenuItem mniNewGroup = CreateMenuItem("New Group", mniNewGroup_Click);
             cm.Items.Add(mniNewGroup);
 
+            if(gmGroupManager.MaxGroups <= gmGroupManager.GroupCount) {
+                mniNewGroup.IsEnabled = false;
+            }
+
             MenuItem mniDeleteGroup = CreateMenuItem("Delete Group", mniDeleteGroup_Click);
             cm.Items.Add(mniDeleteGroup);
 
@@ -340,15 +334,14 @@ namespace EasyChampionSelection {
             MenuItem mniMoveGroupUp = CreateMenuItem("Move Group Up", mniMoveGroupUp_Click);
             cm.Items.Add(mniMoveGroupUp);
 
-            if((lsbGroups.SelectedItems.Count < 0) || (lsbGroups.SelectedIndex > lsbGroups.Items.Count - 1)) {
+            if(lsbGroups.SelectedIndex < 1) {
                 mniMoveGroupUp.IsEnabled = false;
             }
 
             MenuItem mniMoveGroupDown = CreateMenuItem("Move Group Down", mniMoveGroupDown_Click);
             cm.Items.Add(mniMoveGroupDown);
 
-
-            if((lsbGroups.SelectedItems.Count < 0) || (lsbGroups.SelectedIndex < 1)) {
+            if(lsbGroups.SelectedItem == null || lsbGroups.SelectedIndex > lsbGroups.Items.Count -2) {
                 mniMoveGroupDown.IsEnabled = false;
             }
 
@@ -697,10 +690,10 @@ namespace EasyChampionSelection {
             lblAllChampionsInfo.Content = "All champions: " + lsbAllChampions.Items.Count;
         }
 
-        public void DisplayPopup(string title, string message, PopupAnimation animation, int? timeout) {
+        public void DisplayPopup(string message) {
             try {
-                FancyBalloon balloon = new FancyBalloon(title, message);
-                notifyIcon.ShowCustomBalloon(balloon, animation, timeout);
+                FancyBalloon balloon = new FancyBalloon(this.Title, message);
+                notifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Fade, 3500);
             } catch(Exception) { }
         }
 

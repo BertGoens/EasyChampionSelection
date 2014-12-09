@@ -21,7 +21,7 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// The list has changed it's amount of champions.
         /// </summary>
-        //public event ChampionListHandler ChampionsChanged;
+        public event ChampionListHandler ChampionsChanged;
 
         /// <summary>
         /// Returns the number of champions in the list
@@ -43,7 +43,9 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public void setName(string newName) {
             strName = newName;
-            NameChanged(this, new EventArgs());
+            if(NameChanged != null) {
+                NameChanged(this, new EventArgs());
+            }
         }
 
         /// <summary>
@@ -99,7 +101,9 @@ namespace EasyChampionSelection.ECS {
                 lstChampions.Add(name);
                 lstChampions.Sort();
 
-                //ChampionsChanged(this, new EventArgs());
+                if(ChampionsChanged != null) {
+                    ChampionsChanged(this, new EventArgs());
+                }
             }
         }
 
@@ -129,9 +133,10 @@ namespace EasyChampionSelection.ECS {
 			}
             if(changed) {
                 lstChampions.Sort();
-                //ChampionsChanged(this, new EventArgs());
+                if(ChampionsChanged != null) {
+                    ChampionsChanged(this, new EventArgs());
+                }   
             }
-            
         }
 
         /// <summary>
@@ -141,7 +146,9 @@ namespace EasyChampionSelection.ECS {
             int champsPreRemove = getCount();
             lstChampions.Remove(name);
             if(getCount() != champsPreRemove) {
-                //ChampionsChanged(this, new EventArgs());
+                if(ChampionsChanged != null) {
+                    ChampionsChanged(this, new EventArgs());
+                }
             }
         }
 
@@ -170,7 +177,9 @@ namespace EasyChampionSelection.ECS {
                 }
             }
             if(changed) {
-                //ChampionsChanged(this, new EventArgs());
+                if(ChampionsChanged != null) {
+                    ChampionsChanged(this, new EventArgs());
+                }
             }
         }
 
