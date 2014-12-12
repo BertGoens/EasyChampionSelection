@@ -7,11 +7,12 @@ namespace EasyChampionSelection.ECS {
     /// A managing class that handles <c>ChampionList</c>
     /// </summary>
     [Serializable]
-    public class GroupManager {
+    public class StaticGroupManager {
         private const int intMaxGroups = 12;
         private List<ChampionList> lstGroupList;
+        private static StaticGroupManager _instance;
 
-        public delegate void GroupManagerHandler(GroupManager sender, GroupManagerEventArgs e);
+        public delegate void GroupManagerHandler(StaticGroupManager sender, GroupManagerEventArgs e);
 
         /// <summary>
         /// Occurs if a group is added, removed or repositioned.
@@ -21,8 +22,19 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// Constructor
         /// </summary>
-        public GroupManager() {
+        private StaticGroupManager() {
             lstGroupList = new List<ChampionList>(intMaxGroups);
+        }
+
+        /// <summary>
+        /// Singleton setup
+        /// </summary>
+        /// <returns></returns>
+        public static StaticGroupManager GetInstance() {
+            if(_instance == null) {
+                _instance = new StaticGroupManager();
+            }
+            return _instance;
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace EasyChampionSelection {
         public void Redraw() {
             if(wndMainBoss._lolClientHelper != null) {
                 if(wndMainBoss._lolClientHelper.GetProcessLolClient() != null) {
-                    Rectangle pos = wndMainBoss._lolClientHelper.GetClientOverlayPosition();
+                    Rectangle pos = wndMainBoss._lolClientHelper.getClientOverlayPosition();
                     this.Left = pos.X;
                     this.Top = pos.Y;
                     //Width and height is already marked in here
@@ -41,20 +41,20 @@ namespace EasyChampionSelection {
         }
 
         public void StaticLolClientGraphics_OnLeagueClientResized(StaticLolClientGraphics sender, EventArgs e) {
-            Rectangle rect = sender.GetClientOverlayPosition();
+            Rectangle rect = sender.getClientOverlayPosition();
             this.Left = rect.X;
             this.Top = rect.Y;
             //Width and height are currently not being changed
         }
 
         public void StaticLolClientGraphics_OnLeagueClientReposition(StaticLolClientGraphics sender, EventArgs e) {
-            Rectangle rect = sender.GetClientOverlayPosition();
+            Rectangle rect = sender.getClientOverlayPosition();
             this.Left = rect.X;
             this.Top = rect.Y;
             //Width and height are currently not being changed
         }
 
-        public void GroupManager_GroupsChanged(GroupManager sender, GroupManagerEventArgs e) {
+        public void GroupManager_GroupsChanged(StaticGroupManager sender, GroupManagerEventArgs e) {
             if(sender != null) {
                 //Try to preserve checked checkboxes
                 switch(e.eventOperation) {

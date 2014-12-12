@@ -1,8 +1,6 @@
-Fix calculated points in StaticLolClientGrahpics.cs
-
-Make GroupManager A singleton class
-
-maybe add an options settings?
+Fix thumb @ wndConfigLolClientOverlay
+It is not displaying 
+Make settings window
 
 use safer aproaches everywhere to distribute
 try lowering dotnet min version as much as possible

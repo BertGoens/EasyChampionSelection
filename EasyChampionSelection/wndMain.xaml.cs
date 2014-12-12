@@ -51,7 +51,7 @@ namespace EasyChampionSelection {
         /// <summary>
         /// Each champion / group is stored in here
         /// </summary>
-        public GroupManager gmGroupManager;
+        public StaticGroupManager gmGroupManager;
         /// <summary>
         /// Private RIOT API key, please don't abuse!
         /// </summary>
@@ -111,7 +111,7 @@ namespace EasyChampionSelection {
             //Helper window
             wndCO = new wndClientOverload(this);
             wndCO.Owner = this;
-            
+
             //Load Serialized GroupManager_Groups serialized data
             LoadSerializedGroupManager();
 
@@ -177,10 +177,31 @@ namespace EasyChampionSelection {
             tmrCheckForChampSelect.Start();
         }
 
+        private void btnConfigClientOverlay_Click(object sender, RoutedEventArgs e) {
+            bool showError = true;
+
+            if(_lolClientHelper != null) {
+                if(_lolClientHelper.GetProcessLolClient() != null) {
+                    showError = false;
+                    wndConfigLolClientOverlay wndCLCO = new wndConfigLolClientOverlay(_lolClientHelper);
+                    wndCLCO.Owner = this;
+                    wndCLCO.ShowDialog();
+                }
+            }
+
+            if(showError) {
+                DisplayPopup("Please start league of legends first so I can take a screenshot!");
+            }
+        }
+
+        private void btnSettings_Click(object sender, RoutedEventArgs e) {
+
+        }
+
         private void btnCredits_Click(object sender, RoutedEventArgs e) {
             wndCredits wndCR = new wndCredits();
             wndCR.Owner = this;
-            wndCR.Show();
+            wndCR.ShowDialog();
         }
 
         private void btnNewGroup_Click(object sender, RoutedEventArgs e) {
@@ -341,7 +362,7 @@ namespace EasyChampionSelection {
             MenuItem mniMoveGroupDown = CreateMenuItem("Move Group Down", mniMoveGroupDown_Click);
             cm.Items.Add(mniMoveGroupDown);
 
-            if(lsbGroups.SelectedItem == null || lsbGroups.SelectedIndex > lsbGroups.Items.Count -2) {
+            if(lsbGroups.SelectedItem == null || lsbGroups.SelectedIndex > lsbGroups.Items.Count - 2) {
                 mniMoveGroupDown.IsEnabled = false;
             }
 
@@ -598,28 +619,29 @@ namespace EasyChampionSelection {
         }
 
         private void LoadSerializedGroupManager() {
+            lblCurrentGroupChampions.Content = "Create a group first.";
             if(File.Exists(StaticSerializer.PATH_GroupManager)) {
-                gmGroupManager = (GroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_GroupManager);
+                gmGroupManager = (StaticGroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_GroupManager);
                 if(gmGroupManager != null) {
                     if(gmGroupManager.GroupCount > 0) {
+                        lblCurrentGroupChampions.Content = "";
                         gmGroupManager.GroupsChanged += wndCO.GroupManager_GroupsChanged;
                         for(int i = 0; i < gmGroupManager.GroupCount; i++) {
                             gmGroupManager.getGroup(i).NameChanged += wndCO.ChampionList_NameChanged;
                         }
                         lsbGroups.SelectedIndex = 0;
-                    } else {
-                        lblCurrentGroupChampions.Content = "Create a group first.";
                     }
                 } else {
-                    gmGroupManager = new GroupManager();
-                    gmGroupManager.GroupsChanged += wndCO.GroupManager_GroupsChanged;
-                    lblCurrentGroupChampions.Content = "Create a group first.";
+                    NewGroupManager();
                 }
             } else {
-                gmGroupManager = new GroupManager();
-                gmGroupManager.GroupsChanged += wndCO.GroupManager_GroupsChanged;
-                lblCurrentGroupChampions.Content = "Create a group first.";
+                NewGroupManager();
             }
+        }
+
+        private void NewGroupManager() {
+            gmGroupManager = StaticGroupManager.GetInstance();
+            gmGroupManager.GroupsChanged += wndCO.GroupManager_GroupsChanged;
         }
 
         #endregion Private Behavior

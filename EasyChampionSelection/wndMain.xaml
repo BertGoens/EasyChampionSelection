@@ -36,6 +36,8 @@
         <Label x:Name="lblAllChampionsInfo" Content="All champions" HorizontalAlignment="Left" Margin="255,194,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="txtFilterForAllChampions" HorizontalAlignment="Left" Height="23" Margin="255,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" BorderBrush="#FF8493BD" MouseEnter="txtFilterForAllChampions_MouseEnter" MouseLeave="txtFilterForAllChampions_MouseLeave" TextChanged="txtFilterForAllChampions_TextChanged" MaxLength="100" MaxLines="1"/>
         <Label x:Name="lblFilterInfo" Content="Filter" HorizontalAlignment="Left" Margin="255,163,0,0" VerticalAlignment="Top" Foreground="#FF686767"/>
-        <Button x:Name="btnCredits" Content="Credits" HorizontalAlignment="Left" Margin="340,10,0,0" VerticalAlignment="Top" Width="75" Click="btnCredits_Click"/>
+        <Button x:Name="btnCredits" Content="Credits" HorizontalAlignment="Left" Margin="340,60,0,0" VerticalAlignment="Top" Width="75" Click="btnCredits_Click"/>
+        <Button x:Name="btnConfigClientOverlay" Content="Configure Client Overlay" HorizontalAlignment="Left" Margin="284,10,0,0" VerticalAlignment="Top" Click="btnConfigClientOverlay_Click"/>
+        <Button x:Name="btnSettings" Content="Settings" HorizontalAlignment="Left" Margin="340,35,0,0" VerticalAlignment="Top" Width="75" Click="btnSettings_Click"/>
     </Grid>
 </Window>

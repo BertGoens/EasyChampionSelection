@@ -4,7 +4,7 @@
              xmlns:tb="http://www.hardcodet.net/taskbar"
              x:Name="me"
              Height="120"
-             Width="240">
+             Width="220">
     
     <UserControl.Resources>
         <Storyboard x:Key="FadeIn">
@@ -90,36 +90,40 @@
     </UserControl.Triggers>
     
     <Grid x:Name="grid" MouseEnter="grid_MouseEnter">
-        <Border HorizontalAlignment="Stretch" Margin="5,5,5,5" BorderThickness="1,1,1,1" BorderBrush="#FF997137">
+        <Border HorizontalAlignment="Stretch" Margin="5,5,5,5" BorderThickness="2" BorderBrush="#B228306F">
             <Border.Effect>
-                <DropShadowEffect Color="#FF747474" />
+                <DropShadowEffect Color="#28306F" />
             </Border.Effect>
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF4B4B4B" Offset="0" />
-                    <GradientStop Color="#FF8F8F8F" Offset="1" />
+                    <GradientStop Color="#FF66A1C3" Offset="0" />
+                    <GradientStop Color="#FF66B6C3" Offset="1" />
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
  
         <TextBlock  x:Name="txtBalloonMessage" 
-                    Margin="72,49.2,10,0" VerticalAlignment="Top" Foreground="#FFECAD25" TextWrapping="Wrap" />
-            
-        <Path Fill="#FFFFFFFF" Stretch="Fill" Margin="25,38.2,34,0" VerticalAlignment="Top" Height="1" Data="M26,107 L220.04123,107" SnapsToDevicePixels="True">
-            <Path.Stroke>
-                <LinearGradientBrush EndPoint="0.973,0.5" StartPoint="0.005,0.5">
-                    <GradientStop Color="#00ECAD25" Offset="2" />
-                    <GradientStop Color="#87ECAD25" Offset="1" />
-                </LinearGradientBrush>
-            </Path.Stroke>
-        </Path>
-        
+                   Text="TextGoesHere" Margin="15,45,15,10" VerticalAlignment="Top" TextWrapping="Wrap" FontWeight="SemiBold" >
+            <TextBlock.Foreground>
+                <SolidColorBrush Color="#FFECAD25"/>
+            </TextBlock.Foreground>
+        </TextBlock>
+
         <TextBlock x:Name="txtBalloonTitle"
-            Margin="72,10,10,0" VerticalAlignment="Top" Height="23.2" TextWrapping="Wrap" Foreground="#FFECAD25" FontWeight="Bold" />
+           Text="TitleGoesHere"  Margin="15,15,30,0" VerticalAlignment="Top" Height="23.2" TextWrapping="Wrap" Foreground="#FFE6C828" FontWeight="Bold" />
         
         <Image Source="/Resources/Close.png" Width="16" Height="16"
-               HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Stretch="Fill" Opacity="0.4" ToolTip="Close Balloon" 
+               HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Stretch="Fill" Opacity="0.6" ToolTip="Close Balloon" 
                x:Name="imgClose" MouseDown="imgClose_MouseDown" />
+        
+        <Rectangle Fill="#FFFFFFFF" HorizontalAlignment="Left" Height="2" Margin="15,38,15,0" VerticalAlignment="Top" Width="130">
+            <Rectangle.Stroke>
+                <LinearGradientBrush EndPoint="0.973,0.5" StartPoint="0.005,0.5">
+                    <GradientStop Color="#FFECAD25" Offset="0.5" />
+                    <GradientStop Color="#FFECAD25" Offset="1" />
+                </LinearGradientBrush>
+            </Rectangle.Stroke>
+        </Rectangle>
 
     </Grid>
 </UserControl>
