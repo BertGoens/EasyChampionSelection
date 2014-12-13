@@ -1,6 +1,6 @@
-Fix thumb @ wndConfigLolClientOverlay
-It is not displaying 
-Make settings window
+ClickInSearchBar
+
+Fix links in Credits window
 
 use safer aproaches everywhere to distribute
 try lowering dotnet min version as much as possible

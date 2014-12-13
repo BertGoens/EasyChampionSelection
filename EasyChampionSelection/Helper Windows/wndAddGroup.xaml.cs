@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using EasyChampionSelection.ECS;
+using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace EasyChampionSelection {
@@ -6,18 +8,23 @@ namespace EasyChampionSelection {
     /// Interaction logic for wndAddGroup.xaml
     /// </summary>
     public partial class wndAddGroup : Window {
-        private wndMain wndMainBoss;
+        private StaticGroupManager _gm;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public wndAddGroup(wndMain wndMainBoss) {
-            this.wndMainBoss = wndMainBoss;
+        public wndAddGroup(StaticGroupManager gm) {
+            if(gm != null) {
+                this._gm = gm;
+            } else {
+                throw new ArgumentNullException();
+            }
+
             InitializeComponent();
         }
 
         private void txtNewGroupName_TextChanged(object sender, TextChangedEventArgs e) {
-            if(wndMainBoss.GetGroups().Contains(txtNewGroupName.Text)) {
+            if(_gm.getAllGroups().Contains(new ChampionList(txtNewGroupName.Text))) {
                 btnAdd.IsEnabled = false;
             } else {
                 btnAdd.IsEnabled = true;
@@ -26,8 +33,7 @@ namespace EasyChampionSelection {
 
         private void btnAdd_Click(object sender, RoutedEventArgs e) {
             if(txtNewGroupName.Text.Length > 0) {
-                wndMainBoss.AddGroup(txtNewGroupName.Text);
-                wndMainBoss.DisplayGroups();
+                _gm.AddGroup(new ChampionList(txtNewGroupName.Text));
                 this.Close();
             }
         }
@@ -37,9 +43,6 @@ namespace EasyChampionSelection {
         }
 
         private void wndAddGroupVisual_Loaded(object sender, RoutedEventArgs e) {
-            if(wndMainBoss.Equals(null)) {
-                MessageBox.Show("Woops, something went wrong!", this.Name, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
             txtNewGroupName.Focus();
         }
     }

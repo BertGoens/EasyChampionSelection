@@ -12,10 +12,10 @@
     </LinearGradientBrush>
     
     <ControlTemplate x:Key="ThumbOldPosRectangleTemplate">
-        <Rectangle Width="60" Height="30" Fill="White" Opacity="0.8" />
+        <Rectangle Fill="Blue" Opacity="0.8" />
     </ControlTemplate>
 
     <ControlTemplate x:Key="ThumbNewPosRectangleTemplate">
-        <Rectangle Width="100" Height="100" Fill="Black" Opacity="0.8" />
+        <Rectangle Fill="Red" Opacity="0.8" />
     </ControlTemplate>
 </ResourceDictionary>

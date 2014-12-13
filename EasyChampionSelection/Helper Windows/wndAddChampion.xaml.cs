@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using EasyChampionSelection.ECS;
+using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace EasyChampionSelection {
@@ -7,15 +9,20 @@ namespace EasyChampionSelection {
     /// </summary>
     public partial class wndAddChampion : Window {
 
-        private wndMain wndMainBoss;
+        private ChampionList _allChamps;
 
-        public wndAddChampion(wndMain wndMainBoss) {
-            this.wndMainBoss = wndMainBoss;
+        public wndAddChampion(ChampionList allChamps) {
+            if(allChamps != null) {
+                this._allChamps = allChamps;
+            } else {
+                throw new ArgumentNullException();
+            }
+            
             InitializeComponent();
         }
 
         private void txtNewChampion_TextChanged(object sender, TextChangedEventArgs e) {
-            if(wndMainBoss.GetAllChampions().Contains(txtNewChampionName.Text)) {
+            if(_allChamps.Contains(txtNewChampionName.Text)) {
                 btnAddChampion.IsEnabled = false;
             } else {
                 btnAddChampion.IsEnabled = true;
@@ -24,8 +31,7 @@ namespace EasyChampionSelection {
 
         private void btnAddChampion_Click(object sender, RoutedEventArgs e) {
             if(txtNewChampionName.Text.Length > 0) {
-                wndMainBoss.AddChampion(txtNewChampionName.Text);
-                wndMainBoss.DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
+                _allChamps.AddChampion(txtNewChampionName.Text);
                 this.Close();
             }
         }
@@ -35,9 +41,6 @@ namespace EasyChampionSelection {
         }
 
         private void wndAddChampion_Loaded(object sender, RoutedEventArgs e) {
-            if(wndMainBoss.Equals(null)) {
-                MessageBox.Show("Woops, something went wrong!", this.Name, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
             txtNewChampionName.Focus();
         }
     }

@@ -63,6 +63,13 @@ namespace EasyChampionSelection.ECS {
         }
         #endregion Getters & Setters
 
-        public Settings() { }
+        public Settings() {
+            this._showMainFormOnLaunch = true;
+            this._startOnBoot = false;
+            this._userApiKey = "";
+            this._rChampionSearchbarRelativePos = new Rectangle();
+            this._rClientOverlayRelativePos = new Rectangle();
+            this._rTeamChatRelativePos = new Rectangle();
+        }
     }
 }

@@ -11,10 +11,18 @@ namespace EasyChampionSelection {
     /// Interaction logic for wndClientOverload.xaml
     /// </summary>
     public partial class wndClientOverload : Window {
-        wndMain wndMainBoss;
+        private StaticGroupManager _groupManager;
+        private Settings _ecsSettings;
+        private StaticLolClientGraphics _lcg;
+        public wndClientOverload(StaticGroupManager gmGroupManager, Settings ecsSettings, StaticLolClientGraphics lcg) {
+            if(gmGroupManager != null && ecsSettings != null && lcg != null) {
+                this._groupManager = gmGroupManager;
+                this._ecsSettings = ecsSettings;
+                this._lcg = lcg;
+            } else {
+                throw new ArgumentNullException();
+            }
 
-        public wndClientOverload(wndMain wndMainBoss) {
-            this.wndMainBoss = wndMainBoss;
             InitializeComponent();
         }
 
@@ -22,36 +30,29 @@ namespace EasyChampionSelection {
         /// Force redraw the Client Overlay
         /// </summary>
         public void Redraw() {
-            if(wndMainBoss._lolClientHelper != null) {
-                if(wndMainBoss._lolClientHelper.GetProcessLolClient() != null) {
-                    Rectangle pos = wndMainBoss._lolClientHelper.getClientOverlayPosition();
-                    this.Left = pos.X;
-                    this.Top = pos.Y;
-                    //Width and height is already marked in here
-                }
+            if(_lcg.GetProcessLolClient() != null) {
+                Rectangle pos = _lcg.getClientOverlayPosition();
+                this.Left = pos.X;
+                this.Top = pos.Y;
+                this.Width = pos.Width;
+                this.Height = pos.Height;
+                //Width and height is already marked in here
+
             }
 
             cboGroups.Items.Clear();
-            for(int i = 0; i < wndMainBoss.gmGroupManager.GroupCount; i++) {
+            for(int i = 0; i < _groupManager.GroupCount; i++) {
                 System.Windows.Controls.CheckBox chk = new System.Windows.Controls.CheckBox();
-                chk.Content = wndMainBoss.gmGroupManager.getGroup(i).getName();
+                chk.Content = _groupManager.getGroup(i).getName();
                 chk.Checked += new RoutedEventHandler(CheckBox_CheckStateChanged);
                 cboGroups.Items.Add(chk);
             }
-        }
-
-        public void StaticLolClientGraphics_OnLeagueClientResized(StaticLolClientGraphics sender, EventArgs e) {
-            Rectangle rect = sender.getClientOverlayPosition();
-            this.Left = rect.X;
-            this.Top = rect.Y;
-            //Width and height are currently not being changed
         }
 
         public void StaticLolClientGraphics_OnLeagueClientReposition(StaticLolClientGraphics sender, EventArgs e) {
             Rectangle rect = sender.getClientOverlayPosition();
             this.Left = rect.X;
             this.Top = rect.Y;
-            //Width and height are currently not being changed
         }
 
         public void GroupManager_GroupsChanged(StaticGroupManager sender, GroupManagerEventArgs e) {
@@ -60,7 +61,7 @@ namespace EasyChampionSelection {
                 switch(e.eventOperation) {
                     case GroupManagerEventOperation.Add:
                         //Get index of new added item
-                        int newItemIndex = wndMainBoss.gmGroupManager.indexOf(e.operationItem.getName());
+                        int newItemIndex = _groupManager.indexOf(e.operationItem.getName());
                         //Insert item here at the correct spot
                         System.Windows.Controls.CheckBox chk = new System.Windows.Controls.CheckBox();
                         chk.Content = e.operationItem.getName();
@@ -82,7 +83,7 @@ namespace EasyChampionSelection {
                     case GroupManagerEventOperation.Reposition:
                         //Reposition it here based on name
                         //Get new position
-                        int newPosition = wndMainBoss.gmGroupManager.indexOf(e.operationItem.getName());
+                        int newPosition = _groupManager.indexOf(e.operationItem.getName());
                         int oldPosition = -1;
                         bool isChecked = false;
                         //Find old position
@@ -111,7 +112,7 @@ namespace EasyChampionSelection {
 
         public void ChampionList_NameChanged(ChampionList sender, EventArgs e) {
             if(sender != null) {
-                int indexOfSender = wndMainBoss.gmGroupManager.indexOf(sender.getName());
+                int indexOfSender = _groupManager.indexOf(sender.getName());
 
                 //if indexOfSender != -1 update that specific group
                 if(indexOfSender != -1) {
@@ -125,13 +126,11 @@ namespace EasyChampionSelection {
 
         private void CheckBox_CheckStateChanged(object sender, RoutedEventArgs e) {
             String searchFieldText = CreateStringOfChampions();
-            if(wndMainBoss._lolClientHelper != null) {
-                if(wndMainBoss._lolClientHelper.GetProcessLolClient() != null) {
-                    wndMainBoss._lolClientHelper.TypeInSearchBar(searchFieldText);
-                }
-            } else {
-                wndMainBoss.DisplayPopup("lolClient.exe was not found!");
+
+            if(this._lcg.GetProcessLolClient() != null) {
+                this._lcg.TypeInSearchBar(searchFieldText);
             }
+
         }
 
         private String CreateStringOfChampions() {
@@ -141,9 +140,9 @@ namespace EasyChampionSelection {
             for(int i = 0; i < cboGroups.Items.Count; i++) {
                 CheckBox cb = (CheckBox)cboGroups.Items[i];
                 if(cb.IsChecked == true) {
-                    int newGroupCount = wndMainBoss.gmGroupManager.getGroup(i).ChampionCount;
+                    int newGroupCount =_groupManager.getGroup(i).ChampionCount;
                     for(int j = 0; j < newGroupCount; j++) {
-                        string newChampion = wndMainBoss.gmGroupManager.getGroup(i).getChampion(j);
+                        string newChampion = _groupManager.getGroup(i).getChampion(j);
                         if(!lstChampsToFilter.Contains(newChampion)) {
                             lstChampsToFilter.Add(newChampion);
                         }
@@ -164,7 +163,7 @@ namespace EasyChampionSelection {
             if(returnValue.Length > 0) {
                 returnValue = returnValue.Substring(0, returnValue.Length - 1);
             }
-            
+
             return returnValue;
         }
 

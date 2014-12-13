@@ -12,12 +12,14 @@ namespace EasyChampionSelection.Helper_Windows {
     /// </summary>
     public partial class wndConfigLolClientOverlay : Window {
         private StaticLolClientGraphics _lcg;
+        private Settings _ecsSettings;
         private const int _cBaseThumbWidth = 50;
         private const int _cBaseThumbHeight = 50;
 
-        public wndConfigLolClientOverlay(StaticLolClientGraphics lcg) {
-            if(lcg != null) {
+        public wndConfigLolClientOverlay(StaticLolClientGraphics lcg, Settings ecsSettings) {
+            if(lcg != null && ecsSettings != null) {
                 _lcg = lcg;
+                _ecsSettings = ecsSettings;
             } else {
                 throw new ArgumentNullException();
             }
@@ -28,7 +30,7 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void btnGetCurrentClientImage_Click(object sender, RoutedEventArgs e) {
-            BitmapSource lolClientImage = _lcg.SaveClientImage();
+            BitmapSource lolClientImage = _lcg.GetLeagueClientAsBitmapSource();
             imgClientImage.Width = lolClientImage.Width;
             imgClientImage.Height = lolClientImage.Height;
             imgClientImage.Source = lolClientImage;
@@ -37,101 +39,98 @@ namespace EasyChampionSelection.Helper_Windows {
             this.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
         }
 
-        private void rdbChampionSearchbar_Checked(object sender, RoutedEventArgs e) {
-            //Old position rectangle
-            Rectangle oldCSBP = _lcg.getChampionSearchBarPosition();
-            if(chkShowOldPosition.IsChecked == true) {
-                if(oldCSBP != null) {
-                    transformRectangle(thmbOldPos, oldCSBP);
-                    txtNewThumbWidth.Text = (oldCSBP.Width - oldCSBP.X).ToString();
-                    txtNewThumbHeight.Text = (oldCSBP.Height - oldCSBP.Y).ToString();
-                } else {
-                    thmbOldPos.Visibility = System.Windows.Visibility.Hidden;
-                    txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
-                    txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
-                }
-            }
-
-            //New position rectangle
-            if(oldCSBP != null && oldCSBP.Width > 0 && oldCSBP.Height > 0) {
-                transformRectangle(thmbNewPos, oldCSBP);
-            } else {
-                createNewThumb();
-            }
-
-            imgClientImage.Visibility = System.Windows.Visibility.Hidden;
-        }
-
-        private void rdbTeamChat_Checked(object sender, RoutedEventArgs e) {
-            //Old position rectangle
-            Rectangle oldTTP = _lcg.getTeamChatPosition();
-            if(chkShowOldPosition.IsChecked == true) {
-                if(oldTTP != null) {
-                    transformRectangle(thmbOldPos, oldTTP);
-                    txtNewThumbWidth.Text = (oldTTP.Width - oldTTP.X).ToString();
-                    txtNewThumbHeight.Text = (oldTTP.Height - oldTTP.Y).ToString();
-                } else {
-                    thmbOldPos.Visibility = System.Windows.Visibility.Hidden;
-                    txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
-                    txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
-                }
-            }
-
-            //New position rectangle
-            if(oldTTP != null) {
-                transformRectangle(thmbNewPos, oldTTP);
-            } else {
-                createNewThumb();
+        private void chkShowOldPosition_Checked(object sender, RoutedEventArgs e) {
+            if(imgClientImage.Width > 100) {
+                thmbOldPos.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
-        private void rdbClientOverlay_Checked(object sender, RoutedEventArgs e) {
-            Rectangle oldCOP = _lcg.getClientOverlayPosition();
+        private void chkShowOldPosition_Unchecked(object sender, RoutedEventArgs e) {
+            thmbOldPos.Visibility = System.Windows.Visibility.Hidden;
+        }
+
+        private void rdbOnChecked(object sender, RoutedEventArgs e) {
             //Old position rectangle
-            if(chkShowOldPosition.IsChecked == true) {
-                if(oldCOP != null) {
-                    transformRectangle(thmbOldPos, oldCOP);
-                    txtNewThumbWidth.Text = (oldCOP.Width - oldCOP.X).ToString();
-                    txtNewThumbHeight.Text = (oldCOP.Height - oldCOP.Y).ToString();
-                } else {
-                    thmbOldPos.Visibility = System.Windows.Visibility.Hidden;
-                    txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
-                    txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
-                }
+            RadioButton rdbSender = (RadioButton)sender;
+            Rectangle oldPosition = new Rectangle();
+            if(rdbSender.Equals(rdbChampionSearchbar)) {
+                oldPosition = _ecsSettings.ChampionSearchbarRelativePos;
+            } else if(rdbSender.Equals(rdbTeamChat)) {
+                oldPosition = _ecsSettings.TeamChatRelativePos;
+            } else if(rdbSender.Equals(rdbClientOverlay)) {
+                oldPosition = _ecsSettings.TeamChatRelativePos;
             }
 
+            transformRectangle(thmbOldPos, oldPosition);
+            if(oldPosition.Width > 0 && oldPosition.Height > 0) {
+                txtNewThumbWidth.Text = (oldPosition.Width - oldPosition.X).ToString();
+                txtNewThumbHeight.Text = (oldPosition.Height - oldPosition.Y).ToString();
+            } else {
+                txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
+                txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
+            }
+            
+
             //New position rectangle
-            if(oldCOP != null) {
-                transformRectangle(thmbNewPos, oldCOP);
+            if(oldPosition != null && oldPosition.Width > 0 && oldPosition.Height > 0) {
+                transformRectangle(thmbNewPos, oldPosition);
             } else {
                 createNewThumb();
             }
+            thmbNewPos.Visibility = System.Windows.Visibility.Visible;
         }
 
-        private void transformRectangle(Thumb rectRepos, Rectangle newPosition) {
-            rectRepos.Width = newPosition.Width - newPosition.X;
-            rectRepos.Height = newPosition.Bottom - newPosition.Y;
-            Canvas.SetLeft(rectRepos, newPosition.X);
-            Canvas.SetTop(rectRepos, newPosition.Y);
-            rectRepos.Visibility = System.Windows.Visibility.Visible;
+
+        private void txtNewThumbWidth_TextChanged(object sender, TextChangedEventArgs e) {
+            int newWidth = 0;
+            if(int.TryParse(txtNewThumbWidth.Text, out newWidth)) {
+                thmbNewPos.Width = Math.Abs(newWidth);
+            } else {
+                thmbNewPos.Width = _cBaseThumbWidth;
+            }
+        }
+
+        private void txtNewThumbHeight_TextChanged(object sender, TextChangedEventArgs e) {
+            int newHeight = 0;
+            if(int.TryParse(txtNewThumbHeight.Text, out newHeight)) {
+                thmbNewPos.Height = Math.Abs(newHeight);
+            } else {
+                thmbNewPos.Height = _cBaseThumbHeight;
+            }
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e) {
             Rectangle repositionRectangle
-                = new Rectangle((int)thmbNewPos.Margin.Left, (int)thmbNewPos.Margin.Top, (int)thmbNewPos.Width, (int)thmbNewPos.Height);
-            
+                = new Rectangle((int)Canvas.GetLeft(thmbNewPos), (int)Canvas.GetTop(thmbNewPos), (int)thmbNewPos.Width, (int)thmbNewPos.Height);
+
             if(rdbChampionSearchbar.IsChecked == true) {
-                _lcg.setChampionSearchBarPosition(repositionRectangle);
+                _ecsSettings.ChampionSearchbarRelativePos = repositionRectangle;
             } else if(rdbTeamChat.IsChecked == true) {
-                _lcg.setTeamChatPosition(repositionRectangle);
+                _ecsSettings.TeamChatRelativePos = repositionRectangle;
             } else if(rdbClientOverlay.IsChecked == true) {
-                _lcg.setClientOverlayPosition(repositionRectangle);
+                _ecsSettings.ClientOverlayRelativePos = repositionRectangle;
             }
         }
 
         private void thmbRectangle_OnDragDelta(object sender, DragDeltaEventArgs e) {
-                Canvas.SetLeft((Thumb)sender, Canvas.GetLeft((Thumb)sender) + e.HorizontalChange);
-                Canvas.SetTop((Thumb)sender, Canvas.GetTop((Thumb)sender) + e.VerticalChange);    
+            Thumb tSender = (Thumb)sender;
+            
+            int tLeft = (int)Canvas.GetLeft(tSender);
+            int tRight = tLeft + (int)tSender.Width;
+
+            if(tLeft + e.HorizontalChange > -1) {
+                if(tRight + e.HorizontalChange < cvRectangles.Width) {
+                    Canvas.SetLeft(tSender, tLeft + e.HorizontalChange);
+                }
+            }
+                
+            int tTop = (int)Canvas.GetTop(tSender);
+            int tBot = tTop + (int)tSender.Height;
+            if(tTop + e.VerticalChange > -1) {
+                if(tBot + e.VerticalChange < cvRectangles.Height) {
+                    Canvas.SetTop(tSender, tTop + e.VerticalChange);
+                }
+            }
         }
 
         private void createNewThumb() {
@@ -140,7 +139,7 @@ namespace EasyChampionSelection.Helper_Windows {
 
             int tWidth;
             if(int.TryParse(txtNewThumbWidth.Text, out tWidth)) {
-                thmbNewPos.Width = tWidth;
+                thmbNewPos.Width = Math.Abs(tWidth);
             } else {
                 thmbNewPos.Width = _cBaseThumbWidth;
                 txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
@@ -148,11 +147,18 @@ namespace EasyChampionSelection.Helper_Windows {
 
             int tHeight;
             if(int.TryParse(txtNewThumbHeight.Text, out tHeight)) {
-                thmbNewPos.Height = tHeight;
+                thmbNewPos.Height = Math.Abs(tHeight);
             } else {
                 thmbNewPos.Height = _cBaseThumbHeight;
                 txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
             }
+        }
+
+        private void transformRectangle(Thumb rectRepos, Rectangle newPosition) {
+            rectRepos.Width = newPosition.Width;
+            rectRepos.Height = newPosition.Height;
+            Canvas.SetLeft(rectRepos, newPosition.X);
+            Canvas.SetTop(rectRepos, newPosition.Y);
         }
     }
 }

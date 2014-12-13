@@ -184,44 +184,26 @@ namespace EasyChampionSelection.ECS {
         }
 
         /// <summary>
+        /// Removes all champions in the list
+        /// </summary>
+        public void RemoveAllChampions() {
+            bool changed = false;
+            if(lstChampions.Count > 0) {
+                changed = true;
+                lstChampions.Clear();
+            }
+            if(changed) {
+                if(ChampionsChanged != null) {
+                    ChampionsChanged(this, new EventArgs());
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the name of the list
         /// </summary>
         public override string ToString() {
             return strName;
         }
-
-        /*
-        /// <summary>
-        /// Determines if the list are equal.
-        /// </summary>
-        /// <exception cref="ArgumentNullException">Throws an ArgumentNullException if your argument is null</exception>
-        public override bool Equals(object p) {
-            if(p == null) {
-                throw new ArgumentNullException();
-            }
-
-            if((ChampionList)p == null) {
-                return false;
-            }
-
-            ChampionList cList = (ChampionList)p;
-
-            if(this.getName() == cList.getName()) { // Name
-                if(this.getCount() == cList.getCount()) { // Equal count of champions in list
-                    for(int i = 0; i < cList.getCount(); i++) {
-                        if(!(this.getChampion(i) == cList.getChampion(i))) { // If not champName(i) == champName(i)
-                            return false;
-                        }
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-            
-            return true;
-        }
-        */
     }
 }

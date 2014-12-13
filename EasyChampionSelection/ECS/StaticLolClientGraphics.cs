@@ -26,11 +26,8 @@ namespace EasyChampionSelection.ECS {
         #endregion Events
 
         #region Properties & Attributes
-        private Rectangle rChampionSearchbarRelativePos;
-        private Rectangle rTeamChatRelativePos;
-        private Rectangle rClientOverlayRelativePos;
-        private Rectangle rectLolBounds;
-
+        private Rectangle _rectLolBounds;
+        private static Settings _ecsSettings;
         private static Process processLolClient;
         private static StaticLolClientGraphics _instance;
         #endregion Properties & Attributes
@@ -152,51 +149,8 @@ namespace EasyChampionSelection.ECS {
         #endregion Private DLL Import & Related structures
 
         #region Getters & Setters
-        /// <summary>
-        /// Get the relative postition of the Champion Searchbar.
-        /// </summary>
-        public Rectangle getChampionSearchBarPosition() {
-            return rChampionSearchbarRelativePos;
-        }
-        /// <summary>
-        /// Set the relative postition of the Champion Searchbar
-        /// </summary>
-        /// <param name="newPos"></param>
-        public void setChampionSearchBarPosition(Rectangle newPos) {
-            if(newPos != null) {
-                rChampionSearchbarRelativePos = newPos;
-            }
-        }
-
-        /// <summary>
-        /// Get the relative postition of the Team Chat
-        /// </summary>
-        /// <returns></returns>
-        public Rectangle getTeamChatPosition() {
-            return rTeamChatRelativePos;
-        }
-        /// <summary>
-        /// Set the relative postition of the Team Chat
-        /// </summary>
-        public void setTeamChatPosition(Rectangle newPos) {
-            if(newPos != null) {
-                rTeamChatRelativePos = newPos;
-            }
-        }
-
-        /// <summary>
-        /// Get the relative postition of the Client Overlay
-        /// </summary>
-        public Rectangle getClientOverlayPosition() {
-            return rClientOverlayRelativePos;
-        }
-        /// <summary>
-        /// Set the relative postition of the Client Overlay
-        /// </summary>
-        public void setClientOverlayPosition(Rectangle newPos) {
-            if(newPos != null) {
-                rClientOverlayRelativePos = newPos;
-            }
+        public Settings getSettings() {
+            return _ecsSettings;
         }
 
         /// <summary>
@@ -204,6 +158,19 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public Process GetProcessLolClient() {
             return processLolClient;
+        }
+
+        /// <summary>
+        /// Returns the absolute position of where the user wants
+        /// </summary>
+        /// <returns></returns>
+        public Rectangle getClientOverlayPosition() {
+            Rectangle pos = new Rectangle();
+            pos.Width = _ecsSettings.ClientOverlayRelativePos.Width;
+            pos.Height = _ecsSettings.ClientOverlayRelativePos.Height;
+            pos.X = _ecsSettings.ClientOverlayRelativePos.X + _rectLolBounds.X;
+            pos.Y = _ecsSettings.ClientOverlayRelativePos.Y + _rectLolBounds.Y;
+            return pos;
         }
         #endregion Getters & Setters
 
@@ -234,17 +201,15 @@ namespace EasyChampionSelection.ECS {
 
         /// <summary>
         /// Used to type a string of champion-names in the search bar to create a filter.
-        /// The search bar must be set by the user (setChampionSearchbar)
         /// </summary>
-        /// <param name="textToEnter"></param>
         public void TypeInSearchBar(String textToEnter) {
             ClickInSearchBar(textToEnter);
         }
 
         private void ClickInSearchBar(String textToEnter) {
             //Calculate ChampionSearchBar position
-            int ChampionSearchBarXpos = rChampionSearchbarRelativePos.X + ((rChampionSearchbarRelativePos.Width - rChampionSearchbarRelativePos.X) / 2);
-            int ChampionSearchBarYpos = rChampionSearchbarRelativePos.Y + ((rChampionSearchbarRelativePos.Top - rChampionSearchbarRelativePos.Bottom) / 2);
+            int ChampionSearchBarXpos = _ecsSettings.ChampionSearchbarRelativePos.X + ((_ecsSettings.ChampionSearchbarRelativePos.Width / 2));
+            int ChampionSearchBarYpos = _ecsSettings.ChampionSearchbarRelativePos.Y + ((_ecsSettings.ChampionSearchbarRelativePos.Height / 2));
 
             //?
             // get screen coordinates
@@ -283,7 +248,6 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// Determines if the associated League Client is focussed by the user (UI focussed)
         /// </summary>
-        /// <returns></returns>
         public bool isLolClientFocussed() {
             IntPtr foreGroundWindow = GetForegroundWindow();
             int foreGroundWindowProcessId;
@@ -305,27 +269,27 @@ namespace EasyChampionSelection.ECS {
 
         private Bitmap GetLeagueClientAsBitmap() {
             // Old lol bounds
-            Rectangle origLolBounds = new Rectangle(rectLolBounds.X, rectLolBounds.Y, rectLolBounds.Width, rectLolBounds.Height);
+            Rectangle origLolBounds = new Rectangle(_rectLolBounds.X, _rectLolBounds.Y, _rectLolBounds.Width, _rectLolBounds.Height);
 
             // New lol bounds
-            GetWindowRect(processLolClient.MainWindowHandle, out rectLolBounds);
+            GetWindowRect(processLolClient.MainWindowHandle, out _rectLolBounds);
 
             // Check if client has repositioned
-            if(rectLolBounds.X != origLolBounds.X || rectLolBounds.Y != origLolBounds.Y) {
+            if(_rectLolBounds.X != origLolBounds.X || _rectLolBounds.Y != origLolBounds.Y) {
                 if(OnLeagueClientReposition != null) {
                     OnLeagueClientReposition(this, new EventArgs());
                 }
             }
 
             // Check if client has been resized
-            if(rectLolBounds.Width != origLolBounds.Width || rectLolBounds.Height != origLolBounds.Height) {
+            if(_rectLolBounds.Width != origLolBounds.Width || _rectLolBounds.Height != origLolBounds.Height) {
                 if(OnLeagueClientResized != null) {
                     OnLeagueClientResized(this, new EventArgs());
                 }
             }
 
             // Create bitmap of correct size
-            Bitmap lolClientSized_Bitmap = new Bitmap(rectLolBounds.Width - rectLolBounds.X, rectLolBounds.Height - rectLolBounds.Y, PixelFormat.Format24bppRgb);
+            Bitmap lolClientSized_Bitmap = new Bitmap(_rectLolBounds.Width - _rectLolBounds.X, _rectLolBounds.Height - _rectLolBounds.Y, PixelFormat.Format24bppRgb);
             Graphics lolClientSized_Graphics = Graphics.FromImage(lolClientSized_Bitmap);
 
             // Get source handle device context
@@ -337,7 +301,7 @@ namespace EasyChampionSelection.ECS {
 
                 // Copy source into target
                 StretchBlt(lolClient_MemoryHandleDeviceContext, 0, 0, lolClientSized_Bitmap.Width, lolClientSized_Bitmap.Height,
-                    lolClient_WindowDeviceContext, 0, 0, rectLolBounds.Width - rectLolBounds.X, rectLolBounds.Height - rectLolBounds.Y,
+                    lolClient_WindowDeviceContext, 0, 0, _rectLolBounds.Width - _rectLolBounds.X, _rectLolBounds.Height - _rectLolBounds.Y,
                     TernaryRasterOperations.SRCCOPY);
 
                 // Release handle
@@ -350,7 +314,7 @@ namespace EasyChampionSelection.ECS {
 
         /// <summary>
         /// Determines if you are in Champion Select 
-        /// (Does so on your used provided parameters: ChampionSearchbar, TeamChat)
+        /// (Does so on your used provided <c>Settings</c> parameters: ChampionSearchbar, TeamChat)
         /// </summary>
         public bool isInChampSelect() {
             Bitmap picOfClient = GetLeagueClientAsBitmap();
@@ -359,7 +323,7 @@ namespace EasyChampionSelection.ECS {
 
             bool isWhite = false; //Set true
 
-            if(rectLolBounds.Width < 0) {
+            if(_rectLolBounds.Width < 0) {
                 return false;
             }
 
@@ -379,49 +343,10 @@ namespace EasyChampionSelection.ECS {
         }
 
         /// <summary>
-        /// Returns an RGB bitmap of the Client at this moment
+        /// Returns an RGB BitmapSource of the Client at this moment
         /// </summary>
-        public System.Windows.Media.Imaging.BitmapSource SaveClientImage() {
-            // Old lol bounds
-            Rectangle origLolBounds = new Rectangle(rectLolBounds.X, rectLolBounds.Y, rectLolBounds.Width, rectLolBounds.Height);
-
-            // New lol bounds
-            GetWindowRect(processLolClient.MainWindowHandle, out rectLolBounds);
-
-            // Check if client has repositioned
-            if(rectLolBounds.X != origLolBounds.X || rectLolBounds.Y != origLolBounds.Y) {
-                if(OnLeagueClientReposition != null) {
-                    OnLeagueClientReposition(this, new EventArgs());
-                }
-            }
-
-            // Check if client has been resized
-            if(rectLolBounds.Width != origLolBounds.Width || rectLolBounds.Height != origLolBounds.Height) {
-                if(OnLeagueClientResized != null) {
-                    OnLeagueClientResized(this, new EventArgs());
-                }
-            }
-
-            // Create bitmap of correct size
-            Bitmap lolClientSized_Bitmap = new Bitmap(rectLolBounds.Width - rectLolBounds.X, rectLolBounds.Height - rectLolBounds.Y, PixelFormat.Format24bppRgb);
-            Graphics lolClientSized_Graphics = Graphics.FromImage(lolClientSized_Bitmap);
-
-            // Get source handle device context
-            IntPtr lolClient_WindowDeviceContext = GetWindowDC(processLolClient.MainWindowHandle);
-
-            try {
-                // Get target handle device context
-                IntPtr lolClient_MemoryHandleDeviceContext = lolClientSized_Graphics.GetHdc();
-
-                // Copy source into target
-                StretchBlt(lolClient_MemoryHandleDeviceContext, 0, 0, lolClientSized_Bitmap.Width, lolClientSized_Bitmap.Height,
-                    lolClient_WindowDeviceContext, 0, 0, rectLolBounds.Width - rectLolBounds.X, rectLolBounds.Height - rectLolBounds.Y,
-                    TernaryRasterOperations.SRCCOPY);
-
-                // Release handle
-                lolClientSized_Graphics.ReleaseHdc();
-
-            } catch(ArgumentException) { }
+        public System.Windows.Media.Imaging.BitmapSource GetLeagueClientAsBitmapSource() {
+            Bitmap lolClientSized_Bitmap = GetLeagueClientAsBitmap();
 
             IntPtr ip = lolClientSized_Bitmap.GetHbitmap();
             System.Windows.Media.Imaging.BitmapSource bs = null;

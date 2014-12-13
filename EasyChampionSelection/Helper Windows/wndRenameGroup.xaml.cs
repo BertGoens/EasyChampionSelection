@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using EasyChampionSelection.ECS;
+using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace EasyChampionSelection {
@@ -6,20 +8,24 @@ namespace EasyChampionSelection {
     /// Interaction logic for wndRenameGroup.xaml
     /// </summary>
     public partial class wndRenameGroup : Window {
-        private wndMain wndMainBoss;
-        private string strGroupToRename;
+        private StaticGroupManager _gm;
+        private string _strGroupToRename;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public wndRenameGroup(wndMain wndMainBoss, string strGroupToRename) {
+        public wndRenameGroup(StaticGroupManager gm, string strGroupToRename) {
+            if(gm != null && strGroupToRename != null) {
+                this._gm = gm;
+                this._strGroupToRename = strGroupToRename;
+            } else {
+                throw new ArgumentNullException();
+            }
             InitializeComponent();
-            this.strGroupToRename = strGroupToRename;
-            this.wndMainBoss = wndMainBoss;
         }
 
         private void txtRenameGroup_TextChanged(object sender, TextChangedEventArgs e) {
-            if(wndMainBoss.GetGroups().Contains(txtRenameGroup.Text)) {
+            if(_gm.getAllGroups().Contains(new ChampionList(txtRenameGroup.Text))) {
                 btnRenameGroup.IsEnabled = false;
             } else {
                 btnRenameGroup.IsEnabled = true;
@@ -28,9 +34,7 @@ namespace EasyChampionSelection {
 
         private void btnRenameGroup_Click(object sender, RoutedEventArgs e) {
             if(txtRenameGroup.Text.Length > 0) {
-                wndMainBoss.gmGroupManager.getGroup(strGroupToRename).setName(txtRenameGroup.Text);
-                wndMainBoss.DisplayGroups();
-                wndMainBoss.lsbGroups.SelectedIndex = 0;
+                _gm.getGroup(_strGroupToRename).setName(txtRenameGroup.Text);
                 this.Close();
             }
         }
@@ -40,10 +44,7 @@ namespace EasyChampionSelection {
         }
 
         private void wndRenameGroupVisual_Loaded(object sender, RoutedEventArgs e) {
-            if(wndMainBoss.Equals(null) || strGroupToRename.Equals(null)) {
-                MessageBox.Show("Woops, something went wrong!", "wndRenameGroup", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            lblRenameGroupNameInfo.Content = "Rename " + strGroupToRename + " to:";
+            lblRenameGroupNameInfo.Content = "Rename " + _strGroupToRename + " to:";
             txtRenameGroup.SelectAll();
             txtRenameGroup.Focus();
         }
