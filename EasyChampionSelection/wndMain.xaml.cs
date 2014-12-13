@@ -59,18 +59,8 @@ namespace EasyChampionSelection {
         }
 
         private void frmMain_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            //Important: unsubscribe from events to not serializable stuff (etc windows)
-            _allChampions.ChampionsChanged -= _AllChampions_ChampionsChanged;
-            _gmGroupManager.GroupsChanged -= _gmGroupManager_GroupsChanged;
-            for(int i = 0; i < _gmGroupManager.GroupCount; i++) {
-                _gmGroupManager.getGroup(i).NameChanged -= _wndCO.ChampionList_NameChanged;
-            }
-
-            //Serialize important stuff
             StaticSerializer.SerializeObject(_gmGroupManager, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_GroupManager);
-            if(_allChampions.getCount() > 120) {
-                StaticSerializer.SerializeObject(_allChampions, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_AllChampions);
-            }
+            StaticSerializer.SerializeObject(_allChampions, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_AllChampions);
             StaticSerializer.SerializeObject(_ecsSettings, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_Settings);
 
             _notifyIcon.Dispose(); //Dispose to auto clear the icon
@@ -81,11 +71,17 @@ namespace EasyChampionSelection {
         }
 
         private void _gmGroupManager_GroupsChanged(StaticGroupManager sender, GroupManagerEventArgs e) {
+            if(e.eventOperation == GroupManagerEventOperation.Add) {
+                e.operationItem.NameChanged += _gmGroupManager_ChampionList_NameChanged;
+            }
             DisplayGroups();
-            _wndCO.GroupManager_GroupsChanged(sender, e);
         }
 
-        private void tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
+        private void _gmGroupManager_ChampionList_NameChanged(ChampionList sender, EventArgs e) {
+            DisplayGroups();
+        }
+
+        private void _tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
             _tmrCheckForChampSelect.Stop();
 
             //Look for the lolClient process
@@ -94,7 +90,7 @@ namespace EasyChampionSelection {
             if(_lolClientHelper != null) {
                 //Check if the lolClient process hasn't changed (ie: close & restart)
                 if(p.Count() > 0) {
-                    if(p[0].Id == _lolClientHelper.GetProcessLolClient().Id) { //Is same client?
+                    if(p[0].Id == _lolClientHelper.getProcessLolClient().Id) { //Is same client?
                         if(_lolClientHelper.isLolClientFocussed() || _lolClientHelper.isEasyChampionSelectionFoccussed()) { //If lolclient or ECS = active window
                             if(_lolClientHelper.isInChampSelect()) { //Is it in champion select?
                                 if(_wndCO.Visibility != System.Windows.Visibility.Visible) { //Is the ClientOverlay visible?
@@ -121,17 +117,22 @@ namespace EasyChampionSelection {
             _tmrCheckForChampSelect.Start();
         }
 
+        private void _lolClientHelper_OnLeagueClientResized(StaticLolClientGraphics sender, EventArgs e) {
+            DisplayPopup("Your league client has been resized!"
+            + "Double click in the centre of the title bar to bring it back to it's standard position!");
+        }
+
         private void btnConfigClientOverlay_Click(object sender, RoutedEventArgs e) {
             bool showError = true;
 
             if(_lolClientHelper != null) {
-                if(_lolClientHelper.GetProcessLolClient() != null) {
+                if(_lolClientHelper.getProcessLolClient() != null) {
                     try {
                         showError = false;
-                        _wndCLCO.Owner = this;
-                        _wndCLCO.Show();
-                    } catch(Exception) {
-                        DisplayPopup("Woops, something went wrong!");
+                        _wndCLCO.Visibility = System.Windows.Visibility.Visible;
+                        _wndCLCO.ShowInTaskbar = true;
+                    } catch(Exception ex) {
+                        DisplayPopup("Woops, something went wrong!\n" + ex.Message);
                     }
 
                 }
@@ -555,7 +556,7 @@ namespace EasyChampionSelection {
         }
 
         private void SetupTimer() {
-            _tmrCheckForChampSelect.Tick += new EventHandler(tmrCheckForChampSelect_Tick);
+            _tmrCheckForChampSelect.Tick += new EventHandler(_tmrCheckForChampSelect_Tick);
             _tmrCheckForChampSelect.Interval = new TimeSpan(500);
             _tmrCheckForChampSelect.IsEnabled = true;
         }
@@ -572,6 +573,7 @@ namespace EasyChampionSelection {
         }
 
         private void LoadAllChampions() {
+            _allChampions = new ChampionList("AllChampions");
             LoadAllChampionsRiotApi(); //Use api to get all champions
             if(_allChampions.getCount() < 1) {
                 LoadAllChampionsLocal();
@@ -618,9 +620,8 @@ namespace EasyChampionSelection {
                         lblCurrentGroupChampions.Content = "";
                         _gmGroupManager.GroupsChanged += _gmGroupManager_GroupsChanged;
                         for(int i = 0; i < _gmGroupManager.GroupCount; i++) {
-                            _gmGroupManager.getGroup(i).NameChanged += _wndCO.ChampionList_NameChanged;
+                            _gmGroupManager.getGroup(i).NameChanged += _gmGroupManager_ChampionList_NameChanged;
                         }
-                        lsbGroups.SelectedIndex = 0;
                     }
                 } else {
                     NewGroupManager();
@@ -637,8 +638,8 @@ namespace EasyChampionSelection {
 
         private void NewStaticLolClientGraphics(Process LeagueOfLegendsClientProcess) {
             if(LeagueOfLegendsClientProcess != null) {
-                _lolClientHelper = StaticLolClientGraphics.GetInstance(LeagueOfLegendsClientProcess);
-                _lolClientHelper.OnLeagueClientReposition += _wndCO.StaticLolClientGraphics_OnLeagueClientReposition;
+                _lolClientHelper = StaticLolClientGraphics.GetInstance(LeagueOfLegendsClientProcess, _ecsSettings);
+                _lolClientHelper.OnLeagueClientResized += _lolClientHelper_OnLeagueClientResized;
                 if(_wndCLCO != null) {
                     if(_wndCLCO.IsVisible == true) {
                         _wndCLCO.Close();
@@ -671,6 +672,9 @@ namespace EasyChampionSelection {
                 btnDeleteGroup.IsEnabled = false;
             } else {
                 btnDeleteGroup.IsEnabled = true;
+                if(lsbGroups.SelectedItem == null) {
+                    lsbGroups.SelectedIndex = 0;
+                }
             }
         }
 

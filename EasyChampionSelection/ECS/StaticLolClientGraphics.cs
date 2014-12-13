@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace EasyChampionSelection.ECS {
@@ -17,11 +18,13 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// Occurs when the league of legends client is repositioned.
         /// </summary>
+        [field: NonSerialized]
         public event StaticLolClientGraphicsHandler OnLeagueClientReposition;
 
         /// <summary>
         /// Occurs when the league of legends client is reseized
         /// </summary>
+        [field: NonSerialized]
         public event StaticLolClientGraphicsHandler OnLeagueClientResized;
         #endregion Events
 
@@ -156,7 +159,7 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// Returns the associated League Client process
         /// </summary>
-        public Process GetProcessLolClient() {
+        public Process getProcessLolClient() {
             return processLolClient;
         }
 
@@ -179,8 +182,8 @@ namespace EasyChampionSelection.ECS {
         /// Private constructor (singleton)
         /// Please use GetInstance() to use the class.
         /// </summary>
-        /// <param name="pLolClient"></param>
-        private StaticLolClientGraphics(Process pLolClient) {
+        private StaticLolClientGraphics(Process pLolClient, Settings ecsSettings) {
+            _ecsSettings = ecsSettings;
             processLolClient = pLolClient;
         }
         #endregion Constructor
@@ -190,10 +193,15 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// Create a StaticLolClientGraphics object.
         /// </summary>
-        public static StaticLolClientGraphics GetInstance(Process lolClient) {
-            if(_instance == null || lolClient != processLolClient) {
-                _instance = new StaticLolClientGraphics(lolClient);
+        public static StaticLolClientGraphics GetInstance(Process lolClient, Settings ecsSettings) {
+            if(lolClient != null && ecsSettings != null) {
+                if(_instance == null || lolClient != processLolClient) {
+                    _instance = new StaticLolClientGraphics(lolClient, ecsSettings);
+                }
+            } else {
+                throw new ArgumentNullException();
             }
+
             return _instance;
         }
 
@@ -317,29 +325,62 @@ namespace EasyChampionSelection.ECS {
         /// (Does so on your used provided <c>Settings</c> parameters: ChampionSearchbar, TeamChat)
         /// </summary>
         public bool isInChampSelect() {
+            if(_rectLolBounds.Width < 400) {
+                return false;
+            }
+
             Bitmap picOfClient = GetLeagueClientAsBitmap();
 
             Color white = Color.FromArgb(255, 255, 255);
 
-            bool isWhite = false; //Set true
+            //ChampionSearchBar Check
+            int cBarX = _ecsSettings.ChampionSearchbarRelativePos.X;
+            int cBarY = _ecsSettings.ChampionSearchbarRelativePos.Y;
+            int cBarWidth = _ecsSettings.ChampionSearchbarRelativePos.Width;
+            int cBarHeight = _ecsSettings.ChampionSearchbarRelativePos.Height;
+            int championBarWhitePixels = 1;
+            int championBarAllPixels = cBarWidth * cBarHeight;
 
-            if(_rectLolBounds.Width < 0) {
+            for(int y = 0; y < cBarHeight + 1; y++) {
+                for(int x = 0; x < cBarWidth; x++) {
+                    Color pixel = picOfClient.GetPixel(cBarX + x, +cBarY + y);
+                    if(pixel.Equals(white)) {
+                        championBarWhitePixels++;
+                    }
+                }
+                if(championBarWhitePixels > championBarAllPixels / 2) {
+                    break;
+                }
+            }
+            if(championBarWhitePixels < championBarAllPixels / 2) {
                 return false;
             }
 
-            /*
-            if(!(picOfClient.GetPixel(ChampionSearchBarXpos, ChampionSearchBarYpos).Equals(white))) {
-                isWhite = false;
-            } else { //Debugger hack, only do this because it's the first point to check so the outcome won't change
-                isWhite = true;
-            } */
+            //TeamChatBarCheck
+            int tChatbarX = _ecsSettings.TeamChatRelativePos.X;
+            int tChatbarY = _ecsSettings.TeamChatRelativePos.Y;
+            int tChatbarWidth = _ecsSettings.TeamChatRelativePos.Width;
+            int tChatbarHeight = _ecsSettings.TeamChatRelativePos.Height;
+            int tChatbarWhitePixels = 1;
+            int tChatbarAllPixels = tChatbarWidth * tChatbarHeight;
 
-            /*
-            if(!(picOfClient.GetPixel(TeamChatBarXpos, TeamChatBarYpos).Equals(white))) {
-                isWhite = false;
-            } */
+            for(int y = 0; y < tChatbarHeight + 1; y++) {
+                for(int x = 0; x < tChatbarWidth; x++) {
+                    Color pixel = picOfClient.GetPixel(tChatbarX + x, tChatbarY + y);
+                    if(pixel.Equals(white)) {
+                        tChatbarWhitePixels++;
+                    }
+                }
 
-            return isWhite;
+                if(tChatbarWhitePixels > tChatbarAllPixels / 2) {
+                    break;
+                }
+            }
+            if(tChatbarWhitePixels < tChatbarAllPixels / 2) {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>

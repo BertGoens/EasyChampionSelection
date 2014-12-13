@@ -25,6 +25,7 @@ namespace EasyChampionSelection.Helper_Windows {
             lblChampionSearchBar.Content = "Champion Searchbar: " + s.ChampionSearchbarRelativePos.ToString();
             lblClientOverlay.Content = "Client Overlay: " + s.ClientOverlayRelativePos.ToString();
             lblTeamChat.Content = "Team Chat: " + s.TeamChatRelativePos.ToString();
+            this.SizeToContent = System.Windows.SizeToContent.Width;
         }
 
         private void txtApiKey_TextChanged(object sender, TextChangedEventArgs e) {

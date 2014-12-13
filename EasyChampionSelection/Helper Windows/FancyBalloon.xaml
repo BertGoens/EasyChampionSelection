@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:tb="http://www.hardcodet.net/taskbar"
              x:Name="me"
-             Height="120"
+             Height="Auto"
              Width="220">
     
     <UserControl.Resources>
@@ -103,7 +103,7 @@
         </Border>
  
         <TextBlock  x:Name="txtBalloonMessage" 
-                   Text="TextGoesHere" Margin="15,45,15,10" VerticalAlignment="Top" TextWrapping="Wrap" FontWeight="SemiBold" >
+                   Text="TextGoesHere" Margin="15,45,15,15" VerticalAlignment="Top" TextWrapping="Wrap" FontWeight="SemiBold" >
             <TextBlock.Foreground>
                 <SolidColorBrush Color="#FFECAD25"/>
             </TextBlock.Foreground>

@@ -19,25 +19,29 @@ namespace EasyChampionSelection {
                 this._groupManager = gmGroupManager;
                 this._ecsSettings = ecsSettings;
                 this._lcg = lcg;
+                _groupManager.GroupsChanged += _groupManager_GroupsChanged;
+                _lcg.OnLeagueClientReposition +=_lcg_OnLeagueClientReposition;
+                for(int i = 0; i < _groupManager.GroupCount; i++) {
+                    _groupManager.getGroup(i).NameChanged += _groupManager_ChampionList_NameChanged;
+                }
             } else {
                 throw new ArgumentNullException();
             }
 
             InitializeComponent();
+            Redraw();
         }
 
         /// <summary>
         /// Force redraw the Client Overlay
         /// </summary>
-        public void Redraw() {
-            if(_lcg.GetProcessLolClient() != null) {
+        private void Redraw() {
+            if(_lcg.getProcessLolClient() != null) {
                 Rectangle pos = _lcg.getClientOverlayPosition();
                 this.Left = pos.X;
                 this.Top = pos.Y;
                 this.Width = pos.Width;
                 this.Height = pos.Height;
-                //Width and height is already marked in here
-
             }
 
             cboGroups.Items.Clear();
@@ -49,13 +53,13 @@ namespace EasyChampionSelection {
             }
         }
 
-        public void StaticLolClientGraphics_OnLeagueClientReposition(StaticLolClientGraphics sender, EventArgs e) {
+        private void _lcg_OnLeagueClientReposition(StaticLolClientGraphics sender, EventArgs e) {
             Rectangle rect = sender.getClientOverlayPosition();
             this.Left = rect.X;
             this.Top = rect.Y;
         }
 
-        public void GroupManager_GroupsChanged(StaticGroupManager sender, GroupManagerEventArgs e) {
+        private void _groupManager_GroupsChanged(StaticGroupManager sender, GroupManagerEventArgs e) {
             if(sender != null) {
                 //Try to preserve checked checkboxes
                 switch(e.eventOperation) {
@@ -110,7 +114,7 @@ namespace EasyChampionSelection {
             }
         }
 
-        public void ChampionList_NameChanged(ChampionList sender, EventArgs e) {
+        private void _groupManager_ChampionList_NameChanged(ChampionList sender, EventArgs e) {
             if(sender != null) {
                 int indexOfSender = _groupManager.indexOf(sender.getName());
 
@@ -127,7 +131,7 @@ namespace EasyChampionSelection {
         private void CheckBox_CheckStateChanged(object sender, RoutedEventArgs e) {
             String searchFieldText = CreateStringOfChampions();
 
-            if(this._lcg.GetProcessLolClient() != null) {
+            if(this._lcg.getProcessLolClient() != null) {
                 this._lcg.TypeInSearchBar(searchFieldText);
             }
 

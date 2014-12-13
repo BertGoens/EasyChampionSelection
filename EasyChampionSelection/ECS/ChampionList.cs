@@ -16,11 +16,13 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// The list has changed name.
         /// </summary>
+        [field: NonSerialized]
         public event ChampionListHandler NameChanged;
 
         /// <summary>
         /// The list has changed it's amount of champions.
         /// </summary>
+        [field: NonSerialized]
         public event ChampionListHandler ChampionsChanged;
 
         /// <summary>

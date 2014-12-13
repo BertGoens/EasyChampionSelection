@@ -39,16 +39,6 @@ namespace EasyChampionSelection.Helper_Windows {
             this.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
         }
 
-        private void chkShowOldPosition_Checked(object sender, RoutedEventArgs e) {
-            if(imgClientImage.Width > 100) {
-                thmbOldPos.Visibility = System.Windows.Visibility.Visible;
-            }
-        }
-
-        private void chkShowOldPosition_Unchecked(object sender, RoutedEventArgs e) {
-            thmbOldPos.Visibility = System.Windows.Visibility.Hidden;
-        }
-
         private void rdbOnChecked(object sender, RoutedEventArgs e) {
             //Old position rectangle
             RadioButton rdbSender = (RadioButton)sender;
@@ -58,57 +48,53 @@ namespace EasyChampionSelection.Helper_Windows {
             } else if(rdbSender.Equals(rdbTeamChat)) {
                 oldPosition = _ecsSettings.TeamChatRelativePos;
             } else if(rdbSender.Equals(rdbClientOverlay)) {
-                oldPosition = _ecsSettings.TeamChatRelativePos;
+                oldPosition = _ecsSettings.ClientOverlayRelativePos;
             }
 
-            transformRectangle(thmbOldPos, oldPosition);
             if(oldPosition.Width > 0 && oldPosition.Height > 0) {
                 txtNewThumbWidth.Text = (oldPosition.Width - oldPosition.X).ToString();
                 txtNewThumbHeight.Text = (oldPosition.Height - oldPosition.Y).ToString();
+                transformRectangle(thmbPos, oldPosition);
             } else {
                 txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
                 txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
-            }
-            
-
-            //New position rectangle
-            if(oldPosition != null && oldPosition.Width > 0 && oldPosition.Height > 0) {
-                transformRectangle(thmbNewPos, oldPosition);
-            } else {
                 createNewThumb();
             }
-            thmbNewPos.Visibility = System.Windows.Visibility.Visible;
+            
+            thmbPos.Visibility = System.Windows.Visibility.Visible;
         }
 
+        private void rdbChampionSearchbar_Unchecked(object sender, RoutedEventArgs e) {
+            Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(thmbPos), (int)Canvas.GetTop(thmbPos), (int)thmbPos.Width, (int)thmbPos.Height);
+            _ecsSettings.ChampionSearchbarRelativePos = repositionRectangle;
+        }
+
+        private void rdbTeamChat_Unchecked(object sender, RoutedEventArgs e) {
+            Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(thmbPos), (int)Canvas.GetTop(thmbPos), (int)thmbPos.Width, (int)thmbPos.Height);
+            _ecsSettings.TeamChatRelativePos = repositionRectangle;
+        }
+
+        private void rdbClientOverlay_Unchecked(object sender, RoutedEventArgs e) {
+            Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(thmbPos), (int)Canvas.GetTop(thmbPos), (int)thmbPos.Width, (int)thmbPos.Height);
+            _ecsSettings.ClientOverlayRelativePos = repositionRectangle;
+        }
 
         private void txtNewThumbWidth_TextChanged(object sender, TextChangedEventArgs e) {
             int newWidth = 0;
             if(int.TryParse(txtNewThumbWidth.Text, out newWidth)) {
-                thmbNewPos.Width = Math.Abs(newWidth);
+                newWidth =  Math.Abs(newWidth);
+                thmbPos.Width = newWidth;
             } else {
-                thmbNewPos.Width = _cBaseThumbWidth;
+                thmbPos.Width = _cBaseThumbWidth;
             }
         }
 
         private void txtNewThumbHeight_TextChanged(object sender, TextChangedEventArgs e) {
             int newHeight = 0;
             if(int.TryParse(txtNewThumbHeight.Text, out newHeight)) {
-                thmbNewPos.Height = Math.Abs(newHeight);
+                thmbPos.Height = Math.Abs(newHeight);
             } else {
-                thmbNewPos.Height = _cBaseThumbHeight;
-            }
-        }
-
-        private void btnSave_Click(object sender, RoutedEventArgs e) {
-            Rectangle repositionRectangle
-                = new Rectangle((int)Canvas.GetLeft(thmbNewPos), (int)Canvas.GetTop(thmbNewPos), (int)thmbNewPos.Width, (int)thmbNewPos.Height);
-
-            if(rdbChampionSearchbar.IsChecked == true) {
-                _ecsSettings.ChampionSearchbarRelativePos = repositionRectangle;
-            } else if(rdbTeamChat.IsChecked == true) {
-                _ecsSettings.TeamChatRelativePos = repositionRectangle;
-            } else if(rdbClientOverlay.IsChecked == true) {
-                _ecsSettings.ClientOverlayRelativePos = repositionRectangle;
+                thmbPos.Height = _cBaseThumbHeight;
             }
         }
 
@@ -134,22 +120,22 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void createNewThumb() {
-            Canvas.SetLeft(thmbNewPos, 0d);
-            Canvas.SetTop(thmbNewPos, 0d);
+            Canvas.SetLeft(thmbPos, 0d);
+            Canvas.SetTop(thmbPos, 0d);
 
             int tWidth;
             if(int.TryParse(txtNewThumbWidth.Text, out tWidth)) {
-                thmbNewPos.Width = Math.Abs(tWidth);
+                thmbPos.Width = Math.Abs(tWidth);
             } else {
-                thmbNewPos.Width = _cBaseThumbWidth;
+                thmbPos.Width = _cBaseThumbWidth;
                 txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
             }
 
             int tHeight;
             if(int.TryParse(txtNewThumbHeight.Text, out tHeight)) {
-                thmbNewPos.Height = Math.Abs(tHeight);
+                thmbPos.Height = Math.Abs(tHeight);
             } else {
-                thmbNewPos.Height = _cBaseThumbHeight;
+                thmbPos.Height = _cBaseThumbHeight;
                 txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
             }
         }
@@ -160,5 +146,12 @@ namespace EasyChampionSelection.Helper_Windows {
             Canvas.SetLeft(rectRepos, newPosition.X);
             Canvas.SetTop(rectRepos, newPosition.Y);
         }
+
+        private void Window_Closing_1(object sender, System.ComponentModel.CancelEventArgs e) {
+            this.Visibility = System.Windows.Visibility.Hidden;
+            this.ShowInTaskbar = false;
+            e.Cancel = true;
+        }
+
     }
 }

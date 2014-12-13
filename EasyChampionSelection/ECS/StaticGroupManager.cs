@@ -7,7 +7,7 @@ namespace EasyChampionSelection.ECS {
     /// A managing class that handles <c>ChampionList</c>
     /// </summary>
     [Serializable]
-    public class StaticGroupManager {
+    public sealed class StaticGroupManager {
         private const int intMaxGroups = 12;
         private List<ChampionList> lstGroupList;
         private static StaticGroupManager _instance;
@@ -17,6 +17,7 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// Occurs if a group is added, removed or repositioned.
         /// </summary>
+        [field: NonSerialized]
         public event GroupManagerHandler GroupsChanged;
 
         /// <summary>
