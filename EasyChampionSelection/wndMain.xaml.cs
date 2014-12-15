@@ -81,6 +81,10 @@ namespace EasyChampionSelection {
             DisplayGroups();
         }
 
+        private void _ecsSettings_ClientOverlayChanged(Settings sender, EventArgs e) {
+            _wndCO.RepositionClientOverlay();
+        }
+
         private void _tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
             _tmrCheckForChampSelect.Stop();
 
@@ -115,11 +119,6 @@ namespace EasyChampionSelection {
             }
 
             _tmrCheckForChampSelect.Start();
-        }
-
-        private void _lolClientHelper_OnLeagueClientResized(StaticLolClientGraphics sender, EventArgs e) {
-            DisplayPopup("Your league client has been resized!"
-            + "Double click in the centre of the title bar to bring it back to it's standard position!");
         }
 
         private void btnConfigClientOverlay_Click(object sender, RoutedEventArgs e) {
@@ -570,6 +569,7 @@ namespace EasyChampionSelection {
             } else {
                 _ecsSettings = new Settings();
             }
+            _ecsSettings.ClientOverlayChanged += _ecsSettings_ClientOverlayChanged;
         }
 
         private void LoadAllChampions() {
@@ -598,6 +598,8 @@ namespace EasyChampionSelection {
                 } catch(NullReferenceException ex) {
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
                 }
+            } else {
+                DisplayPopup("No API key found, get one at https://developer.riotgames.com/");
             }
 
         }
@@ -639,7 +641,6 @@ namespace EasyChampionSelection {
         private void NewStaticLolClientGraphics(Process LeagueOfLegendsClientProcess) {
             if(LeagueOfLegendsClientProcess != null) {
                 _lolClientHelper = StaticLolClientGraphics.GetInstance(LeagueOfLegendsClientProcess, _ecsSettings);
-                _lolClientHelper.OnLeagueClientResized += _lolClientHelper_OnLeagueClientResized;
                 if(_wndCLCO != null) {
                     if(_wndCLCO.IsVisible == true) {
                         _wndCLCO.Close();

@@ -282,6 +282,10 @@ namespace EasyChampionSelection.ECS {
             // New lol bounds
             GetWindowRect(processLolClient.MainWindowHandle, out _rectLolBounds);
 
+            if(_rectLolBounds.Width < 1 || _rectLolBounds.Height < 1) {
+                return null;
+            }
+
             // Check if client has repositioned
             if(_rectLolBounds.X != origLolBounds.X || _rectLolBounds.Y != origLolBounds.Y) {
                 if(OnLeagueClientReposition != null) {
@@ -314,10 +318,11 @@ namespace EasyChampionSelection.ECS {
 
                 // Release handle
                 lolClientSized_Graphics.ReleaseHdc();
-
+                lolClientSized_Graphics.Dispose();
             } catch(ArgumentException) { }
 
             return lolClientSized_Bitmap;
+
         }
 
         /// <summary>
@@ -326,10 +331,17 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public bool isInChampSelect() {
             if(_rectLolBounds.Width < 400) {
-                return false;
+                GetWindowRect(processLolClient.MainWindowHandle, out _rectLolBounds);
+                if(_rectLolBounds.Width < 400) {
+                    return false;
+                }
             }
 
             Bitmap picOfClient = GetLeagueClientAsBitmap();
+
+            if(picOfClient == null) {
+                return false;
+            }
 
             Color white = Color.FromArgb(255, 255, 255);
 
@@ -380,6 +392,8 @@ namespace EasyChampionSelection.ECS {
                 return false;
             }
 
+            picOfClient.Dispose();
+
             return true;
         }
 
@@ -387,19 +401,32 @@ namespace EasyChampionSelection.ECS {
         /// Returns an RGB BitmapSource of the Client at this moment
         /// </summary>
         public System.Windows.Media.Imaging.BitmapSource GetLeagueClientAsBitmapSource() {
-            Bitmap lolClientSized_Bitmap = GetLeagueClientAsBitmap();
+            //Use the IDisposable so we automatically dispose our image (can soak a lot of memory)
+            using(Bitmap lolClientSized_Bitmap = GetLeagueClientAsBitmap()) {
 
-            IntPtr ip = lolClientSized_Bitmap.GetHbitmap();
-            System.Windows.Media.Imaging.BitmapSource bs = null;
-            try {
-                bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(ip,
-                   IntPtr.Zero, System.Windows.Int32Rect.Empty,
-                   System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
-            } finally {
-                DeleteObject(ip);
+                if(lolClientSized_Bitmap == null) {
+                    return null;
+                }
+
+                IntPtr ip;
+                try {
+                    ip = lolClientSized_Bitmap.GetHbitmap();
+                } catch(ArgumentException) {
+                    return null;
+                }
+
+                System.Windows.Media.Imaging.BitmapSource bs = null;
+
+                try {
+                    bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(ip,
+                       IntPtr.Zero, System.Windows.Int32Rect.Empty,
+                       System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+                } finally {
+                    DeleteObject(ip);
+                }
+
+                return bs;
             }
-
-            return bs;
         }
     }
 }

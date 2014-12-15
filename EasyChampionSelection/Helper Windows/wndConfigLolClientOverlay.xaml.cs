@@ -15,6 +15,9 @@ namespace EasyChampionSelection.Helper_Windows {
         private Settings _ecsSettings;
         private const int _cBaseThumbWidth = 50;
         private const int _cBaseThumbHeight = 50;
+        private const int _cBaseImageWidth = 800;
+        private const int _cBaseImageHeight = 600;
+        private BitmapSource _lolClientImage;
 
         public wndConfigLolClientOverlay(StaticLolClientGraphics lcg, Settings ecsSettings) {
             if(lcg != null && ecsSettings != null) {
@@ -29,52 +32,76 @@ namespace EasyChampionSelection.Helper_Windows {
             txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            //Save last rdb
+            if(rdbChampionSearchbar.IsChecked == true) {
+                rdbChampionSearchbar_SavePosition(null, null);
+            } else if(rdbTeamChat.IsChecked == true) {
+                rdbTeamChat_SavePosition(null, null);
+            } else if(rdbClientOverlay.IsChecked == true) {
+                rdbClientOverlay_SavePosition(null, null);
+            }
+
+            this.Visibility = System.Windows.Visibility.Hidden;
+            this.ShowInTaskbar = false;
+            e.Cancel = true;
+        }
+
         private void btnGetCurrentClientImage_Click(object sender, RoutedEventArgs e) {
-            BitmapSource lolClientImage = _lcg.GetLeagueClientAsBitmapSource();
-            imgClientImage.Width = lolClientImage.Width;
-            imgClientImage.Height = lolClientImage.Height;
-            imgClientImage.Source = lolClientImage;
-            cvRectangles.Width = lolClientImage.Width;
-            cvRectangles.Height = lolClientImage.Height;
-            this.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
+            _lolClientImage = _lcg.GetLeagueClientAsBitmapSource();
+            if(_lolClientImage != null) {
+                imgClientImage.Width = _lolClientImage.Width;
+                imgClientImage.Height = _lolClientImage.Height;
+                imgClientImage.Source = _lolClientImage;
+                cvRectangles.Width = _lolClientImage.Width;
+                cvRectangles.Height = _lolClientImage.Height;
+
+                expOptions.Visibility = Visibility.Visible;
+
+                this.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
+            }
         }
 
         private void rdbOnChecked(object sender, RoutedEventArgs e) {
-            //Old position rectangle
+            btnShowHideOverlay.Visibility = Visibility.Visible;
+
+            spThumbSizeInfo.Visibility = System.Windows.Visibility.Visible;
+
+            //Saved position rectangle
             RadioButton rdbSender = (RadioButton)sender;
-            Rectangle oldPosition = new Rectangle();
+            Rectangle SavedPosition = new Rectangle();
             if(rdbSender.Equals(rdbChampionSearchbar)) {
-                oldPosition = _ecsSettings.ChampionSearchbarRelativePos;
+                SavedPosition = _ecsSettings.ChampionSearchbarRelativePos;
             } else if(rdbSender.Equals(rdbTeamChat)) {
-                oldPosition = _ecsSettings.TeamChatRelativePos;
+                SavedPosition = _ecsSettings.TeamChatRelativePos;
             } else if(rdbSender.Equals(rdbClientOverlay)) {
-                oldPosition = _ecsSettings.ClientOverlayRelativePos;
+                SavedPosition = _ecsSettings.ClientOverlayRelativePos;
             }
 
-            if(oldPosition.Width > 0 && oldPosition.Height > 0) {
-                txtNewThumbWidth.Text = (oldPosition.Width - oldPosition.X).ToString();
-                txtNewThumbHeight.Text = (oldPosition.Height - oldPosition.Y).ToString();
-                transformRectangle(thmbPos, oldPosition);
+            if(SavedPosition.Width > 0 && SavedPosition.Height > 0) {
+                txtNewThumbWidth.Text = (SavedPosition.Width - SavedPosition.X).ToString();
+                txtNewThumbHeight.Text = (SavedPosition.Height - SavedPosition.Y).ToString();
+                transformRectangle(thmbPos, SavedPosition);
             } else {
                 txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
                 txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
                 createNewThumb();
             }
-            
+
             thmbPos.Visibility = System.Windows.Visibility.Visible;
         }
 
-        private void rdbChampionSearchbar_Unchecked(object sender, RoutedEventArgs e) {
+        private void rdbChampionSearchbar_SavePosition(object sender, RoutedEventArgs e) {
             Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(thmbPos), (int)Canvas.GetTop(thmbPos), (int)thmbPos.Width, (int)thmbPos.Height);
             _ecsSettings.ChampionSearchbarRelativePos = repositionRectangle;
         }
 
-        private void rdbTeamChat_Unchecked(object sender, RoutedEventArgs e) {
+        private void rdbTeamChat_SavePosition(object sender, RoutedEventArgs e) {
             Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(thmbPos), (int)Canvas.GetTop(thmbPos), (int)thmbPos.Width, (int)thmbPos.Height);
             _ecsSettings.TeamChatRelativePos = repositionRectangle;
         }
 
-        private void rdbClientOverlay_Unchecked(object sender, RoutedEventArgs e) {
+        private void rdbClientOverlay_SavePosition(object sender, RoutedEventArgs e) {
             Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(thmbPos), (int)Canvas.GetTop(thmbPos), (int)thmbPos.Width, (int)thmbPos.Height);
             _ecsSettings.ClientOverlayRelativePos = repositionRectangle;
         }
@@ -82,7 +109,7 @@ namespace EasyChampionSelection.Helper_Windows {
         private void txtNewThumbWidth_TextChanged(object sender, TextChangedEventArgs e) {
             int newWidth = 0;
             if(int.TryParse(txtNewThumbWidth.Text, out newWidth)) {
-                newWidth =  Math.Abs(newWidth);
+                newWidth = Math.Abs(newWidth);
                 thmbPos.Width = newWidth;
             } else {
                 thmbPos.Width = _cBaseThumbWidth;
@@ -98,9 +125,9 @@ namespace EasyChampionSelection.Helper_Windows {
             }
         }
 
-        private void thmbRectangle_OnDragDelta(object sender, DragDeltaEventArgs e) {
+        private void thmbPos_OnDragDelta(object sender, DragDeltaEventArgs e) {
             Thumb tSender = (Thumb)sender;
-            
+
             int tLeft = (int)Canvas.GetLeft(tSender);
             int tRight = tLeft + (int)tSender.Width;
 
@@ -109,7 +136,7 @@ namespace EasyChampionSelection.Helper_Windows {
                     Canvas.SetLeft(tSender, tLeft + e.HorizontalChange);
                 }
             }
-                
+
             int tTop = (int)Canvas.GetTop(tSender);
             int tBot = tTop + (int)tSender.Height;
             if(tTop + e.VerticalChange > -1) {
@@ -147,10 +174,18 @@ namespace EasyChampionSelection.Helper_Windows {
             Canvas.SetTop(rectRepos, newPosition.Y);
         }
 
-        private void Window_Closing_1(object sender, System.ComponentModel.CancelEventArgs e) {
-            this.Visibility = System.Windows.Visibility.Hidden;
-            this.ShowInTaskbar = false;
-            e.Cancel = true;
+        private void btnShowHideOverlay_Click(object sender, RoutedEventArgs e) {
+            if(btnShowHideOverlay.Content.ToString() == "Hide overlay") {
+                expOptions.IsExpanded = false;
+                spThumbSizeInfo.Visibility = Visibility.Hidden;
+                btnShowHideOverlay.Content = "Show overlay";
+
+
+            } else {
+                expOptions.IsExpanded = true;
+                spThumbSizeInfo.Visibility = System.Windows.Visibility.Visible;
+                btnShowHideOverlay.Content = "Hide overlay";
+            }
         }
 
     }

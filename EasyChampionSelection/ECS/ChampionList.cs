@@ -11,19 +11,19 @@ namespace EasyChampionSelection.ECS {
         private string strName = "";
         private List<string> lstChampions;
 
-        public delegate void ChampionListHandler(ChampionList sender, EventArgs e);
+        public delegate void ChangedEventHandler(ChampionList sender, EventArgs e);
 
         /// <summary>
         /// The list has changed name.
         /// </summary>
         [field: NonSerialized]
-        public event ChampionListHandler NameChanged;
+        public event ChangedEventHandler NameChanged;
 
         /// <summary>
         /// The list has changed it's amount of champions.
         /// </summary>
         [field: NonSerialized]
-        public event ChampionListHandler ChampionsChanged;
+        public event ChangedEventHandler ChampionsChanged;
 
         /// <summary>
         /// Returns the number of champions in the list

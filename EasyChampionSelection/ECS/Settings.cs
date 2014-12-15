@@ -4,22 +4,48 @@ using System.Drawing;
 namespace EasyChampionSelection.ECS {
     [Serializable]
     public class Settings {
-        
+
         private Rectangle _rChampionSearchbarRelativePos;
-        private Rectangle _rTeamChatRelativePos; 
+        private Rectangle _rTeamChatRelativePos;
         private Rectangle _rClientOverlayRelativePos;
 
         private bool _showMainFormOnLaunch;
-        private bool _startOnBoot;
         private string _userApiKey;
 
-       #region Getters & Setters
+        public delegate void ChangedEventHandler(Settings sender, EventArgs e);
+
+        /// <summary>
+        /// Occurs when the ChampionSearchbar is moved or reseized.
+        /// </summary>
+        [field: NonSerialized]
+        public event ChangedEventHandler ChampionSearchbarChanged;
+
+        /// <summary>
+        /// Occurs when the TeamChatbar is moved or reseized.
+        /// </summary>
+        [field: NonSerialized]
+        public event ChangedEventHandler TeamChatChanged;
+
+        /// <summary>
+        /// Occurs when the Client Overlay is moved or reseized.
+        /// </summary>
+        [field: NonSerialized]
+        public event ChangedEventHandler ClientOverlayChanged;
+
+        #region Getters & Setters
         /// <summary>
         /// Get or set the relative postition of the Champion Searchbar.
         /// </summary>
         public Rectangle ChampionSearchbarRelativePos {
             get { return _rChampionSearchbarRelativePos; }
-            set { _rChampionSearchbarRelativePos = value; }
+            set {
+                if(value != null && value != _rChampionSearchbarRelativePos) {
+                    _rChampionSearchbarRelativePos = value;
+                    if(ChampionSearchbarChanged != null) {
+                        ChampionSearchbarChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -27,7 +53,14 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public Rectangle TeamChatRelativePos {
             get { return _rTeamChatRelativePos; }
-            set { _rTeamChatRelativePos = value; }
+            set {
+                if(value != null && value != _rTeamChatRelativePos) {
+                    _rTeamChatRelativePos = value;
+                    if(TeamChatChanged != null) {
+                        TeamChatChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -35,7 +68,14 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public Rectangle ClientOverlayRelativePos {
             get { return _rClientOverlayRelativePos; }
-            set { _rClientOverlayRelativePos = value; }
+            set {
+                if(value != null && value != _rClientOverlayRelativePos) {
+                    _rClientOverlayRelativePos = value;
+                    if(ClientOverlayChanged != null) {
+                         ClientOverlayChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -43,15 +83,11 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public bool ShowMainFormOnLaunch {
             get { return _showMainFormOnLaunch; }
-            set { _showMainFormOnLaunch = value; }
-        }
-
-        /// <summary>
-        /// Get or set if the programn should start when the computer starts
-        /// </summary>
-        public bool StartOnBoot {
-            get { return _startOnBoot; }
-            set { _startOnBoot = value; }
+            set {
+                if(value != _showMainFormOnLaunch) {
+                    _showMainFormOnLaunch = value;
+                }
+            }
         }
 
         /// <summary>
@@ -59,13 +95,16 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         public string UserApiKey {
             get { return _userApiKey; }
-            set { _userApiKey = value; }
+            set {
+                if(value != null && value != _userApiKey) {
+                    _userApiKey = value;
+                }
+            }
         }
         #endregion Getters & Setters
 
         public Settings() {
             this._showMainFormOnLaunch = true;
-            this._startOnBoot = false;
             this._userApiKey = "";
             this._rChampionSearchbarRelativePos = new Rectangle();
             this._rClientOverlayRelativePos = new Rectangle();

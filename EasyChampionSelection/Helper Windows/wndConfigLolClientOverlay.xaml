@@ -1,7 +1,13 @@
 ﻿<Window x:Class="EasyChampionSelection.Helper_Windows.wndConfigLolClientOverlay"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Configure Client Overlay" Height="300" Width="800" Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg" ShowInTaskbar="True" Closing="Window_Closing_1">
+        Title="Configure Client Overlay" 
+        Height="360" 
+        Width="600" 
+        Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg" 
+        ShowInTaskbar="True" 
+        Closing="Window_Closing">
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -9,24 +15,126 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+
     <Grid Background="{StaticResource windowHelperBackground}">
-        <Button x:Name="btnGetCurrentClientImage" Content="Get current client image" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="btnGetCurrentClientImage_Click"/>
-        <Expander Header="Modify:" HorizontalAlignment="Left" Margin="210,10,0,0" VerticalAlignment="Top" IsExpanded="True">
+        <Image x:Name="imgClientImage" 
+               HorizontalAlignment="Left" 
+               VerticalAlignment="Top" 
+               Margin="10,20,10,0" />
+
+        <Canvas x:Name="cvRectangles" 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Top" 
+                Margin="10,20,10,0" >
+            <Thumb Name="thmbPos" 
+                   DragDelta="thmbPos_OnDragDelta" 
+                   Canvas.Left="150" 
+                   Canvas.Top="20" 
+                   Template="{StaticResource ThumbNewPosRectangleTemplate}" 
+                   Visibility="Hidden" />
+        </Canvas>
+
+        <Button x:Name="btnGetCurrentClientImage" 
+                Content="Get current client image" 
+                HorizontalAlignment="Left" 
+                Margin="10,0,0,0" 
+                VerticalAlignment="Top" 
+                Click="btnGetCurrentClientImage_Click"/>
+
+        <Button x:Name="btnShowHideOverlay"
+                Content="Hide overlay" 
+                HorizontalAlignment="Left"
+                Margin="10,25,0,0" 
+                VerticalAlignment="Top"
+                Width="75"
+                Visibility="Hidden" 
+                Click="btnShowHideOverlay_Click"/>
+
+        <Expander x:Name="expOptions"
+                  Header="Modify:" 
+                  HorizontalAlignment="Left" 
+                  Margin="180,0,0,0" 
+                  VerticalAlignment="Top" 
+                  IsExpanded="True"
+                  Background="White"
+                  Opacity="0.8"
+                  Visibility="Hidden"
+                  >
             <StackPanel>
-                <RadioButton x:Name="rdbChampionSearchbar" Content="Champion Searchbar" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Top" Checked="rdbOnChecked" Unchecked="rdbChampionSearchbar_Unchecked"/>
-                <RadioButton x:Name="rdbTeamChat" Content="Team Chat" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Top" Checked="rdbOnChecked" Unchecked="rdbTeamChat_Unchecked"/>
-                <RadioButton x:Name="rdbClientOverlay" Content="ECS Client Overlay" Margin="3" VerticalAlignment="Top" Checked="rdbOnChecked" Unchecked="rdbClientOverlay_Unchecked"/>
+                <RadioButton x:Name="rdbChampionSearchbar" 
+                             Content="Champion Searchbar"
+                             HorizontalAlignment="Left" 
+                             Margin="3" 
+                             VerticalAlignment="Top" 
+                             Opacity="1"
+                             Checked="rdbOnChecked" 
+                             Unchecked="rdbChampionSearchbar_SavePosition"/>
+                <RadioButton x:Name="rdbTeamChat" 
+                             Content="Team Chat" 
+                             HorizontalAlignment="Left" 
+                             Margin="3" 
+                             Opacity="1"
+                             VerticalAlignment="Top" 
+                             Checked="rdbOnChecked" 
+                             Unchecked="rdbTeamChat_SavePosition"/>
+                <RadioButton x:Name="rdbClientOverlay" 
+                             Content="ECS Client Overlay" 
+                             Margin="3"
+                             Opacity="1"
+                             VerticalAlignment="Top"
+                             Checked="rdbOnChecked" 
+                             Unchecked="rdbClientOverlay_SavePosition"/>
             </StackPanel>
         </Expander>
 
-        <Image x:Name="imgClientImage" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,100,10,10" Width="100" />
-        <Canvas x:Name="cvRectangles" HorizontalAlignment="Left" VerticalAlignment="Top" Height="100" Width="400" Margin="13,103,10,10" >
-            <Thumb Name="thmbPos" DragDelta="thmbPos_OnDragDelta" Canvas.Left="150" Canvas.Top="20" Template="{StaticResource ThumbNewPosRectangleTemplate}" Visibility="Hidden" />
-        </Canvas>
-        <Label Content="Thumb size:" HorizontalAlignment="Left" Margin="384,14,0,0" VerticalAlignment="Top" ToolTip="Resize your thumb (rectangle) to suit your preferences"/>
-        <Label Content="Width" HorizontalAlignment="Left" Margin="384,45,0,0" VerticalAlignment="Top"/>
-        <Label Content="Height" HorizontalAlignment="Left" Margin="384,70,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtNewThumbWidth" HorizontalAlignment="Left" Height="23" Margin="435,45,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" VerticalContentAlignment="Center" TextChanged="txtNewThumbWidth_TextChanged"/>
-        <TextBox x:Name="txtNewThumbHeight" HorizontalAlignment="Left" Height="23" Margin="435,73,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" VerticalContentAlignment="Center" TextChanged="txtNewThumbHeight_TextChanged"/>
+
+        <StackPanel x:Name="spThumbSizeInfo"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top" 
+                    Margin="320,0,0,0"
+                    Background="YellowGreen"
+                    Opacity="0.8"
+                    Visibility="Hidden"
+                     >
+            <Label Content="Thumb size:" 
+               Margin="0,0,0,0"
+               />
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top">
+                <Label Content="Width"
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Top" 
+                       Margin="5,0,4,0"/>
+                <TextBox x:Name="txtNewThumbWidth"
+                        HorizontalAlignment="Left"
+                        Height="23" Margin="0,0,0,0" 
+                        TextWrapping="Wrap" 
+                        VerticalAlignment="Top"
+                        Width="50" 
+                        VerticalContentAlignment="Center"
+                        TextChanged="txtNewThumbWidth_TextChanged"
+                         />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top">
+                <Label Content="Height"
+                       HorizontalAlignment="Left" 
+                       Margin="5,0,0,0"
+                       VerticalAlignment="Top"
+                       />
+                <TextBox x:Name="txtNewThumbHeight" 
+                        HorizontalAlignment="Left"
+                        Height="23"
+                        Margin="0,0,10,10"
+                        TextWrapping="Wrap" 
+                        VerticalAlignment="Top" 
+                        Width="50" 
+                        VerticalContentAlignment="Center" 
+                        TextChanged="txtNewThumbHeight_TextChanged" 
+                         />
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Window>

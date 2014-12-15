@@ -53,6 +53,14 @@ namespace EasyChampionSelection {
             }
         }
 
+        public void RepositionClientOverlay() {
+            Rectangle rect = _lcg.getClientOverlayPosition();
+            this.Left = rect.X;
+            this.Top = rect.Y;
+            this.Width = rect.Width;
+            this.Height = rect.Height;
+        }
+
         private void _lcg_OnLeagueClientReposition(StaticLolClientGraphics sender, EventArgs e) {
             Rectangle rect = sender.getClientOverlayPosition();
             this.Left = rect.X;

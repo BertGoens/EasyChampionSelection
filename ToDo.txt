@@ -1,5 +1,3 @@
-Use a scrollviewer for ConfigClientOverlay Image but make sure it works with the canvas
-
 use safer aproaches everywhere to distribute
 try lowering dotnet min version as much as possible
 
