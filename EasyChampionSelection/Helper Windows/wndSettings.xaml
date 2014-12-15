@@ -12,7 +12,7 @@
     <Grid Background="{StaticResource windowHelperBackground}">
         <Label Content="API-key" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="txtApiKey" HorizontalAlignment="Left" Height="23" Margin="65,14,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="240" VerticalContentAlignment="Center" TextChanged="txtApiKey_TextChanged" MaxLines="1" MaxLength="36"/>
-        <CheckBox x:Name="chkShowMainFormOnBoot" Content="Show Main form on launch" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top" Checked="chkShowMainFormOnBoot_Checked" Unchecked="chkShowMainFormOnBoot_Unchecked" />
+        <CheckBox x:Name="chkShowMainFormOnBoot" Content="Show Main form on launch" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top" Checked="chkShowMainFormOnBoot_Checked" Unchecked="chkShowMainFormOnBoot_Unchecked" />
         <Label x:Name="lblChampionSearchBar" Content="ChampionSearchBar:" HorizontalAlignment="Left" Margin="10,105,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lblTeamChat" Content="TeamChat:" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lblClientOverlay" Content="Client Overlay:" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top"/>

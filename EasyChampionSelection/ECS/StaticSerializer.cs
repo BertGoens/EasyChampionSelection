@@ -16,13 +16,12 @@ namespace EasyChampionSelection.ECS {
 
         public static void SerializeObject(object objectToSerialize, string fileName) {
             try {
+                Directory.CreateDirectory(fileName.Substring(0, fileName.LastIndexOf("/")));
                 Stream stream = File.Open(fileName, FileMode.Create);
                 BinaryFormatter bFormatter = new BinaryFormatter();
                 bFormatter.Serialize(stream, objectToSerialize);
                 stream.Close();
             } catch(DirectoryNotFoundException) {
-
-                throw;
             }
 
         }

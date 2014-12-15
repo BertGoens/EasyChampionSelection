@@ -72,7 +72,7 @@ namespace EasyChampionSelection.ECS {
                 if(value != null && value != _rClientOverlayRelativePos) {
                     _rClientOverlayRelativePos = value;
                     if(ClientOverlayChanged != null) {
-                         ClientOverlayChanged(this, EventArgs.Empty);
+                        ClientOverlayChanged(this, EventArgs.Empty);
                     }
                 }
             }
@@ -101,6 +101,7 @@ namespace EasyChampionSelection.ECS {
                 }
             }
         }
+
         #endregion Getters & Setters
 
         public Settings() {

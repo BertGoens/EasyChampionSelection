@@ -24,12 +24,13 @@ namespace EasyChampionSelection {
         private ChampionList _allChampions;
         private wndClientOverload _wndCO;
         private wndConfigLolClientOverlay _wndCLCO;
-        private bool _forceShowClientOverload;
-        public StaticGroupManager _gmGroupManager;
+        private wndContactCreator _wndCC;
+        private StaticGroupManager _gmGroupManager;
         private Settings _ecsSettings;
         private TaskbarIcon _notifyIcon;
-        public StaticLolClientGraphics _lolClientHelper;
-
+        private StaticLolClientGraphics _lolClientHelper;
+        private TimeSpan _tmspTimerClienActiveInterval = new TimeSpan(500);
+        private TimeSpan _tmspTimerAfkInterval = new TimeSpan(1000);
         #endregion Properties & Attributes
 
         public wndMain() {
@@ -48,7 +49,7 @@ namespace EasyChampionSelection {
 
             SetupNotifyIcon(); //TrayIcon
 
-            LoadSerializedGroupManager(); 
+            LoadSerializedGroupManager();
             LoadAllChampions(); //Load all champions (Riot api or local)
 
             //Visualize the data
@@ -64,6 +65,8 @@ namespace EasyChampionSelection {
             StaticSerializer.SerializeObject(_ecsSettings, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_Settings);
 
             _notifyIcon.Dispose(); //Dispose to auto clear the icon
+
+            Application.Current.Shutdown();
         }
 
         private void _AllChampions_ChampionsChanged(ChampionList sender, EventArgs e) {
@@ -88,33 +91,39 @@ namespace EasyChampionSelection {
         private void _tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
             _tmrCheckForChampSelect.Stop();
 
-            //Look for the lolClient process
-            Process[] p = Process.GetProcessesByName("LolClient");
-
-            if(_lolClientHelper != null) {
-                //Check if the lolClient process hasn't changed (ie: close & restart)
-                if(p.Count() > 0) {
-                    if(p[0].Id == _lolClientHelper.getProcessLolClient().Id) { //Is same client?
-                        if(_lolClientHelper.isLolClientFocussed() || _lolClientHelper.isEasyChampionSelectionFoccussed()) { //If lolclient or ECS = active window
-                            if(_lolClientHelper.isInChampSelect()) { //Is it in champion select?
-                                if(_wndCO.Visibility != System.Windows.Visibility.Visible) { //Is the ClientOverlay visible?
-                                    _wndCO.Show();
-                                }
-                            } else { // not in champ select, hide overlay
-                                _wndCO.Visibility = System.Windows.Visibility.Hidden;
-                            }
-                        } else { // lolclient not foccussed
-                            if(!_forceShowClientOverload) {
-                                _wndCO.Visibility = System.Windows.Visibility.Hidden;
-                            }
-                        }
-                    } else { //Create new / update lolClientHelper
-                        NewStaticLolClientGraphics(p[0]);
-                    }
-                }
+            //Check if player is ingame
+            Process[] gameClient = Process.GetProcessesByName("League of Legends");
+            if(gameClient.Count() > 0) {
+                _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
             } else {
-                if(p.Count() > 0) {
-                    NewStaticLolClientGraphics(p[0]);
+                _tmrCheckForChampSelect.Interval = _tmspTimerClienActiveInterval;
+
+                //Look for the lolClient process
+                Process[] p = Process.GetProcessesByName("LolClient");
+
+                if(_lolClientHelper != null) {
+                    //Check if the lolClient process hasn't changed (ie: close & restart)
+                    if(p.Count() > 0) {
+                        if(p[0].Id == _lolClientHelper.getProcessLolClient().Id) { //Is same client?
+                            if(_lolClientHelper.isLolClientFocussed() || _lolClientHelper.isEasyChampionSelectionFoccussed()) { //If lolclient or ECS = active window
+                                if(_lolClientHelper.isInChampSelect()) { //Is it in champion select?
+                                    if(_wndCO.Visibility != System.Windows.Visibility.Visible) { //Is the ClientOverlay visible?
+                                        _wndCO.Show();
+                                    }
+                                } else { // not in champ select, hide overlay
+                                    _wndCO.Visibility = System.Windows.Visibility.Hidden;
+                                }
+                            }
+                        } else { //Create new / update lolClientHelper
+                            NewStaticLolClientGraphics(p[0]);
+                        }
+                    }
+                } else {
+                    if(p.Count() > 0) {
+                        NewStaticLolClientGraphics(p[0]);
+                    } else {
+                        _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
+                    }
                 }
             }
 
@@ -143,14 +152,9 @@ namespace EasyChampionSelection {
         }
 
         private void btnSettings_Click(object sender, RoutedEventArgs e) {
-            try {
-                wndSettings wndST = new wndSettings(_ecsSettings);
-                wndST.Owner = this;
-                wndST.ShowDialog();
-            } catch(Exception) {
-                DisplayPopup("Woops, something went wrong!");
-            }
-
+            wndSettings wndST = new wndSettings(_ecsSettings);
+            wndST.Owner = this;
+            wndST.ShowDialog();
         }
 
         private void btnCredits_Click(object sender, RoutedEventArgs e) {
@@ -244,17 +248,10 @@ namespace EasyChampionSelection {
                 cm.Items.Add(mniShowMainWindow);
             }
 
-            MenuItem mniShow = CreateMenuItem("Show Client Overlay", mniShow_Click);
-            cm.Items.Add(mniShow);
+            cm.Items.Add(new Separator());
 
-            MenuItem mniHide = CreateMenuItem("Hide Client Overlay", mniHide_Click);
-            cm.Items.Add(mniHide);
-
-            if(_wndCO.Visibility != System.Windows.Visibility.Visible) {
-                mniHide.IsEnabled = false;
-            } else {
-                mniShow.IsEnabled = false;
-            }
+            MenuItem mniContactCreator = CreateMenuItem("Contact creator", mniContactCreator_Click);
+            cm.Items.Add(mniContactCreator);
 
             cm.Items.Add(new Separator());
 
@@ -274,14 +271,14 @@ namespace EasyChampionSelection {
             this.ShowInTaskbar = false;
         }
 
-        private void mniShow_Click(object sender, RoutedEventArgs e) {
-            _wndCO.Show();
-            _forceShowClientOverload = true;
-        }
-
-        private void mniHide_Click(object sender, RoutedEventArgs e) {
-            _wndCO.Visibility = System.Windows.Visibility.Hidden;
-            _forceShowClientOverload = false;
+        private void mniContactCreator_Click(object sender, RoutedEventArgs e) {
+            if(_wndCC == null) {
+                _wndCC = new wndContactCreator();
+                _wndCC.Owner = this;
+                _wndCC.Show();
+            } else {
+                _wndCC.Show();
+            }
         }
 
         private void mniExit_Click(object sender, RoutedEventArgs e) {
@@ -556,7 +553,7 @@ namespace EasyChampionSelection {
 
         private void SetupTimer() {
             _tmrCheckForChampSelect.Tick += new EventHandler(_tmrCheckForChampSelect_Tick);
-            _tmrCheckForChampSelect.Interval = new TimeSpan(500);
+            _tmrCheckForChampSelect.Interval = _tmspTimerClienActiveInterval;
             _tmrCheckForChampSelect.IsEnabled = true;
         }
 
@@ -583,7 +580,7 @@ namespace EasyChampionSelection {
 
         private void LoadAllChampionsRiotApi() {
             _allChampions.RemoveAllChampions();
-            if(_ecsSettings.UserApiKey.Length > 0) {
+            if(_ecsSettings.UserApiKey.Length == 36) {
                 try {
                     StaticRiotApi staticApi = StaticRiotApi.GetInstance(_ecsSettings.UserApiKey);
                     RiotSharp.StaticDataEndpoint.ChampionListStatic champions = staticApi.GetChampions(RiotSharp.Region.euw, RiotSharp.StaticDataEndpoint.ChampionData.info, RiotSharp.Language.en_US);
@@ -594,12 +591,11 @@ namespace EasyChampionSelection {
                     }
 
                 } catch(RiotSharpException ex) {
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
-                } catch(NullReferenceException ex) {
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
+                    DisplayPopup("Trouble loading trough the api: " + ex.ToString());
+                } catch(NullReferenceException) {
                 }
             } else {
-                DisplayPopup("No API key found, get one at https://developer.riotgames.com/");
+                DisplayPopup("No correct API key found, get one at https://developer.riotgames.com/");
             }
 
         }
@@ -647,10 +643,10 @@ namespace EasyChampionSelection {
                     }
                 }
                 _wndCLCO = new wndConfigLolClientOverlay(_lolClientHelper, _ecsSettings);
-                _wndCLCO.Owner = this;
+                //_wndCLCO.Owner = this;
                 _wndCO = new wndClientOverload(_gmGroupManager, _ecsSettings, _lolClientHelper); //Helper window
                 _wndCO.Owner = this;
-                DisplayPopup("Your lolClient.exe process just got updated.");
+                DisplayPopup("Your lolclient.exe process just got updated.");
             }
         }
 

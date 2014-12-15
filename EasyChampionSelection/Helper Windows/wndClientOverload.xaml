@@ -3,8 +3,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
     x:Name="wndMyClientOverload"
     x:Class="EasyChampionSelection.wndClientOverload"
-    Height="40" Width="300" ShowInTaskbar="False" Topmost="True" WindowStyle="None" ShowActivated="False"
-     ResizeMode="NoResize" Title="ECS lolClient Overlay" BorderBrush="#FFB8B8B8" BorderThickness="1" >
+    Height="40" 
+    Width="300" 
+    ShowInTaskbar="False" 
+    Topmost="True" 
+    WindowStyle="None"
+    ShowActivated="False"
+    ResizeMode="NoResize" 
+    Title="ECS lolClient Overlay">
     
     <Grid>
         <Grid.Background>
@@ -13,8 +19,18 @@
                 <GradientStop Color="#FFAF4B0B" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
+        
         <ComboBox x:Name="cboGroups" 
-                  HorizontalAlignment="Left" Margin="56,0,0,0" VerticalAlignment="Center" Width="230" Height="25" UseLayoutRounding="False" />
-        <Label Content="Groups:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" />
+                  HorizontalAlignment="Left" 
+                  Margin="56,0,0,0" 
+                  VerticalAlignment="Center"
+                  Width="230"
+                  Height="25" 
+                  SelectionChanged="cboGroups_SelectionChanged"
+                   />
+        <Label Content="Groups:" 
+               HorizontalAlignment="Left" 
+               VerticalAlignment="Center"
+               />
     </Grid>
 </Window>

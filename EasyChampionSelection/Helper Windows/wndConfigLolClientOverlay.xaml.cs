@@ -79,8 +79,8 @@ namespace EasyChampionSelection.Helper_Windows {
             }
 
             if(SavedPosition.Width > 0 && SavedPosition.Height > 0) {
-                txtNewThumbWidth.Text = (SavedPosition.Width - SavedPosition.X).ToString();
-                txtNewThumbHeight.Text = (SavedPosition.Height - SavedPosition.Y).ToString();
+                txtNewThumbWidth.Text = Math.Abs(SavedPosition.Width).ToString();
+                txtNewThumbHeight.Text = Math.Abs(SavedPosition.Height).ToString();
                 transformRectangle(thmbPos, SavedPosition);
             } else {
                 txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();

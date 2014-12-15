@@ -20,7 +20,7 @@ namespace EasyChampionSelection {
                 this._ecsSettings = ecsSettings;
                 this._lcg = lcg;
                 _groupManager.GroupsChanged += _groupManager_GroupsChanged;
-                _lcg.OnLeagueClientReposition +=_lcg_OnLeagueClientReposition;
+                _lcg.OnLeagueClientReposition += _lcg_OnLeagueClientReposition;
                 for(int i = 0; i < _groupManager.GroupCount; i++) {
                     _groupManager.getGroup(i).NameChanged += _groupManager_ChampionList_NameChanged;
                 }
@@ -40,6 +40,7 @@ namespace EasyChampionSelection {
                 Rectangle pos = _lcg.getClientOverlayPosition();
                 this.Left = pos.X;
                 this.Top = pos.Y;
+                cboGroups.Width = pos.Width - cboGroups.Margin.Left - 5;
                 this.Width = pos.Width;
                 this.Height = pos.Height;
             }
@@ -137,37 +138,50 @@ namespace EasyChampionSelection {
         }
 
         private void CheckBox_CheckStateChanged(object sender, RoutedEventArgs e) {
-            String searchFieldText = CreateStringOfChampions();
-
-            if(this._lcg.getProcessLolClient() != null) {
-                this._lcg.TypeInSearchBar(searchFieldText);
-            }
-
+            this._lcg.TypeInSearchBar(CreateStringOfCheckedItems());
         }
 
-        private String CreateStringOfChampions() {
+        private void cboGroups_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            _lcg.TypeInSearchBar(CreateStringOfChampionsInChampionList(_groupManager.getGroup(cboGroups.SelectedIndex)));
+        }
+
+        private string CreateStringOfChampionsInChampionList(ChampionList c) {
             //The client accepts regex commandos
+
+            string returnValue = "";
+            for(int i = 0; i < c.getCount(); i++) {
+                returnValue += c.getChampion(i) + "|";
+            }
+
+            //replace whitespace with \s (regex space)
+            returnValue = returnValue.Replace(" ", "\\s");
+
+            //remove last |
+            if(returnValue.Length > 0) {
+                returnValue = returnValue.Substring(0, returnValue.Length - 1);
+            }
+
+            return returnValue;
+        }
+
+        private string CreateStringOfCheckedItems() {
+            string returnValue = "";
+
             List<string> lstChampsToFilter = new List<string>();
 
             for(int i = 0; i < cboGroups.Items.Count; i++) {
                 CheckBox cb = (CheckBox)cboGroups.Items[i];
                 if(cb.IsChecked == true) {
-                    int newGroupCount =_groupManager.getGroup(i).ChampionCount;
+                    int newGroupCount = _groupManager.getGroup(i).ChampionCount;
                     for(int j = 0; j < newGroupCount; j++) {
                         string newChampion = _groupManager.getGroup(i).getChampion(j);
                         if(!lstChampsToFilter.Contains(newChampion)) {
                             lstChampsToFilter.Add(newChampion);
+                            returnValue += newChampion + "|";
                         }
                     }
                 }
             }
-
-            lstChampsToFilter.Sort();
-            string returnValue = "";
-            for(int i = 0; i < lstChampsToFilter.Count; i++) {
-                returnValue += lstChampsToFilter[i] + "|";
-            }
-
             //replace whitespace with \s (regex space)
             returnValue = returnValue.Replace(" ", "\\s");
 
