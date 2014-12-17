@@ -152,6 +152,10 @@ namespace EasyChampionSelection.ECS {
         #endregion Private DLL Import & Related structures
 
         #region Getters & Setters
+        public StaticLolClientGraphics getInstance() {
+            return _instance;
+        }
+
         public Settings getSettings() {
             return _ecsSettings;
         }
@@ -289,14 +293,14 @@ namespace EasyChampionSelection.ECS {
             // Check if client has repositioned
             if(_rectLolBounds.X != origLolBounds.X || _rectLolBounds.Y != origLolBounds.Y) {
                 if(OnLeagueClientReposition != null) {
-                    OnLeagueClientReposition(this, new EventArgs());
+                    OnLeagueClientReposition(this, EventArgs.Empty);
                 }
             }
 
             // Check if client has been resized
             if(_rectLolBounds.Width != origLolBounds.Width || _rectLolBounds.Height != origLolBounds.Height) {
                 if(OnLeagueClientResized != null) {
-                    OnLeagueClientResized(this, new EventArgs());
+                    OnLeagueClientResized(this, EventArgs.Empty);
                 }
             }
 

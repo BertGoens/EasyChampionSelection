@@ -12,6 +12,16 @@ namespace EasyChampionSelection.Helper_Windows {
             InitializeComponent();
         }
 
+        public wndContactCreator(Exception error, string userComment) : this() {
+            txtSubject.Text = "Error " + error.InnerException.ToString();
+            txtBody.Text = "Hello, I've encountered this error today: \n" +
+                error.ToString();
+
+            if(userComment.Length > 0) {
+                txtBody.Text += "\n\n" + userComment;
+            }
+        }
+
         private void btnSendMail_Click(object sender, RoutedEventArgs e) {
             if(!txtFromSender.Text.Contains("@")) {
                 MessageBox.Show("Please use a valid email address!");

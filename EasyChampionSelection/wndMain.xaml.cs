@@ -20,17 +20,18 @@ namespace EasyChampionSelection {
 
         #region Properties & Attributes
 
+        private bool _manuallyEnableTimerVisual = false;
         private DispatcherTimer _tmrCheckForChampSelect = new DispatcherTimer();
         private ChampionList _allChampions;
         private wndClientOverload _wndCO;
         private wndConfigLolClientOverlay _wndCLCO;
         private wndContactCreator _wndCC;
-        private StaticGroupManager _gmGroupManager;
+        private StaticGroupManager _gm;
         private Settings _ecsSettings;
         private TaskbarIcon _notifyIcon;
-        private StaticLolClientGraphics _lolClientHelper;
+        private StaticLolClientGraphics _lcg;
         private TimeSpan _tmspTimerClienActiveInterval = new TimeSpan(500);
-        private TimeSpan _tmspTimerAfkInterval = new TimeSpan(1000);
+        private TimeSpan _tmspTimerAfkInterval = new TimeSpan(5000);
         #endregion Properties & Attributes
 
         public wndMain() {
@@ -60,7 +61,7 @@ namespace EasyChampionSelection {
         }
 
         private void frmMain_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            StaticSerializer.SerializeObject(_gmGroupManager, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_GroupManager);
+            StaticSerializer.SerializeObject(_gm, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_GroupManager);
             StaticSerializer.SerializeObject(_allChampions, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_AllChampions);
             StaticSerializer.SerializeObject(_ecsSettings, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_Settings);
 
@@ -91,50 +92,67 @@ namespace EasyChampionSelection {
         private void _tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
             _tmrCheckForChampSelect.Stop();
 
-            //Check if player is ingame
-            Process[] gameClient = Process.GetProcessesByName("League of Legends");
-            if(gameClient.Count() > 0) {
-                _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
-            } else {
-                _tmrCheckForChampSelect.Interval = _tmspTimerClienActiveInterval;
+            try {
+                //Check if player is ingame
+                Process[] gameClient = Process.GetProcessesByName("League of Legends");
+                if(gameClient.Count() > 0) {
+                    _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
+                } else {
+                    _tmrCheckForChampSelect.Interval = _tmspTimerClienActiveInterval;
 
-                //Look for the lolClient process
-                Process[] p = Process.GetProcessesByName("LolClient");
-
-                if(_lolClientHelper != null) {
-                    //Check if the lolClient process hasn't changed (ie: close & restart)
-                    if(p.Count() > 0) {
-                        if(p[0].Id == _lolClientHelper.getProcessLolClient().Id) { //Is same client?
-                            if(_lolClientHelper.isLolClientFocussed() || _lolClientHelper.isEasyChampionSelectionFoccussed()) { //If lolclient or ECS = active window
-                                if(_lolClientHelper.isInChampSelect()) { //Is it in champion select?
-                                    if(_wndCO.Visibility != System.Windows.Visibility.Visible) { //Is the ClientOverlay visible?
-                                        _wndCO.Show();
-                                    }
-                                } else { // not in champ select, hide overlay
-                                    _wndCO.Visibility = System.Windows.Visibility.Hidden;
-                                }
-                            }
-                        } else { //Create new / update lolClientHelper
+                    Process[] p = Process.GetProcessesByName("lolclient"); //Look for the lolClient process
+                    if(_lcg == null) {
+                        if(p.Count() > 0) {
                             NewStaticLolClientGraphics(p[0]);
+                        } else {
+                            _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
+                            DeleteOldStaticLolClientGraphics(); //Delete all references to client dependent classes with events
+                            _tmrCheckForChampSelect.Start();
+                            return;
                         }
                     }
-                } else {
-                    if(p.Count() > 0) {
-                        NewStaticLolClientGraphics(p[0]);
-                    } else {
-                        _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
-                    }
-                }
-            }
 
+                    bool clientExists = false;
+                    for(int i = 0; i < p.Length; i++) {
+                        if(p[i].Id == _lcg.getProcessLolClient().Id) {
+                            clientExists = true;
+                            break;
+                        }
+                    }
+
+                    if(!clientExists) {
+                        NewStaticLolClientGraphics(p[0]);
+                    }
+
+
+                    if(_lcg.isLolClientFocussed() ||_lcg.isEasyChampionSelectionFoccussed()) {
+                        if(_lcg.isInChampSelect()) {
+                            _wndCO.Visibility = System.Windows.Visibility.Visible;
+                        } else {
+                            _wndCO.Visibility = System.Windows.Visibility.Hidden;
+                        }
+                        if(_wndCLCO.IsFocused) {
+                            _wndCO.Visibility = Visibility.Hidden;
+                        }
+                    }
+
+                }
+            } catch(Exception ex) {
+                wndErrorHelper wndEH = new wndErrorHelper(ex);
+                wndEH.Owner = this;
+                wndEH.ShowDialog();
+                _tmrCheckForChampSelect.Stop();
+                _manuallyEnableTimerVisual = true;
+                return;
+            }
             _tmrCheckForChampSelect.Start();
         }
 
         private void btnConfigClientOverlay_Click(object sender, RoutedEventArgs e) {
             bool showError = true;
 
-            if(_lolClientHelper != null) {
-                if(_lolClientHelper.getProcessLolClient() != null) {
+            if(_lcg != null) {
+                if(_lcg.getProcessLolClient() != null) {
                     try {
                         showError = false;
                         _wndCLCO.Visibility = System.Windows.Visibility.Visible;
@@ -170,7 +188,7 @@ namespace EasyChampionSelection {
 
         private void btnNewGroup_Click(object sender, RoutedEventArgs e) {
             try {
-                wndAddGroup wndAG = new wndAddGroup(_gmGroupManager);
+                wndAddGroup wndAG = new wndAddGroup(_gm);
                 wndAG.Owner = this;
                 wndAG.ShowDialog();
             } catch(Exception) {
@@ -181,8 +199,8 @@ namespace EasyChampionSelection {
         private void btnDeleteGroup_Click(object sender, RoutedEventArgs e) {
             if(lsbGroups.SelectedIndex > -1) {
                 if(MessageBoxResult.Yes == MessageBox.Show("Remove: " + lsbGroups.SelectedItem.ToString(), "Remove group", MessageBoxButton.YesNo)) {
-                    _gmGroupManager.RemoveGroup(lsbGroups.SelectedIndex);
-                    lblGroupsCount.Content = "Groups: " + lsbGroups.Items.Count + " / " + _gmGroupManager.MaxGroups;
+                    _gm.RemoveGroup(lsbGroups.SelectedIndex);
+                    lblGroupsCount.Content = "Groups: " + lsbGroups.Items.Count + " / " + _gm.MaxGroups;
                     DisplayGroups();
                     DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
                 }
@@ -197,7 +215,7 @@ namespace EasyChampionSelection {
 
         private void btnAddChampionsToCurrentGroup_Click(object sender, RoutedEventArgs e) {
             for(int i = 0; i < lsbAllChampions.SelectedItems.Count; i++) {
-                _gmGroupManager.getGroup(lsbGroups.SelectedIndex).AddChampion(lsbAllChampions.SelectedItems[i].ToString());
+                _gm.getGroup(lsbGroups.SelectedIndex).AddChampion(lsbAllChampions.SelectedItems[i].ToString());
             }
 
             DisplayChampsInSelectedGroup();
@@ -206,7 +224,7 @@ namespace EasyChampionSelection {
 
         private void btnRemoveChampionsFromCurrentGroup_Click(object sender, RoutedEventArgs e) {
             for(int i = 0; i < lsbChampionsInGroup.SelectedItems.Count; i++) {
-                _gmGroupManager.getGroup(lsbGroups.SelectedIndex).RemoveChampion(lsbChampionsInGroup.SelectedItems[i].ToString());
+                _gm.getGroup(lsbGroups.SelectedIndex).RemoveChampion(lsbChampionsInGroup.SelectedItems[i].ToString());
             }
             DisplayChampsInSelectedGroup();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
@@ -249,6 +267,10 @@ namespace EasyChampionSelection {
             }
 
             cm.Items.Add(new Separator());
+            if(_manuallyEnableTimerVisual) {
+                MenuItem mniManuallyEnableTimer = CreateMenuItem("Start timer", mniManuallyEnableTimer_Click);
+                cm.Items.Add(mniManuallyEnableTimer);
+            }
 
             MenuItem mniContactCreator = CreateMenuItem("Contact creator", mniContactCreator_Click);
             cm.Items.Add(mniContactCreator);
@@ -269,6 +291,11 @@ namespace EasyChampionSelection {
         private void mniHideMainWindow_Click(object sender, RoutedEventArgs e) {
             this.Visibility = System.Windows.Visibility.Hidden;
             this.ShowInTaskbar = false;
+        }
+
+        private void mniManuallyEnableTimer_Click(object sender, RoutedEventArgs e) {
+            _manuallyEnableTimerVisual = false;
+            _tmrCheckForChampSelect.Start();
         }
 
         private void mniContactCreator_Click(object sender, RoutedEventArgs e) {
@@ -300,7 +327,7 @@ namespace EasyChampionSelection {
             MenuItem mniNewGroup = CreateMenuItem("New Group", mniNewGroup_Click);
             cm.Items.Add(mniNewGroup);
 
-            if(_gmGroupManager.MaxGroups <= _gmGroupManager.GroupCount) {
+            if(_gm.MaxGroups <= _gm.GroupCount) {
                 mniNewGroup.IsEnabled = false;
             }
 
@@ -332,7 +359,7 @@ namespace EasyChampionSelection {
         }
 
         void mniRenameGroup_Click(object sender, RoutedEventArgs e) {
-            wndRenameGroup wndRG = new wndRenameGroup(_gmGroupManager, lsbGroups.SelectedItem.ToString());
+            wndRenameGroup wndRG = new wndRenameGroup(_gm, lsbGroups.SelectedItem.ToString());
             wndRG.Owner = this;
             wndRG.ShowDialog();
         }
@@ -346,13 +373,13 @@ namespace EasyChampionSelection {
         }
 
         void mniMoveGroupUp_Click(object sender, RoutedEventArgs e) {
-            _gmGroupManager.ReOrder((ChampionList)lsbGroups.SelectedItem, lsbGroups.SelectedIndex - 1);
+            _gm.ReOrder((ChampionList)lsbGroups.SelectedItem, lsbGroups.SelectedIndex - 1);
             DisplayGroups();
 
         }
 
         void mniMoveGroupDown_Click(object sender, RoutedEventArgs e) {
-            _gmGroupManager.ReOrder((ChampionList)lsbGroups.SelectedItem, lsbGroups.SelectedIndex + 1);
+            _gm.ReOrder((ChampionList)lsbGroups.SelectedItem, lsbGroups.SelectedIndex + 1);
             DisplayGroups();
 
         }
@@ -426,9 +453,9 @@ namespace EasyChampionSelection {
                 if(champsInClipboardText[i].Length > 1) {
                     if(!_allChampions.Contains(champsInClipboardText[i])) {
                         _allChampions.AddChampion(champsInClipboardText[i]);
-                        _gmGroupManager.getGroup(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
-                    } else if(!_gmGroupManager.getGroup(lsbGroups.SelectedIndex).Contains(champsInClipboardText[i])) {
-                        _gmGroupManager.getGroup(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
+                        _gm.getGroup(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
+                    } else if(!_gm.getGroup(lsbGroups.SelectedIndex).Contains(champsInClipboardText[i])) {
+                        _gm.getGroup(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
                     }
                 }
             }
@@ -554,7 +581,7 @@ namespace EasyChampionSelection {
         private void SetupTimer() {
             _tmrCheckForChampSelect.Tick += new EventHandler(_tmrCheckForChampSelect_Tick);
             _tmrCheckForChampSelect.Interval = _tmspTimerClienActiveInterval;
-            _tmrCheckForChampSelect.IsEnabled = true;
+            _tmrCheckForChampSelect.Start();
         }
 
         private void LoadSettings() {
@@ -612,13 +639,13 @@ namespace EasyChampionSelection {
         private void LoadSerializedGroupManager() {
             lblCurrentGroupChampions.Content = "Create a group first.";
             if(File.Exists(StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_GroupManager)) {
-                _gmGroupManager = (StaticGroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_GroupManager);
-                if(_gmGroupManager != null) {
-                    if(_gmGroupManager.GroupCount > 0) {
+                _gm = (StaticGroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_GroupManager);
+                if(_gm != null) {
+                    if(_gm.GroupCount > 0) {
                         lblCurrentGroupChampions.Content = "";
-                        _gmGroupManager.GroupsChanged += _gmGroupManager_GroupsChanged;
-                        for(int i = 0; i < _gmGroupManager.GroupCount; i++) {
-                            _gmGroupManager.getGroup(i).NameChanged += _gmGroupManager_ChampionList_NameChanged;
+                        _gm.GroupsChanged += _gmGroupManager_GroupsChanged;
+                        for(int i = 0; i < _gm.GroupCount; i++) {
+                            _gm.getGroup(i).NameChanged += _gmGroupManager_ChampionList_NameChanged;
                         }
                     }
                 } else {
@@ -630,22 +657,35 @@ namespace EasyChampionSelection {
         }
 
         private void NewGroupManager() {
-            _gmGroupManager = StaticGroupManager.GetInstance();
-            _gmGroupManager.GroupsChanged += _gmGroupManager_GroupsChanged;
+            _gm = StaticGroupManager.GetInstance();
+            _gm.GroupsChanged += _gmGroupManager_GroupsChanged;
+        }
+
+        private void DeleteOldStaticLolClientGraphics() {
+            if(_wndCLCO != null) {
+                _wndCLCO.Close();
+                _wndCLCO = null;
+            }
+
+            if(_wndCO != null) {
+                _wndCO.SafeDelete(); //Unsubscribes from all events
+                _wndCO = null;
+            }
+
+            _lcg = null;
         }
 
         private void NewStaticLolClientGraphics(Process LeagueOfLegendsClientProcess) {
             if(LeagueOfLegendsClientProcess != null) {
-                _lolClientHelper = StaticLolClientGraphics.GetInstance(LeagueOfLegendsClientProcess, _ecsSettings);
-                if(_wndCLCO != null) {
-                    if(_wndCLCO.IsVisible == true) {
-                        _wndCLCO.Close();
-                    }
-                }
-                _wndCLCO = new wndConfigLolClientOverlay(_lolClientHelper, _ecsSettings);
-                //_wndCLCO.Owner = this;
-                _wndCO = new wndClientOverload(_gmGroupManager, _ecsSettings, _lolClientHelper); //Helper window
+                DeleteOldStaticLolClientGraphics();
+
+                _lcg = StaticLolClientGraphics.GetInstance(LeagueOfLegendsClientProcess, _ecsSettings);
+
+                _wndCLCO = new wndConfigLolClientOverlay(_lcg, _ecsSettings);
+                _wndCLCO.Owner = this;
+                _wndCO = new wndClientOverload(_gm, _lcg);
                 _wndCO.Owner = this;
+
                 DisplayPopup("Your lolclient.exe process just got updated.");
             }
         }
@@ -656,16 +696,16 @@ namespace EasyChampionSelection {
 
         public void DisplayGroups() {
             lsbGroups.Items.Clear();
-            for(int i = 0; i < _gmGroupManager.GroupCount; i++) {
-                lsbGroups.Items.Add(_gmGroupManager.getGroup(i));
+            for(int i = 0; i < _gm.GroupCount; i++) {
+                lsbGroups.Items.Add(_gm.getGroup(i));
             }
-            lblGroupsCount.Content = "Groups: " + lsbGroups.Items.Count + " / " + _gmGroupManager.MaxGroups;
-            if(_gmGroupManager.GroupCount == _gmGroupManager.MaxGroups) {
+            lblGroupsCount.Content = "Groups: " + lsbGroups.Items.Count + " / " + _gm.MaxGroups;
+            if(_gm.GroupCount == _gm.MaxGroups) {
                 btnNewGroup.IsEnabled = false;
             } else {
                 btnNewGroup.IsEnabled = true;
             }
-            if(_gmGroupManager.GroupCount == 0) {
+            if(_gm.GroupCount == 0) {
                 btnDeleteGroup.IsEnabled = false;
             } else {
                 btnDeleteGroup.IsEnabled = true;
@@ -678,9 +718,9 @@ namespace EasyChampionSelection {
         public void DisplayChampsInSelectedGroup() {
             lsbChampionsInGroup.Items.Clear();
             if(lsbGroups.SelectedIndex > -1) {
-                int championsInList = _gmGroupManager.getGroup(lsbGroups.SelectedIndex).ChampionCount;
+                int championsInList = _gm.getGroup(lsbGroups.SelectedIndex).ChampionCount;
                 for(int i = 0; i < championsInList; i++) {
-                    lsbChampionsInGroup.Items.Add(_gmGroupManager.getGroup(lsbGroups.SelectedIndex).getChampion(i));
+                    lsbChampionsInGroup.Items.Add(_gm.getGroup(lsbGroups.SelectedIndex).getChampion(i));
                 }
             }
             lblCurrentGroupChampions.Content = "Champions: " + lsbChampionsInGroup.Items.Count;

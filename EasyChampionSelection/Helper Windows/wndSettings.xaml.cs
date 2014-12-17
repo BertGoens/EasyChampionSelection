@@ -1,5 +1,6 @@
 ﻿using EasyChampionSelection.ECS;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -37,6 +38,11 @@ namespace EasyChampionSelection.Helper_Windows {
 
         private void chkShowMainFormOnBoot_Unchecked(object sender, RoutedEventArgs e) {
             _s.ShowMainFormOnLaunch = false;
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e) {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
     }
 }

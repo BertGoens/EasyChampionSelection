@@ -24,7 +24,9 @@ namespace EasyChampionSelection.Helper_Windows {
                 _lcg = lcg;
                 _ecsSettings = ecsSettings;
             } else {
-                throw new ArgumentNullException();
+                MessageBox.Show("lgc: " + (lcg == null ? "Null" : "OK") + Environment.NewLine +
+                    "ecsSettings: " + (ecsSettings == null ? "Null":"OK")
+                    ,"wndConfigLolClientOverlay is incorrectly loaded!");
             }
 
             InitializeComponent();

@@ -11,13 +11,13 @@ namespace EasyChampionSelection {
     /// Interaction logic for wndClientOverload.xaml
     /// </summary>
     public partial class wndClientOverload : Window {
+
         private StaticGroupManager _groupManager;
-        private Settings _ecsSettings;
         private StaticLolClientGraphics _lcg;
-        public wndClientOverload(StaticGroupManager gmGroupManager, Settings ecsSettings, StaticLolClientGraphics lcg) {
-            if(gmGroupManager != null && ecsSettings != null && lcg != null) {
+
+        public wndClientOverload(StaticGroupManager gmGroupManager, StaticLolClientGraphics lcg) {
+            if(gmGroupManager != null && lcg != null) {
                 this._groupManager = gmGroupManager;
-                this._ecsSettings = ecsSettings;
                 this._lcg = lcg;
                 _groupManager.GroupsChanged += _groupManager_GroupsChanged;
                 _lcg.OnLeagueClientReposition += _lcg_OnLeagueClientReposition;
@@ -25,11 +25,20 @@ namespace EasyChampionSelection {
                     _groupManager.getGroup(i).NameChanged += _groupManager_ChampionList_NameChanged;
                 }
             } else {
-                throw new ArgumentNullException();
+                MessageBox.Show("wndClientOverload has null parameters!");
             }
 
             InitializeComponent();
             Redraw();
+        }
+
+        public void SafeDelete() {
+            _groupManager.GroupsChanged -= _groupManager_GroupsChanged;
+            _lcg.OnLeagueClientReposition -= _lcg_OnLeagueClientReposition;
+            for(int i = 0; i < _groupManager.GroupCount; i++) {
+                _groupManager.getGroup(i).NameChanged -= _groupManager_ChampionList_NameChanged;
+            }
+            Close();
         }
 
         /// <summary>
@@ -40,7 +49,7 @@ namespace EasyChampionSelection {
                 Rectangle pos = _lcg.getClientOverlayPosition();
                 this.Left = pos.X;
                 this.Top = pos.Y;
-                cboGroups.Width = pos.Width - cboGroups.Margin.Left - 5;
+                cboGroups.Width = Math.Abs(pos.Width - cboGroups.Margin.Left - 5);
                 this.Width = pos.Width;
                 this.Height = pos.Height;
             }
