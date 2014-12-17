@@ -578,12 +578,12 @@ namespace EasyChampionSelection {
             _allChampions.ChampionsChanged += _AllChampions_ChampionsChanged;
         }
 
-        private void LoadAllChampionsRiotApi() {
+        private async void LoadAllChampionsRiotApi() {
             _allChampions.RemoveAllChampions();
             if(_ecsSettings.UserApiKey.Length == 36) {
                 try {
                     StaticRiotApi staticApi = StaticRiotApi.GetInstance(_ecsSettings.UserApiKey);
-                    RiotSharp.StaticDataEndpoint.ChampionListStatic champions = staticApi.GetChampions(RiotSharp.Region.euw, RiotSharp.StaticDataEndpoint.ChampionData.info, RiotSharp.Language.en_US);
+                    RiotSharp.StaticDataEndpoint.ChampionListStatic champions = await staticApi.GetChampionsAsync(RiotSharp.Region.euw, RiotSharp.StaticDataEndpoint.ChampionData.info, RiotSharp.Language.en_US);
 
                     for(int i = 0; i < champions.Champions.Count; i++) {
                         string ChampionName = champions.Champions.Values.ElementAt(i).Name;

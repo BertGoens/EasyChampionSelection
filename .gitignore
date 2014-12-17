@@ -6,8 +6,6 @@
 *.user
 *.userosscache
 *.sln.docstates
-*.pfx
-*.csproj
 *.pdb
 
 # Build results
@@ -159,7 +157,6 @@ ClientBin/
 *~
 *.dbmdl
 *.dbproj.schemaview
-*.pfx
 *.publishsettings
 node_modules/
 bower_components/
