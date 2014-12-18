@@ -10,14 +10,16 @@ namespace EasyChampionSelection.Helper_Windows {
     /// </summary>
     public partial class wndSettings : Window {
         private Settings _s;
+        private StaticLolClientGraphics _lcg;
 
-        public wndSettings(Settings s) {
+        public wndSettings(Settings s, StaticLolClientGraphics lcg) {
             if(s == null) {
                 throw new ArgumentNullException();
             }
 
             InitializeComponent();
             _s = s;
+            _lcg = lcg;
 
             txtApiKey.Text = s.UserApiKey;
             chkShowMainFormOnBoot.IsChecked = s.ShowMainFormOnLaunch;
@@ -26,6 +28,9 @@ namespace EasyChampionSelection.Helper_Windows {
             lblClientOverlay.Content = "Client Overlay: " + s.ClientOverlayRelativePos.ToString();
             lblTeamChat.Content = "Team Chat: " + s.TeamChatRelativePos.ToString();
             this.SizeToContent = System.Windows.SizeToContent.Width;
+            if(_lcg == null) {
+                btnConfigClientOverlay.IsEnabled = false;
+            }
         }
 
         private void txtApiKey_TextChanged(object sender, TextChangedEventArgs e) {
@@ -43,6 +48,10 @@ namespace EasyChampionSelection.Helper_Windows {
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e) {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
+        }
+
+        private void btnConfigClientOverlay_Click(object sender, RoutedEventArgs e) {
+
         }
     }
 }

@@ -49,9 +49,10 @@ namespace EasyChampionSelection {
                 Rectangle pos = _lcg.getClientOverlayPosition();
                 this.Left = pos.X;
                 this.Top = pos.Y;
-                cboGroups.Width = Math.Abs(pos.Width - cboGroups.Margin.Left - 5);
                 this.Width = pos.Width;
                 this.Height = pos.Height;
+
+                cboGroups.Width = Math.Abs(pos.Width - cboGroups.Margin.Left - 5);
             }
 
             cboGroups.Items.Clear();

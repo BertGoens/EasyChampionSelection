@@ -9,14 +9,25 @@ namespace EasyChampionSelection.ECS {
     /// A basic (de)serialization class
     /// </summary>
     public static class StaticSerializer {
-        public const string PATH_FolderForSaveData = "Save/";
+        public const string PATH_Folder_SaveData = @"\Save\";
+        public const string PATH_Folder_ErrorData = @"\Error\";
         public const string PATH_GroupManager = "Groups.ser";
         public const string PATH_AllChampions = "AllChampions.ser";
         public const string PATH_Settings = "Settings.ser";
+        public const string PATH_ClientImage = "ClientImage.ser";
+
+        public static string applicationPath() {
+            string r = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+            r = Path.GetDirectoryName(r);
+            r = r.Replace("file:/", "");
+            r = r.Replace(@"file:\", "");
+            return r;
+        }
 
         public static void SerializeObject(object objectToSerialize, string fileName) {
+            
             try {
-                Directory.CreateDirectory(fileName.Substring(0, fileName.LastIndexOf("/")));
+                Directory.CreateDirectory(Path.GetDirectoryName(fileName));
                 Stream stream = File.Open(fileName, FileMode.Create);
                 BinaryFormatter bFormatter = new BinaryFormatter();
                 bFormatter.Serialize(stream, objectToSerialize);

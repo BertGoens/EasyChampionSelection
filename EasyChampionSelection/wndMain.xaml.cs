@@ -24,7 +24,6 @@ namespace EasyChampionSelection {
         private DispatcherTimer _tmrCheckForChampSelect = new DispatcherTimer();
         private ChampionList _allChampions;
         private wndClientOverload _wndCO;
-        private wndConfigLolClientOverlay _wndCLCO;
         private wndContactCreator _wndCC;
         private StaticGroupManager _gm;
         private Settings _ecsSettings;
@@ -61,9 +60,7 @@ namespace EasyChampionSelection {
         }
 
         private void frmMain_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            StaticSerializer.SerializeObject(_gm, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_GroupManager);
-            StaticSerializer.SerializeObject(_allChampions, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_AllChampions);
-            StaticSerializer.SerializeObject(_ecsSettings, StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_Settings);
+            SaveSerializedData();
 
             _notifyIcon.Dispose(); //Dispose to auto clear the icon
 
@@ -86,7 +83,19 @@ namespace EasyChampionSelection {
         }
 
         private void _ecsSettings_ClientOverlayChanged(Settings sender, EventArgs e) {
-            _wndCO.RepositionClientOverlay();
+            if(_wndCO != null) {
+                _wndCO.RepositionClientOverlay();
+            }
+        }
+
+        private void _ecsSettings_ApiKeyChanged(Settings sender, EventArgs e) {
+            LoadAllChampionsRiotApi();
+        }
+
+        private void lolClientHasClosed() {
+            _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
+            DeleteOldStaticLolClientGraphics(); //Delete all references to client dependent classes with events
+            _tmrCheckForChampSelect.Start();
         }
 
         private void _tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
@@ -102,14 +111,17 @@ namespace EasyChampionSelection {
 
                     Process[] p = Process.GetProcessesByName("lolclient"); //Look for the lolClient process
                     if(_lcg == null) {
-                        if(p.Count() > 0) {
+                        if(p.Length > 0) {
                             NewStaticLolClientGraphics(p[0]);
                         } else {
-                            _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
-                            DeleteOldStaticLolClientGraphics(); //Delete all references to client dependent classes with events
-                            _tmrCheckForChampSelect.Start();
+                            lolClientHasClosed();
                             return;
                         }
+                    }
+
+                    if(p.Length == 0) {
+                        lolClientHasClosed();
+                        return;
                     }
 
                     bool clientExists = false;
@@ -124,20 +136,17 @@ namespace EasyChampionSelection {
                         NewStaticLolClientGraphics(p[0]);
                     }
 
-
-                    if(_lcg.isLolClientFocussed() ||_lcg.isEasyChampionSelectionFoccussed()) {
+                    if(_lcg.isLolClientFocussed() || _lcg.isEasyChampionSelectionFoccussed()) {
                         if(_lcg.isInChampSelect()) {
                             _wndCO.Visibility = System.Windows.Visibility.Visible;
                         } else {
                             _wndCO.Visibility = System.Windows.Visibility.Hidden;
                         }
-                        if(_wndCLCO.IsFocused) {
-                            _wndCO.Visibility = Visibility.Hidden;
-                        }
                     }
 
                 }
             } catch(Exception ex) {
+                SaveSerializedData();
                 wndErrorHelper wndEH = new wndErrorHelper(ex);
                 wndEH.Owner = this;
                 wndEH.ShowDialog();
@@ -148,29 +157,12 @@ namespace EasyChampionSelection {
             _tmrCheckForChampSelect.Start();
         }
 
-        private void btnConfigClientOverlay_Click(object sender, RoutedEventArgs e) {
-            bool showError = true;
-
-            if(_lcg != null) {
-                if(_lcg.getProcessLolClient() != null) {
-                    try {
-                        showError = false;
-                        _wndCLCO.Visibility = System.Windows.Visibility.Visible;
-                        _wndCLCO.ShowInTaskbar = true;
-                    } catch(Exception ex) {
-                        DisplayPopup("Woops, something went wrong!\n" + ex.Message);
-                    }
-
-                }
-            }
-
-            if(showError) {
-                DisplayPopup("Please start league of legends first so I can take a screenshot!");
-            }
+        private void btnGuide_Click(object sender, RoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo("https://github.com/BertGoens/EasyChampionSelection"));
         }
 
         private void btnSettings_Click(object sender, RoutedEventArgs e) {
-            wndSettings wndST = new wndSettings(_ecsSettings);
+            wndSettings wndST = new wndSettings(_ecsSettings, _lcg);
             wndST.Owner = this;
             wndST.ShowDialog();
         }
@@ -207,24 +199,34 @@ namespace EasyChampionSelection {
             }
         }
 
+        private void lsbChampionsInGroupItem_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+            RemoveChampionsFromCurrentGroup(this, e);
+        }
+
+        private void lsbAllChampionsItem_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+            AddChampionsToCurrentGroup(this, e);
+        }
+
         private void lsbGroups_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
             lsbChampionsInGroup.Items.Clear();
             DisplayChampsInSelectedGroup();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
         }
 
-        private void btnAddChampionsToCurrentGroup_Click(object sender, RoutedEventArgs e) {
+        private void AddChampionsToCurrentGroup(object sender, RoutedEventArgs e) {
             for(int i = 0; i < lsbAllChampions.SelectedItems.Count; i++) {
-                _gm.getGroup(lsbGroups.SelectedIndex).AddChampion(lsbAllChampions.SelectedItems[i].ToString());
+                ListBoxItem lbi = (ListBoxItem)lsbAllChampions.SelectedItems[i];
+                _gm.getGroup(lsbGroups.SelectedIndex).AddChampion(lbi.Content.ToString());
             }
 
             DisplayChampsInSelectedGroup();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
         }
 
-        private void btnRemoveChampionsFromCurrentGroup_Click(object sender, RoutedEventArgs e) {
+        private void RemoveChampionsFromCurrentGroup(object sender, RoutedEventArgs e) {
             for(int i = 0; i < lsbChampionsInGroup.SelectedItems.Count; i++) {
-                _gm.getGroup(lsbGroups.SelectedIndex).RemoveChampion(lsbChampionsInGroup.SelectedItems[i].ToString());
+                ListBoxItem lbi = (ListBoxItem)lsbChampionsInGroup.SelectedItems[i];
+                _gm.getGroup(lsbGroups.SelectedIndex).RemoveChampion(lbi.Content.ToString());
             }
             DisplayChampsInSelectedGroup();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
@@ -405,22 +407,6 @@ namespace EasyChampionSelection {
                 mniRemove.IsEnabled = false;
             }
 
-            cm.Items.Add(new Separator());
-
-            MenuItem mniCopy = CreateMenuItem("Copy", mniCopy_Click);
-            cm.Items.Add(mniCopy);
-
-            if(lsbGroups.SelectedItems.Count < 1) {
-                mniCopy.IsEnabled = false;
-            }
-
-            MenuItem mniPaste = CreateMenuItem("Paste", mniPaste_Click);
-            cm.Items.Add(mniPaste);
-
-            if(lsbGroups.SelectedItems.Count < 1) {
-                mniPaste.IsEnabled = false;
-            }
-
             lsbChampionsInGroup.ContextMenu = cm;
             e.Handled = true;
         }
@@ -430,37 +416,7 @@ namespace EasyChampionSelection {
         }
 
         void mniRemove_Click(object sender, RoutedEventArgs e) {
-            btnRemoveChampionsFromCurrentGroup_Click(sender, e);
-        }
-
-        void mniCopy_Click(object sender, RoutedEventArgs e) {
-            string clipboardText = "";
-
-            for(int i = 0; i < lsbChampionsInGroup.SelectedItems.Count; i++) {
-                clipboardText += lsbChampionsInGroup.SelectedItems[i] + Environment.NewLine;
-
-            }
-            Clipboard.SetText(clipboardText, TextDataFormat.Text);
-        }
-
-        void mniPaste_Click(object sender, RoutedEventArgs e) {
-            string clipboardText = "";
-            clipboardText = Clipboard.GetText(TextDataFormat.Text);
-
-            string[] champsInClipboardText = clipboardText.Split(Environment.NewLine.ToCharArray());
-
-            for(int i = 0; i < champsInClipboardText.Length; i++) {
-                if(champsInClipboardText[i].Length > 1) {
-                    if(!_allChampions.Contains(champsInClipboardText[i])) {
-                        _allChampions.AddChampion(champsInClipboardText[i]);
-                        _gm.getGroup(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
-                    } else if(!_gm.getGroup(lsbGroups.SelectedIndex).Contains(champsInClipboardText[i])) {
-                        _gm.getGroup(lsbGroups.SelectedIndex).AddChampion(champsInClipboardText[i]);
-                    }
-                }
-            }
-            DisplayChampsInSelectedGroup();
-            DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
+            RemoveChampionsFromCurrentGroup(sender, e);
         }
 
         //Context Menu lsbAllChampions
@@ -485,36 +441,22 @@ namespace EasyChampionSelection {
 
             MenuItem mniManuallyAddChampion = CreateMenuItem("Manually add a champion", mniManuallyAddChampion_Click);
             cm.Items.Add(mniManuallyAddChampion);
-
-            cm.Items.Add(new Separator());
-
-            MenuItem mniCopyAllChampions = CreateMenuItem("Copy", mniCopyAllChampions_Click);
-            cm.Items.Add(mniCopyAllChampions);
-
-            if(lsbAllChampions.SelectedItems.Count < 1) {
-                mniCopyAllChampions.IsEnabled = false;
-            }
-
-            MenuItem mniPasteAllChampions = CreateMenuItem("Paste", mniPasteAllChampions_Click);
-            cm.Items.Add(mniPasteAllChampions);
-
-            if(lsbAllChampions.SelectedItems.Count < 1) {
-                mniPasteAllChampions.IsEnabled = false;
-            }
-
+            
             lsbAllChampions.ContextMenu = cm;
+
+            e.Handled = true;
         }
 
-        void mniUnselectAllChampions_Click(object sender, RoutedEventArgs e) {
+        private void mniUnselectAllChampions_Click(object sender, RoutedEventArgs e) {
             lsbAllChampions.UnselectAll();
         }
 
-        void mniReloadWithApi_Click(object sender, RoutedEventArgs e) {
+        private void mniReloadWithApi_Click(object sender, RoutedEventArgs e) {
             LoadAllChampionsRiotApi();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
         }
 
-        void mniReloadLocal_Click(object sender, RoutedEventArgs e) {
+        private void mniReloadLocal_Click(object sender, RoutedEventArgs e) {
             if(File.Exists(StaticSerializer.PATH_AllChampions)) {
                 LoadAllChampionsLocal();
                 DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
@@ -523,36 +465,10 @@ namespace EasyChampionSelection {
             }
         }
 
-        void mniManuallyAddChampion_Click(object sender, RoutedEventArgs e) {
+        private void mniManuallyAddChampion_Click(object sender, RoutedEventArgs e) {
             wndAddChampion wndAC = new wndAddChampion(_allChampions);
             wndAC.Owner = this;
             wndAC.ShowDialog();
-        }
-
-        void mniCopyAllChampions_Click(object sender, RoutedEventArgs e) {
-            string clipboardText = "";
-
-            for(int i = 0; i < lsbAllChampions.SelectedItems.Count; i++) {
-                clipboardText += lsbAllChampions.SelectedItems[i] + Environment.NewLine;
-
-            }
-            Clipboard.SetText(clipboardText, TextDataFormat.Text);
-        }
-
-        void mniPasteAllChampions_Click(object sender, RoutedEventArgs e) {
-            string clipboardText = "";
-            clipboardText = Clipboard.GetText(TextDataFormat.Text);
-
-            string[] champsInClipboardText = clipboardText.Split(Environment.NewLine.ToCharArray());
-
-            for(int i = 0; i < champsInClipboardText.Length; i++) {
-                if(!_allChampions.Contains(champsInClipboardText[i])) {
-                    if(champsInClipboardText[i].Length > 1) {
-                        _allChampions.AddChampion(champsInClipboardText[i]);
-                    }
-                }
-            }
-            DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
         }
 
         #endregion ContextMenus
@@ -585,8 +501,9 @@ namespace EasyChampionSelection {
         }
 
         private void LoadSettings() {
-            if(File.Exists(StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_Settings)) {
-                _ecsSettings = (Settings)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_Settings);
+            string fileLoc = StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_Settings;
+            if(File.Exists(fileLoc)) {
+                _ecsSettings = (Settings)StaticSerializer.DeSerializeObject(fileLoc);
                 if(_ecsSettings == null) {
                     _ecsSettings = new Settings();
                 }
@@ -594,6 +511,7 @@ namespace EasyChampionSelection {
                 _ecsSettings = new Settings();
             }
             _ecsSettings.ClientOverlayChanged += _ecsSettings_ClientOverlayChanged;
+            _ecsSettings.ApiKeyChanged += _ecsSettings_ApiKeyChanged;
         }
 
         private void LoadAllChampions() {
@@ -606,6 +524,7 @@ namespace EasyChampionSelection {
         }
 
         private async void LoadAllChampionsRiotApi() {
+            DisplayPopup("Loading champions with API");
             _allChampions.RemoveAllChampions();
             if(_ecsSettings.UserApiKey.Length == 36) {
                 try {
@@ -618,7 +537,7 @@ namespace EasyChampionSelection {
                     }
 
                 } catch(RiotSharpException ex) {
-                    DisplayPopup("Trouble loading trough the api: " + ex.ToString());
+                    DisplayPopup("Trouble loading trough the api: \n" + ex.ToString());
                 } catch(NullReferenceException) {
                 }
             } else {
@@ -628,8 +547,9 @@ namespace EasyChampionSelection {
         }
 
         private void LoadAllChampionsLocal() {
-            if(File.Exists(StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_AllChampions)) {
-                _allChampions = (ChampionList)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_AllChampions);
+            string fileLoc = StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_AllChampions;
+            if(File.Exists(fileLoc)) {
+                _allChampions = (ChampionList)StaticSerializer.DeSerializeObject(fileLoc);
                 DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
             } else {
                 _allChampions = new ChampionList("AllChamps");
@@ -638,8 +558,9 @@ namespace EasyChampionSelection {
 
         private void LoadSerializedGroupManager() {
             lblCurrentGroupChampions.Content = "Create a group first.";
-            if(File.Exists(StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_GroupManager)) {
-                _gm = (StaticGroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.PATH_FolderForSaveData + StaticSerializer.PATH_GroupManager);
+            string fileLoc = StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_GroupManager;
+            if(File.Exists(fileLoc)) {
+                _gm = (StaticGroupManager)StaticSerializer.DeSerializeObject(fileLoc);
                 if(_gm != null) {
                     if(_gm.GroupCount > 0) {
                         lblCurrentGroupChampions.Content = "";
@@ -662,11 +583,6 @@ namespace EasyChampionSelection {
         }
 
         private void DeleteOldStaticLolClientGraphics() {
-            if(_wndCLCO != null) {
-                _wndCLCO.Close();
-                _wndCLCO = null;
-            }
-
             if(_wndCO != null) {
                 _wndCO.SafeDelete(); //Unsubscribes from all events
                 _wndCO = null;
@@ -681,14 +597,19 @@ namespace EasyChampionSelection {
 
                 _lcg = StaticLolClientGraphics.GetInstance(LeagueOfLegendsClientProcess, _ecsSettings);
 
-                _wndCLCO = new wndConfigLolClientOverlay(_lcg, _ecsSettings);
-                _wndCLCO.Owner = this;
                 _wndCO = new wndClientOverload(_gm, _lcg);
                 _wndCO.Owner = this;
 
                 DisplayPopup("Your lolclient.exe process just got updated.");
             }
         }
+
+        private void SaveSerializedData() {
+            StaticSerializer.SerializeObject(_gm, StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_GroupManager);
+            StaticSerializer.SerializeObject(_allChampions, StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_AllChampions);
+            StaticSerializer.SerializeObject(_ecsSettings, StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_Settings);
+        }
+
 
         #endregion Private Behavior
 
@@ -720,7 +641,10 @@ namespace EasyChampionSelection {
             if(lsbGroups.SelectedIndex > -1) {
                 int championsInList = _gm.getGroup(lsbGroups.SelectedIndex).ChampionCount;
                 for(int i = 0; i < championsInList; i++) {
-                    lsbChampionsInGroup.Items.Add(_gm.getGroup(lsbGroups.SelectedIndex).getChampion(i));
+                    ListBoxItem lsbChampionsInGroupItem = new ListBoxItem();
+                    lsbChampionsInGroupItem.Content = _gm.getGroup(lsbGroups.SelectedIndex).getChampion(i);
+                    lsbChampionsInGroupItem.PreviewMouseDoubleClick += lsbChampionsInGroupItem_PreviewMouseDoubleClick;
+                    lsbChampionsInGroup.Items.Add(lsbChampionsInGroupItem);
                 }
             }
             lblCurrentGroupChampions.Content = "Champions: " + lsbChampionsInGroup.Items.Count;
@@ -728,14 +652,30 @@ namespace EasyChampionSelection {
 
         public void DisplayAllChampionsMinusInSelectedGroupAccordingToFilter() {
             lsbAllChampions.Items.Clear();
-            for(int i = 0; i < _allChampions.getCount(); i++) {
-                if(!lsbChampionsInGroup.Items.Contains(_allChampions.getChampion(i))) {
+            if(lsbGroups.SelectedIndex > -1) {
+                for(int i = 0; i < _allChampions.getCount(); i++) {
+                    if(!_gm.getGroup(lsbGroups.SelectedIndex).Contains(_allChampions.getChampion(i))) { //lsbChampionsInGroup.Items.Contains(_allChampions.getChampion(i))
+                        string newChamp = _allChampions.getChampion(i);
+                        if(newChamp.ToUpper().Contains(txtFilterForAllChampions.Text.ToUpper())) {
+                            ListBoxItem lsbAllChampionsItem = new ListBoxItem();
+                            lsbAllChampionsItem.Content = _allChampions.getChampion(i);
+                            lsbAllChampionsItem.PreviewMouseDoubleClick += lsbAllChampionsItem_PreviewMouseDoubleClick;
+                            lsbAllChampions.Items.Add(lsbAllChampionsItem);
+                        }
+                    }
+                }
+            } else {
+                for(int i = 0; i < _allChampions.getCount(); i++) {
                     string newChamp = _allChampions.getChampion(i);
                     if(newChamp.ToUpper().Contains(txtFilterForAllChampions.Text.ToUpper())) {
-                        lsbAllChampions.Items.Add(_allChampions.getChampion(i));
+                        ListBoxItem lsbAllChampionsItem = new ListBoxItem();
+                        lsbAllChampionsItem.Content = _allChampions.getChampion(i);
+                        lsbAllChampionsItem.PreviewMouseDoubleClick += lsbAllChampionsItem_PreviewMouseDoubleClick;
+                        lsbAllChampions.Items.Add(lsbAllChampionsItem);
                     }
                 }
             }
+
             lblAllChampionsInfo.Content = "All champions: " + lsbAllChampions.Items.Count;
         }
 

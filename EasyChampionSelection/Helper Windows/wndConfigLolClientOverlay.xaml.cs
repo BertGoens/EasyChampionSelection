@@ -20,13 +20,9 @@ namespace EasyChampionSelection.Helper_Windows {
         private BitmapSource _lolClientImage;
 
         public wndConfigLolClientOverlay(StaticLolClientGraphics lcg, Settings ecsSettings) {
-            if(lcg != null && ecsSettings != null) {
+            if(ecsSettings != null) {
                 _lcg = lcg;
                 _ecsSettings = ecsSettings;
-            } else {
-                MessageBox.Show("lgc: " + (lcg == null ? "Null" : "OK") + Environment.NewLine +
-                    "ecsSettings: " + (ecsSettings == null ? "Null":"OK")
-                    ,"wndConfigLolClientOverlay is incorrectly loaded!");
             }
 
             InitializeComponent();
@@ -50,18 +46,20 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void btnGetCurrentClientImage_Click(object sender, RoutedEventArgs e) {
-            _lolClientImage = _lcg.GetLeagueClientAsBitmapSource();
-            if(_lolClientImage != null) {
-                imgClientImage.Width = _lolClientImage.Width;
-                imgClientImage.Height = _lolClientImage.Height;
-                imgClientImage.Source = _lolClientImage;
-                cvRectangles.Width = _lolClientImage.Width;
-                cvRectangles.Height = _lolClientImage.Height;
+            if(_lcg != null) {
+                _lolClientImage = _lcg.GetLeagueClientAsBitmapSource();
+                if(_lolClientImage != null) {
+                    imgClientImage.Width = _lolClientImage.Width;
+                    imgClientImage.Height = _lolClientImage.Height;
+                    imgClientImage.Source = _lolClientImage;
+                    cvRectangles.Width = _lolClientImage.Width;
+                    cvRectangles.Height = _lolClientImage.Height;
 
-                expOptions.Visibility = Visibility.Visible;
+                    expOptions.Visibility = Visibility.Visible;
 
-                this.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
-            }
+                    this.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
+                }
+            } 
         }
 
         private void rdbOnChecked(object sender, RoutedEventArgs e) {
@@ -181,8 +179,6 @@ namespace EasyChampionSelection.Helper_Windows {
                 expOptions.IsExpanded = false;
                 spThumbSizeInfo.Visibility = Visibility.Hidden;
                 btnShowHideOverlay.Content = "Show overlay";
-
-
             } else {
                 expOptions.IsExpanded = true;
                 spThumbSizeInfo.Visibility = System.Windows.Visibility.Visible;

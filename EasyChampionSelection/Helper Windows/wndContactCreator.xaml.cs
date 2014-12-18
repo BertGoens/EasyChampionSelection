@@ -13,7 +13,11 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         public wndContactCreator(Exception error, string userComment) : this() {
-            txtSubject.Text = "Error " + error.InnerException.ToString();
+            txtSubject.Text = "Error ";
+            if(error.InnerException != null) {
+                txtSubject.Text += error.InnerException.ToString();
+            }
+            
             txtBody.Text = "Hello, I've encountered this error today: \n" +
                 error.ToString();
 

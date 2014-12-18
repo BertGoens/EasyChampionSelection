@@ -92,12 +92,12 @@
     <Grid x:Name="grid" MouseEnter="grid_MouseEnter">
         <Border HorizontalAlignment="Stretch" Margin="5,5,5,5" BorderThickness="2" BorderBrush="#B228306F">
             <Border.Effect>
-                <DropShadowEffect Color="#28306F" />
+                <DropShadowEffect Color="#FF3B5C7C" />
             </Border.Effect>
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF66A1C3" Offset="0" />
-                    <GradientStop Color="#FF66B6C3" Offset="1" />
+                    <GradientStop Color="#FF6599CC" Offset="0" />
+                    <GradientStop Color="#FF6599CC" Offset="1" />
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
@@ -105,22 +105,22 @@
         <TextBlock  x:Name="txtBalloonMessage" 
                    Text="TextGoesHere" Margin="15,45,15,15" VerticalAlignment="Top" TextWrapping="Wrap" FontWeight="SemiBold" >
             <TextBlock.Foreground>
-                <SolidColorBrush Color="#FFECAD25"/>
+                <SolidColorBrush Color="#FF000000"/>
             </TextBlock.Foreground>
         </TextBlock>
 
         <TextBlock x:Name="txtBalloonTitle"
-           Text="TitleGoesHere"  Margin="15,15,30,0" VerticalAlignment="Top" Height="23.2" TextWrapping="Wrap" Foreground="#FFE6C828" FontWeight="Bold" />
+           Text="TitleGoesHere"  Margin="15,15,30,0" VerticalAlignment="Top" Height="23.2" TextWrapping="Wrap" Foreground="#FF000000" FontWeight="Bold" />
         
         <Image Source="/Resources/Close.png" Width="16" Height="16"
                HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Stretch="Fill" Opacity="0.6" ToolTip="Close Balloon" 
                x:Name="imgClose" MouseDown="imgClose_MouseDown" />
         
-        <Rectangle Fill="#FFFFFFFF" HorizontalAlignment="Left" Height="2" Margin="15,38,15,0" VerticalAlignment="Top" Width="130">
+        <Rectangle Fill="#FFFFFFFF" HorizontalAlignment="Left" Height="2" Margin="15,38,0,0" VerticalAlignment="Top" Width="175">
             <Rectangle.Stroke>
                 <LinearGradientBrush EndPoint="0.973,0.5" StartPoint="0.005,0.5">
-                    <GradientStop Color="#FFECAD25" Offset="0.5" />
-                    <GradientStop Color="#FFECAD25" Offset="1" />
+                    <GradientStop Color="#FFCCCCFF" Offset="0.5" />
+                    <GradientStop Color="#FFCCCCFF" Offset="1" />
                 </LinearGradientBrush>
             </Rectangle.Stroke>
         </Rectangle>

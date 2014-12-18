@@ -20,8 +20,7 @@
                    Margin="10,10,-51,0" 
                    VerticalAlignment="Top">
                         Woops! You recieved an error. <LineBreak />
-                        Try to not run around setting your house of fire, my mother hates that. <LineBreak />
-                        If you can reproduce this error consider to send it to me.<LineBreak/>
+                        If you can reproduce this error consider sending it to me.<LineBreak/>
                         You will have to manually start the timer again: <LineBreak />
                         Right click on the Tray-Icon > Start timer
         </TextBlock>
@@ -64,7 +63,8 @@
                  Width="372"
                  />
         
-        <Button Content="btnSendError"
+        <Button x:Name="btnSendError"
+            Content="Send Error"
                 HorizontalAlignment="Left"
                 Margin="10,459,0,0"
                 VerticalAlignment="Top"

@@ -32,6 +32,12 @@ namespace EasyChampionSelection.ECS {
         [field: NonSerialized]
         public event ChangedEventHandler ClientOverlayChanged;
 
+        /// <summary>
+        /// Occurs when the api key is changed.
+        /// </summary>
+        [field:NonSerialized]
+        public event ChangedEventHandler ApiKeyChanged;
+
         #region Getters & Setters
         /// <summary>
         /// Get or set the relative postition of the Champion Searchbar.
@@ -96,8 +102,11 @@ namespace EasyChampionSelection.ECS {
         public string UserApiKey {
             get { return _userApiKey; }
             set {
-                if(value != null && value != _userApiKey) {
+                if(value != null && value != _userApiKey && value.Length == 36) {
                     _userApiKey = value;
+                    if(ApiKeyChanged != null) {
+                        ApiKeyChanged(this, EventArgs.Empty);
+                    }
                 }
             }
         }
