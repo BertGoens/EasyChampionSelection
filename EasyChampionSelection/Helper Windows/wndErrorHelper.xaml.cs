@@ -29,12 +29,7 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void btnSaveError_Click(object sender, RoutedEventArgs e) {
-            string dateOfToday = DateTime.Today.ToString("d");
-            dateOfToday = dateOfToday.Replace("/", "_");
-
-            string filePath = StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_ErrorData + "Error_ " + dateOfToday + ".txt";
-            Directory.CreateDirectory(filePath.Substring(0, filePath.LastIndexOf(@"\")));
-            using(StreamWriter sw = new StreamWriter(filePath, true)) {
+            using(StreamWriter sw = new StreamWriter(StaticSerializer.FullPath_ErrorFile, true)) {
                 if(_error.InnerException != null) {
                     sw.WriteLine("InnerException");
                     sw.WriteLine(_error.InnerException.ToString());

@@ -25,6 +25,7 @@ namespace EasyChampionSelection {
         private ChampionList _allChampions;
         private wndClientOverload _wndCO;
         private wndContactCreator _wndCC;
+        private wndSettings _wndST;
         private StaticGroupManager _gm;
         private Settings _ecsSettings;
         private TaskbarIcon _notifyIcon;
@@ -43,7 +44,7 @@ namespace EasyChampionSelection {
             LoadSettings(); //Load this first
 
             if(!_ecsSettings.ShowMainFormOnLaunch) {
-                this.Visibility = System.Windows.Visibility.Hidden;
+                this.Visibility = Visibility.Hidden;
                 this.ShowInTaskbar = false;
             }
 
@@ -162,9 +163,17 @@ namespace EasyChampionSelection {
         }
 
         private void btnSettings_Click(object sender, RoutedEventArgs e) {
-            wndSettings wndST = new wndSettings(_ecsSettings, _lcg);
-            wndST.Owner = this;
-            wndST.ShowDialog();
+            if(_wndST != null) {
+                if(_wndST.IsLoaded == false) {
+                    _wndST = new wndSettings(_ecsSettings, _lcg);
+                    _wndST.Owner = this;
+                }
+            } else {
+                _wndST = new wndSettings(_ecsSettings, _lcg);
+                _wndST.Owner = this;
+            }
+
+            _wndST.Show();
         }
 
         private void btnCredits_Click(object sender, RoutedEventArgs e) {
@@ -457,7 +466,7 @@ namespace EasyChampionSelection {
         }
 
         private void mniReloadLocal_Click(object sender, RoutedEventArgs e) {
-            if(File.Exists(StaticSerializer.PATH_AllChampions)) {
+            if(File.Exists(StaticSerializer.FullPath_AllChampions)) {
                 LoadAllChampionsLocal();
                 DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
             } else {
@@ -501,9 +510,8 @@ namespace EasyChampionSelection {
         }
 
         private void LoadSettings() {
-            string fileLoc = StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_Settings;
-            if(File.Exists(fileLoc)) {
-                _ecsSettings = (Settings)StaticSerializer.DeSerializeObject(fileLoc);
+            if(File.Exists(StaticSerializer.FullPath_Settings)) {
+                _ecsSettings = (Settings)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_Settings);
                 if(_ecsSettings == null) {
                     _ecsSettings = new Settings();
                 }
@@ -547,9 +555,8 @@ namespace EasyChampionSelection {
         }
 
         private void LoadAllChampionsLocal() {
-            string fileLoc = StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_AllChampions;
-            if(File.Exists(fileLoc)) {
-                _allChampions = (ChampionList)StaticSerializer.DeSerializeObject(fileLoc);
+            if(File.Exists(StaticSerializer.FullPath_AllChampions)) {
+                _allChampions = (ChampionList)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_AllChampions);
                 DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
             } else {
                 _allChampions = new ChampionList("AllChamps");
@@ -558,9 +565,9 @@ namespace EasyChampionSelection {
 
         private void LoadSerializedGroupManager() {
             lblCurrentGroupChampions.Content = "Create a group first.";
-            string fileLoc = StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_GroupManager;
-            if(File.Exists(fileLoc)) {
-                _gm = (StaticGroupManager)StaticSerializer.DeSerializeObject(fileLoc);
+
+            if(File.Exists(StaticSerializer.FullPath_GroupManager)) {
+                _gm = (StaticGroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_GroupManager);
                 if(_gm != null) {
                     if(_gm.GroupCount > 0) {
                         lblCurrentGroupChampions.Content = "";
@@ -597,17 +604,31 @@ namespace EasyChampionSelection {
 
                 _lcg = StaticLolClientGraphics.GetInstance(LeagueOfLegendsClientProcess, _ecsSettings);
 
+                bool ReOpenConfigLolClientOverlay = false;
+                bool settingsOpened = false;
+                if(_wndST != null) {
+                    settingsOpened = _wndST.IsLoaded;
+                    if(_wndST.IsConfigLolClientOverlayOpened()) {
+                        ReOpenConfigLolClientOverlay = true;
+                    }
+                    _wndST.SafeClose();
+                }
+                _wndST = new wndSettings(_ecsSettings, _lcg, ReOpenConfigLolClientOverlay);
+                _wndST.Owner = this;
+                if(settingsOpened) {
+                    _wndST.Show();
+                }
+
                 _wndCO = new wndClientOverload(_gm, _lcg);
-                _wndCO.Owner = this;
 
                 DisplayPopup("Your lolclient.exe process just got updated.");
             }
         }
 
         private void SaveSerializedData() {
-            StaticSerializer.SerializeObject(_gm, StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_GroupManager);
-            StaticSerializer.SerializeObject(_allChampions, StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_AllChampions);
-            StaticSerializer.SerializeObject(_ecsSettings, StaticSerializer.applicationPath() + StaticSerializer.PATH_Folder_SaveData + StaticSerializer.PATH_Settings);
+            StaticSerializer.SerializeObject(_gm, StaticSerializer.FullPath_GroupManager);
+            StaticSerializer.SerializeObject(_allChampions, StaticSerializer.FullPath_AllChampions);
+            StaticSerializer.SerializeObject(_ecsSettings, StaticSerializer.FullPath_Settings);
         }
 
 

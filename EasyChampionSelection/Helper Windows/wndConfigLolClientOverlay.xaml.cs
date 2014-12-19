@@ -1,10 +1,13 @@
 ﻿using EasyChampionSelection.ECS;
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
+using System.Collections.Generic;
 
 namespace EasyChampionSelection.Helper_Windows {
     /// <summary>
@@ -17,6 +20,7 @@ namespace EasyChampionSelection.Helper_Windows {
         private const int _cBaseThumbHeight = 50;
         private const int _cBaseImageWidth = 800;
         private const int _cBaseImageHeight = 600;
+        private Bitmap _ClientBitmap;
         private BitmapSource _lolClientImage;
 
         public wndConfigLolClientOverlay(StaticLolClientGraphics lcg, Settings ecsSettings) {
@@ -28,6 +32,12 @@ namespace EasyChampionSelection.Helper_Windows {
             InitializeComponent();
             txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
             txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
+
+            if(File.Exists(StaticSerializer.FullPath_ClientImage)) {
+                _ClientBitmap = new Bitmap(StaticSerializer.FullPath_ClientImage);
+                _lolClientImage =StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap);
+                Visualize_lolClientImage();
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -40,26 +50,36 @@ namespace EasyChampionSelection.Helper_Windows {
                 rdbClientOverlay_SavePosition(null, null);
             }
 
-            this.Visibility = System.Windows.Visibility.Hidden;
-            this.ShowInTaskbar = false;
-            e.Cancel = true;
+            if(_lolClientImage != null) {
+                try {
+                    _ClientBitmap.Save(StaticSerializer.FullPath_ClientImage, ImageFormat.Jpeg);
+                } catch(Exception ex) {
+                    ex.ToString();
+                }
+            }
         }
 
         private void btnGetCurrentClientImage_Click(object sender, RoutedEventArgs e) {
             if(_lcg != null) {
-                _lolClientImage = _lcg.GetLeagueClientAsBitmapSource();
+                _ClientBitmap = _lcg.GetLeagueClientAsBitmap(); // Get bitmap of league client
+                _lolClientImage =  StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap); //Convert bitmap to bitmapsource
+
                 if(_lolClientImage != null) {
-                    imgClientImage.Width = _lolClientImage.Width;
-                    imgClientImage.Height = _lolClientImage.Height;
-                    imgClientImage.Source = _lolClientImage;
-                    cvRectangles.Width = _lolClientImage.Width;
-                    cvRectangles.Height = _lolClientImage.Height;
-
-                    expOptions.Visibility = Visibility.Visible;
-
-                    this.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
+                    Visualize_lolClientImage();
                 }
             } 
+        }
+
+        private void btnShowHideOverlay_Click(object sender, RoutedEventArgs e) {
+            if(btnShowHideOverlay.Content.ToString() == "Hide overlay") {
+                expOptions.IsExpanded = false;
+                spThumbSizeInfo.Visibility = Visibility.Hidden;
+                btnShowHideOverlay.Content = "Show overlay";
+            } else {
+                expOptions.IsExpanded = true;
+                spThumbSizeInfo.Visibility = System.Windows.Visibility.Visible;
+                btnShowHideOverlay.Content = "Hide overlay";
+            }
         }
 
         private void rdbOnChecked(object sender, RoutedEventArgs e) {
@@ -81,11 +101,11 @@ namespace EasyChampionSelection.Helper_Windows {
             if(SavedPosition.Width > 0 && SavedPosition.Height > 0) {
                 txtNewThumbWidth.Text = Math.Abs(SavedPosition.Width).ToString();
                 txtNewThumbHeight.Text = Math.Abs(SavedPosition.Height).ToString();
-                transformRectangle(thmbPos, SavedPosition);
+                TransformRectangle(thmbPos, SavedPosition);
             } else {
                 txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
                 txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
-                createNewThumb();
+                CreateNewThumb();
             }
 
             thmbPos.Visibility = System.Windows.Visibility.Visible;
@@ -146,7 +166,19 @@ namespace EasyChampionSelection.Helper_Windows {
             }
         }
 
-        private void createNewThumb() {
+        private void Visualize_lolClientImage() {
+            imgClientImage.Width = _lolClientImage.Width;
+            imgClientImage.Height = _lolClientImage.Height;
+            imgClientImage.Source = _lolClientImage;
+            cvRectangles.Width = _lolClientImage.Width;
+            cvRectangles.Height = _lolClientImage.Height;
+
+            expOptions.Visibility = Visibility.Visible;
+
+            this.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
+        }
+
+        private void CreateNewThumb() {
             Canvas.SetLeft(thmbPos, 0d);
             Canvas.SetTop(thmbPos, 0d);
 
@@ -167,23 +199,11 @@ namespace EasyChampionSelection.Helper_Windows {
             }
         }
 
-        private void transformRectangle(Thumb rectRepos, Rectangle newPosition) {
+        private void TransformRectangle(Thumb rectRepos, Rectangle newPosition) {
             rectRepos.Width = newPosition.Width;
             rectRepos.Height = newPosition.Height;
             Canvas.SetLeft(rectRepos, newPosition.X);
             Canvas.SetTop(rectRepos, newPosition.Y);
-        }
-
-        private void btnShowHideOverlay_Click(object sender, RoutedEventArgs e) {
-            if(btnShowHideOverlay.Content.ToString() == "Hide overlay") {
-                expOptions.IsExpanded = false;
-                spThumbSizeInfo.Visibility = Visibility.Hidden;
-                btnShowHideOverlay.Content = "Show overlay";
-            } else {
-                expOptions.IsExpanded = true;
-                spThumbSizeInfo.Visibility = System.Windows.Visibility.Visible;
-                btnShowHideOverlay.Content = "Hide overlay";
-            }
         }
 
     }

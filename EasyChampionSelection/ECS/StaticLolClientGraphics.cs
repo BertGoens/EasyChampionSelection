@@ -143,12 +143,6 @@ namespace EasyChampionSelection.ECS {
             WHITENESS = 0x00FF0062,
         };
 
-        /// <summary>
-        /// Bitmap to BitmapSource helper
-        /// </summary>
-        [DllImport("gdi32")]
-        static extern int DeleteObject(IntPtr o);
-
         #endregion Private DLL Import & Related structures
 
         #region Getters & Setters
@@ -279,7 +273,7 @@ namespace EasyChampionSelection.ECS {
             return isTrue;
         }
 
-        private Bitmap GetLeagueClientAsBitmap() {
+        public Bitmap GetLeagueClientAsBitmap() {
             // Old lol bounds
             Rectangle origLolBounds = new Rectangle(_rectLolBounds.X, _rectLolBounds.Y, _rectLolBounds.Width, _rectLolBounds.Height);
 
@@ -401,36 +395,5 @@ namespace EasyChampionSelection.ECS {
             return true;
         }
 
-        /// <summary>
-        /// Returns an RGB BitmapSource of the Client at this moment
-        /// </summary>
-        public System.Windows.Media.Imaging.BitmapSource GetLeagueClientAsBitmapSource() {
-            //Use the IDisposable so we automatically dispose our image (can soak a lot of memory)
-            using(Bitmap lolClientSized_Bitmap = GetLeagueClientAsBitmap()) {
-
-                if(lolClientSized_Bitmap == null) {
-                    return null;
-                }
-
-                IntPtr ip;
-                try {
-                    ip = lolClientSized_Bitmap.GetHbitmap();
-                } catch(ArgumentException) {
-                    return null;
-                }
-
-                System.Windows.Media.Imaging.BitmapSource bs = null;
-
-                try {
-                    bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(ip,
-                       IntPtr.Zero, System.Windows.Int32Rect.Empty,
-                       System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
-                } finally {
-                    DeleteObject(ip);
-                }
-
-                return bs;
-            }
-        }
     }
 }

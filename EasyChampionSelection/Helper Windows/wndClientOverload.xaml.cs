@@ -46,13 +46,7 @@ namespace EasyChampionSelection {
         /// </summary>
         private void Redraw() {
             if(_lcg.getProcessLolClient() != null) {
-                Rectangle pos = _lcg.getClientOverlayPosition();
-                this.Left = pos.X;
-                this.Top = pos.Y;
-                this.Width = pos.Width;
-                this.Height = pos.Height;
-
-                cboGroups.Width = Math.Abs(pos.Width - cboGroups.Margin.Left - 5);
+                RepositionClientOverlay();
             }
 
             cboGroups.Items.Clear();
@@ -65,11 +59,17 @@ namespace EasyChampionSelection {
         }
 
         public void RepositionClientOverlay() {
-            Rectangle rect = _lcg.getClientOverlayPosition();
-            this.Left = rect.X;
-            this.Top = rect.Y;
-            this.Width = rect.Width;
-            this.Height = rect.Height;
+            Rectangle pos = _lcg.getClientOverlayPosition();
+            this.Left = pos.X;
+            this.Top = pos.Y;
+            this.Width = pos.Width;
+            this.Height = pos.Height;
+
+            if(pos.Width - cboGroups.Margin.Left - 5 > 0) {
+                cboGroups.Width = pos.Width - cboGroups.Margin.Left - 15;
+            } else {
+                cboGroups.Width = Math.Abs(pos.Width - cboGroups.Margin.Left - 5);
+            }
         }
 
         private void _lcg_OnLeagueClientReposition(StaticLolClientGraphics sender, EventArgs e) {
@@ -148,11 +148,16 @@ namespace EasyChampionSelection {
         }
 
         private void CheckBox_CheckStateChanged(object sender, RoutedEventArgs e) {
+            cboGroups.SelectedIndex = -1;
             this._lcg.TypeInSearchBar(CreateStringOfCheckedItems());
+            e.Handled = true;
         }
 
         private void cboGroups_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            _lcg.TypeInSearchBar(CreateStringOfChampionsInChampionList(_groupManager.getGroup(cboGroups.SelectedIndex)));
+            if(cboGroups.SelectedIndex > -1) {
+                _lcg.TypeInSearchBar(CreateStringOfChampionsInChampionList(_groupManager.getGroup(cboGroups.SelectedIndex)));
+                e.Handled = true;
+            }
         }
 
         private string CreateStringOfChampionsInChampionList(ChampionList c) {
@@ -201,6 +206,14 @@ namespace EasyChampionSelection {
             }
 
             return returnValue;
+        }
+
+        private void wndMyClientOverload_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            if(e.Property.Name == "IsVisible") {
+                if((bool)e.NewValue == true) {
+                    RepositionClientOverlay();
+                }
+            }
         }
 
     }

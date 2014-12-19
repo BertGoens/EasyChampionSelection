@@ -7,10 +7,11 @@
     Width="300" 
     ShowInTaskbar="False" 
     Topmost="True" 
+    Focusable="False"
     WindowStyle="None"
     ShowActivated="False"
     ResizeMode="NoResize" 
-    Title="ECS lolClient Overlay">
+    Title="ECS lolClient Overlay" IsVisibleChanged="wndMyClientOverload_IsVisibleChanged">
     
     <Grid>
         <Grid.Background>
@@ -26,7 +27,7 @@
                   VerticalAlignment="Center"
                   Width="230"
                   Height="25" 
-                  SelectionChanged="cboGroups_SelectionChanged"
+                  SelectionChanged="cboGroups_SelectionChanged" VerticalContentAlignment="Center"
                    />
         <Label Content="Groups:" 
                HorizontalAlignment="Left" 

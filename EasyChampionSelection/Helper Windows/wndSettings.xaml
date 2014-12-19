@@ -19,6 +19,6 @@
         <Label x:Name="lblChampionSearchBar" Content="ChampionSearchBar:" HorizontalAlignment="Left" Margin="10,105,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lblTeamChat" Content="TeamChat:" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lblClientOverlay" Content="Client Overlay:" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="btnConfigClientOverlay" Content="Config Client Overlay" HorizontalAlignment="Left" Margin="263,194,0,0" VerticalAlignment="Top" Width="119" Click="btnConfigClientOverlay_Click"/>
+        <Button x:Name="btnConfigClientOverlay" Content="Config Client Overlay" HorizontalAlignment="Left" Margin="263,194,0,0" VerticalAlignment="Top" Width="119" Click="OpenConfigClientOverlay"/>
     </Grid>
 </Window>

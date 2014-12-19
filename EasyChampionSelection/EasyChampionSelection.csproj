@@ -98,6 +98,7 @@
     <Compile Include="ECS\StaticGroupManager.cs" />
     <Compile Include="ECS\GroupManagerEventArgs.cs" />
     <Compile Include="ECS\GroupManagerEventOperation.cs" />
+    <Compile Include="ECS\StaticImageUtilities.cs" />
     <Compile Include="ECS\StaticLolClientGraphics.cs" />
     <Compile Include="ECS\StaticSerializer.cs" />
     <Compile Include="Helper Windows\FancyBalloon.xaml.cs">
