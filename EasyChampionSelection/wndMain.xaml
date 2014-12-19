@@ -5,7 +5,9 @@
         Title="Easy Champion Selection"
         Height="467" 
         Width="434"
-        Loaded="frmMain_Loaded"
+        Visibility="Hidden"
+        ShowInTaskbar="False"
+        Loaded="Load"
         Closing="frmMain_Closing"
         Icon="Resources/LolIcon.jpg"
         >

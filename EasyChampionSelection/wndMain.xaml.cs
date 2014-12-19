@@ -34,21 +34,17 @@ namespace EasyChampionSelection {
         private TimeSpan _tmspTimerAfkInterval = new TimeSpan(5000);
         #endregion Properties & Attributes
 
-        public wndMain() {
+        public wndMain(TaskbarIcon tb) {
+            _notifyIcon = tb;
+            _notifyIcon.PreviewTrayContextMenuOpen += notifyIcon_PreviewTrayContextMenuOpen;
+
             InitializeComponent();
         }
 
         #region Events
 
-        private void frmMain_Loaded(object sender, RoutedEventArgs e) {
+        public void Load(object sender, RoutedEventArgs e) {
             LoadSettings(); //Load this first
-
-            if(!_ecsSettings.ShowMainFormOnLaunch) {
-                this.Visibility = Visibility.Hidden;
-                this.ShowInTaskbar = false;
-            }
-
-            SetupNotifyIcon(); //TrayIcon
 
             LoadSerializedGroupManager();
             LoadAllChampions(); //Load all champions (Riot api or local)
@@ -57,12 +53,18 @@ namespace EasyChampionSelection {
             DisplayGroups();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
 
+            if(_ecsSettings.ShowMainFormOnLaunch) {
+                this.Visibility = Visibility.Visible;
+                this.ShowInTaskbar = true;
+            }
+
             SetupTimer(); //Timer
         }
 
         private void frmMain_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             SaveSerializedData();
 
+            _notifyIcon.PreviewTrayContextMenuOpen -= notifyIcon_PreviewTrayContextMenuOpen;
             _notifyIcon.Dispose(); //Dispose to auto clear the icon
 
             Application.Current.Shutdown();
@@ -149,7 +151,6 @@ namespace EasyChampionSelection {
             } catch(Exception ex) {
                 SaveSerializedData();
                 wndErrorHelper wndEH = new wndErrorHelper(ex);
-                wndEH.Owner = this;
                 wndEH.ShowDialog();
                 _tmrCheckForChampSelect.Stop();
                 _manuallyEnableTimerVisual = true;
@@ -192,6 +193,7 @@ namespace EasyChampionSelection {
                 wndAddGroup wndAG = new wndAddGroup(_gm);
                 wndAG.Owner = this;
                 wndAG.ShowDialog();
+                DisplayGroups();
             } catch(Exception) {
                 DisplayPopup("Woops, something went wrong!");
             }
@@ -492,17 +494,6 @@ namespace EasyChampionSelection {
             return mniMI;
         }
 
-        private void SetupNotifyIcon() {
-            _notifyIcon = new TaskbarIcon();
-            _notifyIcon.Icon = Properties.Resources.LolIcon;
-            _notifyIcon.ToolTipText = "Easy Champion Selection";
-            _notifyIcon.Visibility = Visibility.Visible;
-            _notifyIcon.MenuActivation = PopupActivationMode.RightClick;
-            System.Windows.Controls.ContextMenu cm = new System.Windows.Controls.ContextMenu();
-            _notifyIcon.ContextMenu = cm;
-            _notifyIcon.PreviewTrayContextMenuOpen += notifyIcon_PreviewTrayContextMenuOpen;
-        }
-
         private void SetupTimer() {
             _tmrCheckForChampSelect.Tick += new EventHandler(_tmrCheckForChampSelect_Tick);
             _tmrCheckForChampSelect.Interval = _tmspTimerClienActiveInterval;
@@ -614,7 +605,6 @@ namespace EasyChampionSelection {
                     _wndST.SafeClose();
                 }
                 _wndST = new wndSettings(_ecsSettings, _lcg, ReOpenConfigLolClientOverlay);
-                _wndST.Owner = this;
                 if(settingsOpened) {
                     _wndST.Show();
                 }

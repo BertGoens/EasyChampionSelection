@@ -22,15 +22,19 @@ namespace EasyChampionSelection.Helper_Windows {
             InitializeComponent();
             _s = s;
             _lcg = lcg;
+
+            _s.ChampionSearchbarChanged += _s_ChampionSearchbarChanged;
+            _s.ClientOverlayChanged += _s_ClientOverlayChanged;
+            _s.TeamChatChanged += _s_TeamChatChanged;
+
             _wndCLCO = new wndConfigLolClientOverlay(_lcg, _s);
 
             txtApiKey.Text = s.UserApiKey;
             chkShowMainFormOnBoot.IsChecked = s.ShowMainFormOnLaunch;
 
-            lblChampionSearchBar.Content = "Champion Searchbar: " + s.ChampionSearchbarRelativePos.ToString();
-            lblClientOverlay.Content = "Client Overlay: " + s.ClientOverlayRelativePos.ToString();
-            lblTeamChat.Content = "Team Chat: " + s.TeamChatRelativePos.ToString();
-            this.SizeToContent = System.Windows.SizeToContent.Width;
+            lblChampionSearchBar.Content = "Champion Searchbar: " + _s.ChampionSearchbarRelativePos.ToString();
+            lblClientOverlay.Content = "Client Overlay: " + _s.ClientOverlayRelativePos.ToString();
+            lblTeamChat.Content = "Team Chat: " + _s.TeamChatRelativePos.ToString();
 
             if(_lcg == null && !File.Exists(StaticSerializer.FullPath_ClientImage)) {
                 btnConfigClientOverlay.IsEnabled = false;
@@ -39,6 +43,18 @@ namespace EasyChampionSelection.Helper_Windows {
             if(openConfigLolClientOverlay) {
                 OpenConfigClientOverlay(null, null);
             }
+        }
+
+       private void _s_TeamChatChanged(Settings sender, EventArgs e) {
+            lblTeamChat.Content = "Team Chat: " + _s.TeamChatRelativePos.ToString();
+        }
+
+        private void _s_ClientOverlayChanged(Settings sender, EventArgs e) {
+            lblClientOverlay.Content = "Client Overlay: " + _s.ClientOverlayRelativePos.ToString();
+        }
+
+        private void _s_ChampionSearchbarChanged(Settings sender, EventArgs e) {
+            lblChampionSearchBar.Content = "Champion Searchbar: " + _s.ChampionSearchbarRelativePos.ToString();
         }
 
         /// <summary>
@@ -79,8 +95,9 @@ namespace EasyChampionSelection.Helper_Windows {
             if(_wndCLCO.IsLoaded == false) {
                 _wndCLCO = new wndConfigLolClientOverlay(_lcg, _s);
             }
-
             _wndCLCO.Show();
         }
+
+        
     }
 }

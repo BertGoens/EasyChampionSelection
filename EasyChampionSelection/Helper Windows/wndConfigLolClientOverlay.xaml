@@ -108,7 +108,8 @@
                        Margin="5,0,4,0"/>
                 <TextBox x:Name="txtNewThumbWidth"
                         HorizontalAlignment="Left"
-                        Height="23" Margin="0,0,0,0" 
+                        Height="23" 
+                        Margin="0,0,0,0" 
                         TextWrapping="Wrap" 
                         VerticalAlignment="Top"
                         Width="50" 
@@ -116,6 +117,7 @@
                         TextChanged="txtNewThumbWidth_TextChanged"
                          />
             </StackPanel>
+            
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top">
