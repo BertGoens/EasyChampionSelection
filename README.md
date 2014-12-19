@@ -1,31 +1,62 @@
 EasyChampionSelection
 =====================
 
-**Downloads are in the description below, not the Download ZIP button! That is if you want the source code.**
+**Downloads are in the description below, not the Download ZIP button! That's if you want the source code.**
 
-A small programn to help relieve your in champion select.  
+A small programn to help relieve your stress in champion select.  
 Ever had it occuring to you that in the heat of the moment you forgot your champion pool?  
 ECS will pop up a window for you so you'll never have to remember them again.
 It's smart enough to only show up when it's your turn to pick or ban.
 
-##First: 
-Add some groups and put some champions in them.  
-![Step 1](http://i.imgur.com/OcAiJqj.jpg)
+Youtube tutorial: 
 
-Once you've done that you can hide your main window so it doesn't take up space.  
-A tray icon will still do what you want.  
-![Step 1](http://i.imgur.com/O3jPl7E.jpg)
+#Guide
+##Riot API key
+Go to the settings to get your api key
+Once you've obtained it, copy and paste it in the field.
 
-##Second:
-Alright, now we have our gruops the only thing resting us is getting into champion select.  
-Notice the little window next to the Skins-tab.  
-![Step 2](http://i.imgur.com/6nRnYQq.jpg)
+##Configure league client
+Start up league of legends, and create a custom game. 
+(A box should now appear saying "your lolclient.exe has just been updated")
+Now we want to configure our client overlay (Button: Config Client Overlay)
 
-##Lastly:
-Click on the dropdown-menu and all your groups will appear.  
-Want to see 1 or multiple groups? Simply tick the checkbox.
-Don't click away at this moment as my program functions as a typewriter.  
-![Step 3](http://i.imgur.com/IbQLfGS.jpg)
+Create a custom game and press Get Current Client Image  
+![Button: Get Current Client Image](http://i.imgur.com/1axnVZV.jpg)
+Your client should be drawn onto my window.
+If that doesn't happen try to poke the client with a stick or move it a little.
+After we have our image quickly quit your game in the client.
 
-##Download
+Now we must set up 3 'checkpoints' so ECS knows when you are in champion select.
+These are: the Champion Searchbar filter, the Team Chatbar, the ECS client overlay (where should ECS appear)
+My preference is to set ECS next to the skins tab as it looks really smooth.  
+![Configuring Client Overlay](http://imgur.com/Ft2BziH.jpg)
+
+To set a checkbpoint just select one of the radiobuttons and drag the newly spawned red square to it's position. 
+You can adjust the width and height accordingly.
+It's better to make them a little smaller than trying to contain the bars.
+
+If your ready configuring just close the window.
+
+##Adding Groups
+Add all the groups you want, this is how my groups look: 
+Top, Jungle, Mid, Adc, Support, Should Test, Ban, Ban King Poro, ...  
+![Adding a group](http://imgur.com/70Zw7Je.jpg)
+
+You can move groups up, down, rename and delete them.
+Now it's time to get some champions in them.
+Just select the group you want and either select a whole buch off them or just add them one by one.
+(Tip for fast adding and deleting champions: you can double click them)  
+![Adding champions](http://imgur.com/9NX3xPr.jpg)
+
+##Last step
+![Get in champion selection](http://imgur.com/IbQLfGS.jpg?1)
+Your Easy Champion Selection should be assisting you now.
+Have fun!
+
+##Tip:
+![Right Click TrayIcon](http://imgur.com/o1mX374.jpg)  
+Hiding the main window this way will also hide it from your task bar.
+You can set it up to always hide this way in the settings.
+
+#Download
 No executible file has been provided yet.
