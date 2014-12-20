@@ -16,10 +16,10 @@
             <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://developer.riotgames.com/">Get API key</Hyperlink>
         </TextBlock>
         <CheckBox x:Name="chkShowMainFormOnBoot" Content="Show Main form on launch" HorizontalAlignment="Left" Margin="10,63,0,0" VerticalAlignment="Top" Checked="chkShowMainFormOnBoot_Checked" Unchecked="chkShowMainFormOnBoot_Unchecked" />
-        <Label x:Name="lblChampionSearchBar" Content="ChampionSearchBar:" HorizontalAlignment="Left" Margin="10,105,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="lblTeamChat" Content="TeamChat:" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblChampionSearchBar" Content="Champion SearchBar:" HorizontalAlignment="Left" Margin="10,105,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblTeamChat" Content="Team Chatbar:" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lblClientOverlay" Content="Client Overlay:" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="btnConfigClientOverlay" Content="Config Client Overlay" HorizontalAlignment="Left" Margin="10,194,0,0" VerticalAlignment="Top" Width="119" Click="OpenConfigClientOverlay"/>
+        <Button x:Name="btnConfigClientOverlay" Content="Configure Client Overlay" HorizontalAlignment="Left" Margin="10,194,0,0" VerticalAlignment="Top" Width="139" Click="OpenConfigClientOverlay"/>
         <Label x:Name="lblApplicationpath" Content="Application path: " HorizontalAlignment="Left" Margin="10,234,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

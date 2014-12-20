@@ -39,7 +39,7 @@
                  Margin="78,41,0,0"
                  TextWrapping="Wrap"
                  VerticalAlignment="Top" 
-                 Width="204"
+                 Width="204" VerticalContentAlignment="Center"
                  />
         
         <Label Content="Password:" 
@@ -52,7 +52,7 @@
                      Margin="78,71,0,0"
                      VerticalAlignment="Top"
                      Width="204"
-                     Height="23"
+                     Height="23" VerticalContentAlignment="Center"
                      />
 
         <Label Content="Subject:" 
@@ -66,7 +66,7 @@
                  Margin="78,101,0,0" 
                  TextWrapping="Wrap" 
                  VerticalAlignment="Top" 
-                 Width="204"
+                 Width="204" VerticalContentAlignment="Center"
                  />
         
         <TextBox x:Name="txtBody" 
