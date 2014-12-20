@@ -21,7 +21,7 @@ namespace EasyChampionSelection {
         #region Properties & Attributes
 
         private bool _manuallyEnableTimerVisual = false;
-        private DispatcherTimer _tmrCheckForChampSelect = new DispatcherTimer();
+        private DispatcherTimer _tmrCheckForChampSelect = new DispatcherTimer(DispatcherPriority.Background);
         private ChampionList _allChampions;
         private wndClientOverload _wndCO;
         private wndContactCreator _wndCC;
@@ -30,8 +30,8 @@ namespace EasyChampionSelection {
         private Settings _ecsSettings;
         private TaskbarIcon _notifyIcon;
         private StaticLolClientGraphics _lcg;
-        private TimeSpan _tmspTimerClienActiveInterval = new TimeSpan(500);
-        private TimeSpan _tmspTimerAfkInterval = new TimeSpan(5000);
+        private TimeSpan _tmspTimerClienActiveInterval = new TimeSpan(0,0,1);
+        private TimeSpan _tmspTimerAfkInterval = new TimeSpan(0,0,10);
         #endregion Properties & Attributes
 
         public wndMain(TaskbarIcon tb) {
@@ -107,7 +107,7 @@ namespace EasyChampionSelection {
             try {
                 //Check if player is ingame
                 Process[] gameClient = Process.GetProcessesByName("League of Legends");
-                if(gameClient.Count() > 0) {
+                if(gameClient.Length > 0) {
                     _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
                 } else {
                     _tmrCheckForChampSelect.Interval = _tmspTimerClienActiveInterval;

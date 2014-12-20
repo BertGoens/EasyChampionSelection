@@ -43,8 +43,8 @@
         <Button x:Name="btnAddChampionsToCurrentGroup" Content="&lt;&lt;" Margin="175,290,0,0" Click="AddChampionsToCurrentGroup" HorizontalAlignment="Left" Width="75" Height="20" VerticalAlignment="Top"/>
         <Label x:Name="lblCurrentGroupChampions" Content="Champions in %group%" HorizontalAlignment="Left" Margin="10,194,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lblAllChampionsInfo" Content="All champions" HorizontalAlignment="Left" Margin="255,194,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtFilterForAllChampions" HorizontalAlignment="Left" Height="23" Margin="255,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" BorderBrush="#FF8493BD" MouseEnter="txtFilterForAllChampions_MouseEnter" MouseLeave="txtFilterForAllChampions_MouseLeave" TextChanged="txtFilterForAllChampions_TextChanged" MaxLength="100" MaxLines="1"/>
-        <Label x:Name="lblFilterInfo" Content="Filter" HorizontalAlignment="Left" Margin="255,163,0,0" VerticalAlignment="Top" Foreground="#FF686767"/>
+        <TextBox x:Name="txtFilterForAllChampions" HorizontalAlignment="Left" Height="23" Margin="255,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" BorderBrush="#FF8493BD" MouseEnter="txtFilterForAllChampions_MouseEnter" MouseLeave="txtFilterForAllChampions_MouseLeave" TextChanged="txtFilterForAllChampions_TextChanged" MaxLength="100" MaxLines="1" VerticalContentAlignment="Center"/>
+        <Label x:Name="lblFilterInfo" Content="Filter" HorizontalAlignment="Left" Margin="255,163,0,0" VerticalAlignment="Top" Foreground="#FF686767" VerticalContentAlignment="Center"/>
         <Button x:Name="btnCredits" Content="Credits" HorizontalAlignment="Left" Margin="340,60,0,0" VerticalAlignment="Top" Width="75" Click="btnCredits_Click"/>
         <Button x:Name="btnSettings" Content="Settings" HorizontalAlignment="Left" Margin="340,35,0,0" VerticalAlignment="Top" Width="75" Click="btnSettings_Click"/>
         <Button x:Name="btnGuide" Content="Guide" HorizontalAlignment="Left" Margin="340,10,0,0" VerticalAlignment="Top" Width="75" Click="btnGuide_Click"/>

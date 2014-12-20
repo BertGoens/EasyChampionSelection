@@ -36,6 +36,8 @@ namespace EasyChampionSelection.Helper_Windows {
             lblClientOverlay.Content = "Client Overlay: " + _s.ClientOverlayRelativePos.ToString();
             lblTeamChat.Content = "Team Chat: " + _s.TeamChatRelativePos.ToString();
 
+            lblApplicationpath.Content = "Application path: " + StaticSerializer.applicationPath();
+
             if(_lcg == null && !File.Exists(StaticSerializer.FullPath_ClientImage)) {
                 btnConfigClientOverlay.IsEnabled = false;
             }
