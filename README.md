@@ -11,24 +11,31 @@ It's smart enough to only show up when it's your turn to pick or ban.
 Youtube tutorial: 
 
 #Guide
+Install EasyChampionSelection and open it.
+(It requires .Net 4.5)
+
 ##Riot API key
+@Main:Button "Settings"
 Go to the settings to get your api key
 Once you've obtained it, copy and paste it in the field.
 
 ##Configure league client
 Start up league of legends, and create a custom game. 
 (A box should now appear saying "your lolclient.exe has just been updated")
-Now we want to configure our client overlay (Button: Config Client Overlay)
+Now we want to configure our client overlay
+@Settings:Button "Configure Client Overlay"
 
 Create a custom game and press Get Current Client Image  
+@Configure Client Overlay: Button "Get Current Client Image"
 ![Button: Get Current Client Image](http://i.imgur.com/1axnVZV.jpg)
 Your client should be drawn onto my window.
-If that doesn't happen try to poke the client with a stick or move it a little.
-After we have our image quickly quit your game in the client.
+If that doesn't happen try move the client up a little and retry.
+IMPORTANT: After we have our image quickly quit your game in the client.
 
 Now we must set up 3 'checkpoints' so ECS knows when you are in champion select.
 These are: the Champion Searchbar filter, the Team Chatbar, the ECS client overlay (where should ECS appear)
-My preference is to set ECS next to the skins tab as it looks really smooth.  
+For the bars: please insert the red square onto the white part only.
+My ECS Client Overlay preference is next to the skins tab as it looks really smooth.  
 ![Configuring Client Overlay](http://imgur.com/Ft2BziH.jpg)
 
 To set a checkbpoint just select one of the radiobuttons and drag the newly spawned red square to it's position. 
@@ -36,6 +43,9 @@ You can adjust the width and height accordingly.
 It's better to make them a little smaller than trying to contain the bars.
 
 If your ready configuring just close the window.
+
+Look at the Settings window. The Champion Searchbar, Team Chatbar and Client Overlay should now have diffrent values than 0.
+You can close it now.
 
 ##Adding Groups
 Add all the groups you want, this is how my groups look: 
