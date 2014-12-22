@@ -14,7 +14,7 @@ namespace EasyChampionSelection.Helper_Windows {
     /// Interaction logic for wndConfigLolClientOverlay.xaml
     /// </summary>
     public partial class wndConfigLolClientOverlay : Window {
-        private StaticLolClientGraphics _lcg;
+        private StaticPinvokeLolClient _lcg;
         private Settings _ecsSettings;
         private const int _cBaseThumbWidth = 50;
         private const int _cBaseThumbHeight = 50;
@@ -23,7 +23,7 @@ namespace EasyChampionSelection.Helper_Windows {
         private Bitmap _ClientBitmap;
         private BitmapSource _lolClientImage;
 
-        public wndConfigLolClientOverlay(StaticLolClientGraphics lcg, Settings ecsSettings) {
+        public wndConfigLolClientOverlay(StaticPinvokeLolClient lcg, Settings ecsSettings) {
             if(ecsSettings != null) {
                 _lcg = lcg;
                 _ecsSettings = ecsSettings;
@@ -180,8 +180,11 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void CreateNewThumb() {
-            Canvas.SetLeft(thmbPos, 0d);
-            Canvas.SetTop(thmbPos, 0d);
+            double widthMiddle = _ClientBitmap.Width / 2;
+            double heightMiddle = _ClientBitmap.Height / 2;
+
+            Canvas.SetLeft(thmbPos, widthMiddle);
+            Canvas.SetTop(thmbPos, heightMiddle);
 
             int tWidth;
             if(int.TryParse(txtNewThumbWidth.Text, out tWidth)) {

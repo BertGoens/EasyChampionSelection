@@ -11,10 +11,10 @@ namespace EasyChampionSelection.Helper_Windows {
     /// </summary>
     public partial class wndSettings : Window {
         private Settings _s;
-        private StaticLolClientGraphics _lcg;
+        private StaticPinvokeLolClient _lcg;
         private wndConfigLolClientOverlay _wndCLCO;
 
-        public wndSettings(Settings s, StaticLolClientGraphics lcg, bool openConfigLolClientOverlay = false) {
+        public wndSettings(Settings s, StaticPinvokeLolClient lcg, bool openConfigLolClientOverlay = false) {
             if(s == null) {
                 throw new ArgumentNullException();
             }
@@ -98,6 +98,10 @@ namespace EasyChampionSelection.Helper_Windows {
                 _wndCLCO = new wndConfigLolClientOverlay(_lcg, _s);
             }
             _wndCLCO.Show();
+        }
+
+        private void lblApplicationpath_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+            Process.Start(StaticSerializer.applicationPath());
         }
 
         

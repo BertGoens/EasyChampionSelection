@@ -6,6 +6,7 @@
         Width="250" 
         Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg" 
         ShowInTaskbar="True" 
+        ResizeMode="CanResizeWithGrip"
         Closing="Window_Closing">
 
     <Window.Resources>

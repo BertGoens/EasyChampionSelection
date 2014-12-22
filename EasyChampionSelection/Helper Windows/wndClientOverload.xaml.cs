@@ -13,14 +13,18 @@ namespace EasyChampionSelection {
     public partial class wndClientOverload : Window {
 
         private StaticGroupManager _groupManager;
-        private StaticLolClientGraphics _lcg;
+        private StaticPinvokeLolClient _lcg;
 
-        public wndClientOverload(StaticGroupManager gmGroupManager, StaticLolClientGraphics lcg) {
+        private wndClientOverload() {
+            InitializeComponent();
+        }
+
+        public wndClientOverload(StaticGroupManager gmGroupManager, StaticPinvokeLolClient lcg) : this() {
             if(gmGroupManager != null && lcg != null) {
                 this._groupManager = gmGroupManager;
                 this._lcg = lcg;
                 _groupManager.GroupsChanged += _groupManager_GroupsChanged;
-                _lcg.OnLeagueClientReposition += _lcg_OnLeagueClientReposition;
+                _lcg.OnLeagueClientReposition += OnLeagueClientReposition;
                 for(int i = 0; i < _groupManager.GroupCount; i++) {
                     _groupManager.getGroup(i).NameChanged += _groupManager_ChampionList_NameChanged;
                 }
@@ -28,17 +32,7 @@ namespace EasyChampionSelection {
                 MessageBox.Show("wndClientOverload has null parameters!");
             }
 
-            InitializeComponent();
             Redraw();
-        }
-
-        public void SafeDelete() {
-            _groupManager.GroupsChanged -= _groupManager_GroupsChanged;
-            _lcg.OnLeagueClientReposition -= _lcg_OnLeagueClientReposition;
-            for(int i = 0; i < _groupManager.GroupCount; i++) {
-                _groupManager.getGroup(i).NameChanged -= _groupManager_ChampionList_NameChanged;
-            }
-            Close();
         }
 
         /// <summary>
@@ -72,7 +66,7 @@ namespace EasyChampionSelection {
             }
         }
 
-        private void _lcg_OnLeagueClientReposition(StaticLolClientGraphics sender, EventArgs e) {
+        private void OnLeagueClientReposition(StaticPinvokeLolClient sender, EventArgs e) {
             Rectangle rect = sender.getClientOverlayPosition();
             this.Left = rect.X;
             this.Top = rect.Y;

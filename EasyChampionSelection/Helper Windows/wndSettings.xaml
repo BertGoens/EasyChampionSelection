@@ -20,6 +20,6 @@
         <Label x:Name="lblTeamChat" Content="Team Chatbar:" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lblClientOverlay" Content="Client Overlay:" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top"/>
         <Button x:Name="btnConfigClientOverlay" Content="Configure Client Overlay" HorizontalAlignment="Left" Margin="10,194,0,0" VerticalAlignment="Top" Width="139" Click="OpenConfigClientOverlay"/>
-        <Label x:Name="lblApplicationpath" Content="Application path: " HorizontalAlignment="Left" Margin="10,234,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblApplicationpath" Content="Application path: " HorizontalAlignment="Left" Margin="10,234,0,0" VerticalAlignment="Top" MouseDoubleClick="lblApplicationpath_MouseDoubleClick" />
     </Grid>
 </Window>

@@ -8,12 +8,12 @@ using System.Runtime.InteropServices;
 namespace EasyChampionSelection.ECS {
     /// <summary>
     /// A Singleton class
-    /// Static graphical helper for the lolClient.exe process
+    /// P/Invoke class for the lolClient.exe process
     /// </summary>
-    public sealed class StaticLolClientGraphics {
+    public sealed class StaticPinvokeLolClient {
 
         #region Events
-        public delegate void StaticLolClientGraphicsHandler(StaticLolClientGraphics sender, EventArgs e);
+        public delegate void StaticLolClientGraphicsHandler(StaticPinvokeLolClient sender, EventArgs e);
 
         /// <summary>
         /// Occurs when the league of legends client is repositioned.
@@ -32,7 +32,7 @@ namespace EasyChampionSelection.ECS {
         private Rectangle _rectLolBounds;
         private static Settings _ecsSettings;
         private static Process processLolClient;
-        private static StaticLolClientGraphics _instance;
+        private static StaticPinvokeLolClient _instance;
         #endregion Properties & Attributes
 
         #region Private P/Invoke DLL Import & Related structures
@@ -146,7 +146,7 @@ namespace EasyChampionSelection.ECS {
         #endregion Private DLL Import & Related structures
 
         #region Getters & Setters
-        public StaticLolClientGraphics getInstance() {
+        public StaticPinvokeLolClient getInstance() {
             return _instance;
         }
 
@@ -180,7 +180,7 @@ namespace EasyChampionSelection.ECS {
         /// Private constructor (singleton)
         /// Please use GetInstance() to use the class.
         /// </summary>
-        private StaticLolClientGraphics(Process pLolClient, Settings ecsSettings) {
+        private StaticPinvokeLolClient(Process pLolClient, Settings ecsSettings) {
             _ecsSettings = ecsSettings;
             processLolClient = pLolClient;
         }
@@ -191,10 +191,10 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// Create a StaticLolClientGraphics object.
         /// </summary>
-        public static StaticLolClientGraphics GetInstance(Process lolClient, Settings ecsSettings) {
+        public static StaticPinvokeLolClient GetInstance(Process lolClient, Settings ecsSettings) {
             if(lolClient != null && ecsSettings != null) {
                 if(_instance == null || lolClient != processLolClient) {
-                    _instance = new StaticLolClientGraphics(lolClient, ecsSettings);
+                    _instance = new StaticPinvokeLolClient(lolClient, ecsSettings);
                 }
             } else {
                 throw new ArgumentNullException();

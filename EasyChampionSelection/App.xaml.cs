@@ -1,4 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
+﻿using EasyChampionSelection.ECS;
 using System.Windows;
 
 namespace EasyChampionSelection {
@@ -6,20 +6,20 @@ namespace EasyChampionSelection {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
-        private TaskbarIcon _tb;
+        private AppRuntimeResources arr;
 
         private void Application_Startup(object sender, StartupEventArgs e) {
-            SetupNotifyIcon();
-            wndMain wndM = new wndMain(_tb);
-            wndM.Load(null,null);
+            arr = new AppRuntimeResources();
+            if(arr.MySettings.ShowMainFormOnLaunch) {
+                arr.Window_Main.Show();
+            }
         }
 
-        private void SetupNotifyIcon() {
-            _tb = new TaskbarIcon();
-            _tb.Icon =  EasyChampionSelection.Properties.Resources.LolIcon;
-            _tb.ToolTipText = "Easy Champion Selection";
-            _tb.Visibility = Visibility.Visible;
-            _tb.MenuActivation = PopupActivationMode.RightClick;
+        private void Application_Exit(object sender, ExitEventArgs e) {
+            arr.SaveSerializedData();
+            arr.Dispose();
+            Application.Current.Shutdown();
         }
+
     }
 }
