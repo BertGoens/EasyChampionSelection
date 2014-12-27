@@ -12,24 +12,24 @@ namespace EasyChampionSelection {
     /// </summary>
     public partial class wndClientOverload : Window {
 
-        private StaticGroupManager _groupManager;
+        private StaticGroupManager _gm;
         private StaticPinvokeLolClient _lcg;
 
         private wndClientOverload() {
             InitializeComponent();
         }
 
-        public wndClientOverload(StaticGroupManager gmGroupManager, StaticPinvokeLolClient lcg) : this() {
+        public wndClientOverload(StaticGroupManager gmGroupManager, StaticPinvokeLolClient lcg, Action<string, bool, Window> DisplayPopup) : this() {
             if(gmGroupManager != null && lcg != null) {
-                this._groupManager = gmGroupManager;
+                this._gm = gmGroupManager;
                 this._lcg = lcg;
-                _groupManager.GroupsChanged += _groupManager_GroupsChanged;
+                _gm.GroupsChanged += _groupManager_GroupsChanged;
                 _lcg.OnLeagueClientReposition += OnLeagueClientReposition;
-                for(int i = 0; i < _groupManager.GroupCount; i++) {
-                    _groupManager.getGroup(i).NameChanged += _groupManager_ChampionList_NameChanged;
+                for(int i = 0; i < _gm.GroupCount; i++) {
+                    _gm.getGroup(i).NameChanged += _groupManager_ChampionList_NameChanged;
                 }
             } else {
-                MessageBox.Show("wndClientOverload has null parameters!");
+                DisplayPopup("wndClientOverload has null parameters!", true, this);
             }
 
             Redraw();
@@ -44,9 +44,9 @@ namespace EasyChampionSelection {
             }
 
             cboGroups.Items.Clear();
-            for(int i = 0; i < _groupManager.GroupCount; i++) {
+            for(int i = 0; i < _gm.GroupCount; i++) {
                 System.Windows.Controls.CheckBox chk = new System.Windows.Controls.CheckBox();
-                chk.Content = _groupManager.getGroup(i).getName();
+                chk.Content = _gm.getGroup(i).getName();
                 chk.Checked += new RoutedEventHandler(CheckBox_CheckStateChanged);
                 cboGroups.Items.Add(chk);
             }
@@ -78,7 +78,7 @@ namespace EasyChampionSelection {
                 switch(e.eventOperation) {
                     case GroupManagerEventOperation.Add:
                         //Get index of new added item
-                        int newItemIndex = _groupManager.indexOf(e.operationItem.getName());
+                        int newItemIndex = _gm.indexOf(e.operationItem.getName());
                         //Insert item here at the correct spot
                         System.Windows.Controls.CheckBox chk = new System.Windows.Controls.CheckBox();
                         chk.Content = e.operationItem.getName();
@@ -100,7 +100,7 @@ namespace EasyChampionSelection {
                     case GroupManagerEventOperation.Reposition:
                         //Reposition it here based on name
                         //Get new position
-                        int newPosition = _groupManager.indexOf(e.operationItem.getName());
+                        int newPosition = _gm.indexOf(e.operationItem.getName());
                         int oldPosition = -1;
                         bool isChecked = false;
                         //Find old position
@@ -129,7 +129,7 @@ namespace EasyChampionSelection {
 
         private void _groupManager_ChampionList_NameChanged(ChampionList sender, EventArgs e) {
             if(sender != null) {
-                int indexOfSender = _groupManager.indexOf(sender.getName());
+                int indexOfSender = _gm.indexOf(sender.getName());
 
                 //if indexOfSender != -1 update that specific group
                 if(indexOfSender != -1) {
@@ -149,7 +149,7 @@ namespace EasyChampionSelection {
 
         private void cboGroups_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             if(cboGroups.SelectedIndex > -1) {
-                _lcg.TypeInSearchBar(CreateStringOfChampionsInChampionList(_groupManager.getGroup(cboGroups.SelectedIndex)));
+                _lcg.TypeInSearchBar(CreateStringOfChampionsInChampionList(_gm.getGroup(cboGroups.SelectedIndex)));
                 e.Handled = true;
             }
         }
@@ -181,9 +181,9 @@ namespace EasyChampionSelection {
             for(int i = 0; i < cboGroups.Items.Count; i++) {
                 CheckBox cb = (CheckBox)cboGroups.Items[i];
                 if(cb.IsChecked == true) {
-                    int newGroupCount = _groupManager.getGroup(i).ChampionCount;
+                    int newGroupCount = _gm.getGroup(i).ChampionCount;
                     for(int j = 0; j < newGroupCount; j++) {
-                        string newChampion = _groupManager.getGroup(i).getChampion(j);
+                        string newChampion = _gm.getGroup(i).getChampion(j);
                         if(!lstChampsToFilter.Contains(newChampion)) {
                             lstChampsToFilter.Add(newChampion);
                             returnValue += newChampion + "|";

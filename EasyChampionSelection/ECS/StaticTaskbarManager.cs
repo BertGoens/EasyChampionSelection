@@ -5,35 +5,39 @@ using System.Windows.Controls.Primitives;
 
 namespace EasyChampionSelection.ECS {
     public sealed class StaticTaskbarManager {
+        private static string _appName;
         private static StaticTaskbarManager _instance;
-        private static TaskbarIcon _tb;
+        private static TaskbarIcon _myTaskbarIcon;
 
-        public TaskbarIcon Tb {
-            get { return StaticTaskbarManager._tb; }
-            set { StaticTaskbarManager._tb = value; }
+        public TaskbarIcon MyTaskbarIcon {
+            get { return StaticTaskbarManager._myTaskbarIcon; }
+            set { StaticTaskbarManager._myTaskbarIcon = value; }
         }
 
-        private const string appTitle = "Easy Champion Selection";
+        public StaticTaskbarManager Instance {
+            get { return StaticTaskbarManager._instance; }
+            private set { StaticTaskbarManager._instance = value; }
+        }
 
         private StaticTaskbarManager() {
-            if(_tb != null) {
-                _tb.Dispose();
+            if(_myTaskbarIcon != null) {
+                _myTaskbarIcon.Dispose();
             }
 
             SetupNotifyIcon();
         }
 
-        public static StaticTaskbarManager getInstance() {
+        public static StaticTaskbarManager getInstance(string appName) {
+            _appName = appName;
             _instance = new StaticTaskbarManager();
             return _instance;
         }
 
         private void SetupNotifyIcon() {
-            _tb = new TaskbarIcon();
-            _tb.Icon = EasyChampionSelection.Properties.Resources.LolIcon;
-            _tb.ToolTipText = appTitle;
-            _tb.Visibility = Visibility.Visible;
-            _tb.MenuActivation = PopupActivationMode.RightClick;
+            _myTaskbarIcon = new TaskbarIcon();
+            _myTaskbarIcon.Icon = EasyChampionSelection.Properties.Resources.LolIcon;
+            _myTaskbarIcon.ToolTipText = _appName;
+            _myTaskbarIcon.MenuActivation = PopupActivationMode.RightClick;
         }
 
         public void DisplayPopup(string message, bool isErrorMessage, Window sender = null) {
@@ -44,13 +48,13 @@ namespace EasyChampionSelection.ECS {
             }
 
             try {
-                FancyBalloon balloon = new FancyBalloon(appTitle, message);
-                _tb.ShowCustomBalloon(balloon, PopupAnimation.Fade, 3500);
+                FancyBalloon balloon = new FancyBalloon(_appName, message);
+                _myTaskbarIcon.ShowCustomBalloon(balloon, PopupAnimation.Fade, 3500);
             } catch(Exception) { }
         }
 
         public void Dispose() {
-            _tb.Dispose();
+           _myTaskbarIcon.Dispose();
         }
     }
 }

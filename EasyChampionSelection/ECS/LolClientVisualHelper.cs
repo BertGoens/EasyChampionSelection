@@ -1,6 +1,7 @@
 ﻿using EasyChampionSelection.Helper_Windows;
 using System;
 using System.Diagnostics;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace EasyChampionSelection.ECS {
@@ -10,16 +11,31 @@ namespace EasyChampionSelection.ECS {
 
         private Settings _MySettings;
         private Action _UpdateClientOverlay;
-        private StaticTaskbarManager _tbm;
-        public wndClientOverload _wndCO;
+        private Action<string, bool, Window> _DisplayPopup;
 
-        public StaticPinvokeLolClient _MyPinvokeLolClient;
+        private wndClientOverload _wndCO;
+        private StaticPinvokeLolClient _MyPinvokeLolClient;
         private bool _ManuallyEnableTimerVisual;
 
         private TimeSpan _tmspTimerClienActiveInterval;
         private TimeSpan _tmspTimerAfkInterval;
         private DispatcherTimer _tmrCheckForChampSelect;
         #endregion
+
+        public wndClientOverload Window_ClientOverlay {
+            get { return _wndCO; }
+            set { _wndCO = value; }
+        }
+
+        public StaticPinvokeLolClient MyPinvokeLolClient {
+            get { return _MyPinvokeLolClient; }
+            private set { _MyPinvokeLolClient = value; }
+        }
+
+        public bool ManuallyEnableTimerVisual {
+            get { return _ManuallyEnableTimerVisual; }
+            set { _ManuallyEnableTimerVisual = value; }
+        }
 
         #region Constructors
 
@@ -31,12 +47,10 @@ namespace EasyChampionSelection.ECS {
             _tmrCheckForChampSelect.Tick += tmrCheckForChampSelect_Tick;
         }
 
-        public LolClientVisualHelper(wndClientOverload wndCO, Settings MySettings, bool ManuallyEnableTimerVisual, Action UpdateClientOverlay, StaticTaskbarManager tbm) : this() {
-            _tbm = tbm;
-            _wndCO = wndCO;
+        public LolClientVisualHelper(Settings MySettings, Action UpdateClientOverlay, Action<string, bool, Window> DisplayPopup) : this() {
             _MySettings = MySettings;
             _UpdateClientOverlay = UpdateClientOverlay;
-            _ManuallyEnableTimerVisual = ManuallyEnableTimerVisual;
+            _DisplayPopup = DisplayPopup;
             StartTimer();
         }
 
@@ -92,16 +106,16 @@ namespace EasyChampionSelection.ECS {
 
                     if( _MyPinvokeLolClient.isLolClientFocussed() ||  _MyPinvokeLolClient.isEasyChampionSelectionFoccussed()) {
                         if( _MyPinvokeLolClient.isInChampSelect()) {
-                            _wndCO.Visibility = System.Windows.Visibility.Visible;
+                            Window_ClientOverlay.Visibility = System.Windows.Visibility.Visible;
                         } else {
-                            _wndCO.Visibility = System.Windows.Visibility.Hidden;
+                            Window_ClientOverlay.Visibility = System.Windows.Visibility.Hidden;
                         }
                     }
 
                 }
             } catch(Exception ex) {
                 _ManuallyEnableTimerVisual = true;
-                wndErrorHelper wndEH = new wndErrorHelper(ex, _tbm);
+                wndErrorHelper wndEH = new wndErrorHelper(ex, _DisplayPopup);
                 wndEH.ShowDialog();
                 _tmrCheckForChampSelect.Stop();
                 return;
@@ -110,9 +124,9 @@ namespace EasyChampionSelection.ECS {
         }
 
         private void DeleteOldStaticLolClientGraphics() {
-            if(_wndCO != null) {
-                _wndCO.Close();
-                _wndCO = null;
+            if(Window_ClientOverlay != null) {
+                Window_ClientOverlay.Close();
+                Window_ClientOverlay = null;
             }
 
              _MyPinvokeLolClient = null;

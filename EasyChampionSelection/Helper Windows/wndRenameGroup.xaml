@@ -12,7 +12,7 @@
     <Grid Background="{StaticResource windowHelperBackground}">
         <Button x:Name="btnRenameGroup" Content="Rename" HorizontalAlignment="Left" Margin="20,80,0,0" VerticalAlignment="Top" Width="75" ToolTip="Create a new unique group" Click="btnRenameGroup_Click" IsDefault="True"/>
         <Label x:Name="lblRenameGroupNameInfo" Content="Rename %GROUP% to:" HorizontalAlignment="Left" Margin="15,9,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtRenameGroup" HorizontalAlignment="Left" Height="23" Margin="15,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" TextChanged="txtRenameGroup_TextChanged"/>
+        <TextBox x:Name="txtRenameGroup" HorizontalAlignment="Left" Height="23" Margin="15,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" TextChanged="txtRenameGroup_TextChanged" VerticalContentAlignment="Center"/>
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="105,80,0,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click" IsCancel="True"/>
     </Grid>
 </Window>

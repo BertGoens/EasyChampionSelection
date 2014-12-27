@@ -1,3 +1,16 @@
-Maak YT Tutorial
+Make YT Tutorial
 
-Tweak for destribution
+Find out how LSI creates its own categories and the game accepts them?!
+
+DO
+Modify TaskbarIcon (dll?) so it supports multiple popups
+http://blogs.techsmith.com/inside-techsmith/devcorner-debug-uiaccess/
+https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/350ceab8-436b-4ef1-8512-3fee4b470c0a/problem-with-manifest-and-uiaccess-set-to-true?forum=windowsgeneraldevelopmentissues
+Check if our application needs an update
+
+For Distribution:
+Save in /Program Files/ (uiAccess=True > Must be saved in this folder)
+Save as /Program Files/Easy Champion Selection/ECS.Exe
+Create the directories /Error and /Save
+Installer Must include the .Net 4.5 network
+Don't fuck up the application link and give it a target path!

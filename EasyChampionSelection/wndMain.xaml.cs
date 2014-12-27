@@ -23,7 +23,8 @@ namespace EasyChampionSelection {
             InitializeComponent();
         }
 
-        public wndMain(AppRuntimeResources arr) : this() {
+        public wndMain(AppRuntimeResources arr)
+            : this() {
             _ARR = arr;
         }
 
@@ -69,11 +70,11 @@ namespace EasyChampionSelection {
         private void btnSettings_Click(object sender, RoutedEventArgs e) {
             if(_wndST != null) {
                 if(_wndST.IsLoaded == false) {
-                    _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientVisualHelper._MyPinvokeLolClient);
+                    _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientVisualHelper.MyPinvokeLolClient);
                     _wndST.Owner = this;
                 }
             } else {
-                _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientVisualHelper._MyPinvokeLolClient);
+                _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientVisualHelper.MyPinvokeLolClient);
                 _wndST.Owner = this;
             }
 
@@ -86,7 +87,7 @@ namespace EasyChampionSelection {
                 wndCR.Owner = this;
                 wndCR.ShowDialog();
             } catch(Exception) {
-                _ARR.MyTaskbarManager.DisplayPopup("Woops, something went wrong!", true, this);
+                _ARR.DisplayPopup("Woops, something went wrong!", true, this);
             }
 
         }
@@ -98,7 +99,7 @@ namespace EasyChampionSelection {
                 wndAG.ShowDialog();
                 DisplayGroups();
             } catch(Exception) {
-                _ARR.MyTaskbarManager.DisplayPopup("Woops, something went wrong!", true, this);
+                _ARR.DisplayPopup("Woops, something went wrong!", true, this);
             }
         }
 
@@ -296,7 +297,7 @@ namespace EasyChampionSelection {
 
             MenuItem mniManuallyAddChampion = CreateMenuItem("Manually add a champion", mniManuallyAddChampion_Click);
             cm.Items.Add(mniManuallyAddChampion);
-            
+
             lsbAllChampions.ContextMenu = cm;
 
             e.Handled = true;
@@ -343,6 +344,9 @@ namespace EasyChampionSelection {
         #region Public Behavior
 
         public void DisplayGroups() {
+            int selectedItemIndex = lsbGroups.SelectedIndex;
+            int groupCountBeforeOperation = lsbGroups.Items.Count;
+
             lsbGroups.Items.Clear();
             for(int i = 0; i < _ARR.MyGroupManager.GroupCount; i++) {
                 lsbGroups.Items.Add(_ARR.MyGroupManager.getGroup(i));
@@ -357,10 +361,16 @@ namespace EasyChampionSelection {
                 btnDeleteGroup.IsEnabled = false;
             } else {
                 btnDeleteGroup.IsEnabled = true;
-                if(lsbGroups.SelectedItem == null) {
-                    lsbGroups.SelectedIndex = 0;
+            }
+
+            int groupsAfterOperation = lsbGroups.Items.Count;
+            if(groupsAfterOperation != groupCountBeforeOperation) {
+                if(selectedItemIndex+1 > groupsAfterOperation) {
+                    selectedItemIndex = -1;
                 }
             }
+
+            lsbGroups.SelectedIndex = selectedItemIndex;
         }
 
         public void DisplayChampsInSelectedGroup() {
@@ -380,7 +390,7 @@ namespace EasyChampionSelection {
         public void DisplayAllChampionsMinusInSelectedGroupAccordingToFilter() {
             lsbAllChampions.Items.Clear();
             if(lsbGroups.SelectedIndex > -1) {
-                for(int i = 0; i < _ARR.AllChampions .getCount(); i++) {
+                for(int i = 0; i < _ARR.AllChampions.getCount(); i++) {
                     if(!_ARR.MyGroupManager.getGroup(lsbGroups.SelectedIndex).Contains(_ARR.AllChampions.getChampion(i))) { //lsbChampionsInGroup.Items.Contains(_arr.AllChampions.getChampion(i))
                         string newChamp = _ARR.AllChampions.getChampion(i);
                         if(newChamp.ToUpper().Contains(txtFilterForAllChampions.Text.ToUpper())) {
@@ -407,10 +417,6 @@ namespace EasyChampionSelection {
         }
 
         #endregion Public Behavior
-
-        private void frmMainVisual_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            
-        }
 
     }
 }

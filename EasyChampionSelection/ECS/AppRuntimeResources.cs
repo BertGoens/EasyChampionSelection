@@ -8,23 +8,36 @@ using System.Windows.Controls;
 
 namespace EasyChampionSelection.ECS {
     public class AppRuntimeResources {
+        public const string AppName = "Easy Champion Selection";
+
         private StaticTaskbarManager _tbm;
+        private Action<string, bool, Window> _displayPopup;
+
         private StaticGroupManager _gm;
         private Settings _s;
         private ChampionList _allChampions;
 
         private LolClientVisualHelper _lcvh;
-        private bool _manuallyEnableTimerVisual = false;
 
-        private wndClientOverload _wndCO;
         private wndMain _wndM;
         private wndContactCreator _wndCC;
 
         #region Getters & Setters
 
-        public StaticTaskbarManager MyTaskbarManager {
+        private StaticTaskbarManager MyTaskbarManager {
             get { return _tbm; }
-            private set { _tbm = value; }
+            set 
+            {
+                _tbm = value;
+                _displayPopup = _tbm.DisplayPopup;
+            }
+        }
+
+        /// <summary>
+        /// Routed method from StaticTaskbarManager
+        /// </summary>
+        public Action<string, bool, Window> DisplayPopup {
+            get { return _displayPopup; }
         }
 
         public StaticGroupManager MyGroupManager {
@@ -47,9 +60,26 @@ namespace EasyChampionSelection.ECS {
             private set { _lcvh = value; }
         }
 
+        /// <summary>
+        /// Routed property from LolClientVisualHelper
+        /// </summary>
         public wndClientOverload Window_ClientOverlay {
-            get { return _wndCO; }
-            private set { _wndCO = value; }
+            get
+            {
+                if(MyLolClientVisualHelper == null) {
+                    return null;
+                }
+                if(MyLolClientVisualHelper.Window_ClientOverlay == null) {
+                    return null;
+                }
+                return MyLolClientVisualHelper.Window_ClientOverlay;
+            }
+            private set 
+            {
+                if(MyLolClientVisualHelper != null) {
+                    MyLolClientVisualHelper.Window_ClientOverlay = value; 
+                }
+            }
         }
 
         public wndMain Window_Main {
@@ -57,97 +87,104 @@ namespace EasyChampionSelection.ECS {
             private set { _wndM = value; }
         }
 
+        private wndContactCreator Window_ContactCreator {
+            get { return _wndCC; }
+            set { _wndCC = value; }
+        }
+
+        /// <summary>
+        /// Routed property from LolClientVisualHelper
+        /// </summary>
         public bool ManuallyEnableTimerVisual {
-            get { return _manuallyEnableTimerVisual; }
-            set { _manuallyEnableTimerVisual = value; }
+            get { return MyLolClientVisualHelper.ManuallyEnableTimerVisual; }
+            set { MyLolClientVisualHelper.ManuallyEnableTimerVisual = value; }
         }
 
         #endregion
 
         public AppRuntimeResources() {
-            _tbm = StaticTaskbarManager.getInstance();
-
-            _tbm.Tb.PreviewTrayContextMenuOpen += Tb_PreviewTrayContextMenuOpen; //Taskbar ContextMenu binding
+            MyTaskbarManager = StaticTaskbarManager.getInstance(AppName);
+            MyTaskbarManager.MyTaskbarIcon.PreviewTrayContextMenuOpen += Tb_PreviewTrayContextMenuOpen; //Taskbar ContextMenu binding
 
             LoadSettings(); //Load this first
             LoadSerializedGroupManager();
             LoadAllChampions(); //Load all champions (Riot api or local)
 
-            _lcvh = new LolClientVisualHelper(Window_ClientOverlay, MySettings, ManuallyEnableTimerVisual, UpdateClientOverlay, MyTaskbarManager);
+            MyLolClientVisualHelper = new LolClientVisualHelper(MySettings, UpdateClientOverlay, DisplayPopup);
 
-            _wndM = new wndMain(this);
+            Window_Main = new wndMain(this);
         }
 
         public void SaveSerializedData() {
-            StaticSerializer.SerializeObject(_gm, StaticSerializer.FullPath_GroupManager);
-            StaticSerializer.SerializeObject(_allChampions, StaticSerializer.FullPath_AllChampions);
-            StaticSerializer.SerializeObject(_s, StaticSerializer.FullPath_Settings);
+            StaticSerializer.SerializeObject(MyGroupManager, StaticSerializer.FullPath_GroupManager);
+            StaticSerializer.SerializeObject(AllChampions, StaticSerializer.FullPath_AllChampions);
+            StaticSerializer.SerializeObject(MySettings, StaticSerializer.FullPath_Settings);
         }
 
         public void Dispose() {
-            _tbm.Dispose();
+            MyTaskbarManager.Dispose();
         }
 
         #region LoadSerializedData
 
         private void LoadSettings() {
             if(File.Exists(StaticSerializer.FullPath_Settings)) {
-                _s = (Settings)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_Settings);
-                if(_s == null) {
-                    _s = new Settings();
+                MySettings = (Settings)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_Settings);
+                if(MySettings == null) {
+                    MySettings = new Settings();
                 }
             } else {
-                _s = new Settings();
+                MySettings = new Settings();
             }
         }
 
         private void LoadAllChampions() {
-            _allChampions = new ChampionList("AllChampions");
+            AllChampions = new ChampionList("AllChampions");
             LoadAllChampionsRiotApi(); //Use api to get all champions
-            if(_allChampions.getCount() < 1) {
+            if(AllChampions.getCount() < 1) {
                 LoadAllChampionsLocal();
             }
         }
 
         public async void LoadAllChampionsRiotApi() {
-            _tbm.DisplayPopup("Loading champions with API", false, null);
-            _allChampions.RemoveAllChampions();
-            if(_s.UserApiKey.Length == 36) {
+            DisplayPopup("Loading champions with API", false, null);
+            AllChampions.RemoveAllChampions();
+            if(MySettings.UserApiKey.Length == 36) {
                 try {
                     StaticRiotApi staticApi = StaticRiotApi.GetInstance(_s.UserApiKey);
                     RiotSharp.StaticDataEndpoint.ChampionListStatic champions = await staticApi.GetChampionsAsync(RiotSharp.Region.euw, RiotSharp.StaticDataEndpoint.ChampionData.info, RiotSharp.Language.en_US);
 
                     for(int i = 0; i < champions.Champions.Count; i++) {
                         string ChampionName = champions.Champions.Values.ElementAt(i).Name;
-                        _allChampions.AddChampion(ChampionName);
+                        AllChampions.AddChampion(ChampionName);
                     }
 
                 } catch(RiotSharpException ex) {
-                    _tbm.DisplayPopup("Trouble loading trough the api: \n" + ex.ToString(), true, null);
+                    DisplayPopup("Trouble loading trough the api: \n" + ex.ToString(), true, null);
                 } catch(NullReferenceException) {
                 }
             } else {
-                _tbm.DisplayPopup("No correct API key found, get one at https://developer.riotgames.com/", true, null);
+               DisplayPopup("No correct API key found, get one at https://developer.riotgames.com/", true, null);
             }
 
         }
 
         public void LoadAllChampionsLocal() {
             if(File.Exists(StaticSerializer.FullPath_AllChampions)) {
-                _allChampions = (ChampionList)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_AllChampions);
+                AllChampions = (ChampionList)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_AllChampions);
             } else {
-                _allChampions = new ChampionList("AllChamps");
+                AllChampions = new ChampionList("AllChamps");
             }
         }
 
         private void NewGroupManager() {
-            _gm = StaticGroupManager.GetInstance();
+            MyGroupManager = StaticGroupManager.GetInstance();
         }
 
         private void LoadSerializedGroupManager() {
             if(File.Exists(StaticSerializer.FullPath_GroupManager)) {
-                _gm = (StaticGroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_GroupManager);
-                if(_gm == null) {
+                MyGroupManager = (StaticGroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_GroupManager);
+                if(MyGroupManager == null) {
                     NewGroupManager();
                 }
             } else {
@@ -167,31 +204,31 @@ namespace EasyChampionSelection.ECS {
         }
 
         private void Tb_PreviewTrayContextMenuOpen(object sender, System.Windows.RoutedEventArgs e) {
-            _tbm.Tb.ContextMenu = null;
+            MyTaskbarManager.MyTaskbarIcon.ContextMenu = null;
             System.Windows.Controls.ContextMenu cm = new System.Windows.Controls.ContextMenu();
 
-            if(_wndM == null) {
-                _wndM = new wndMain(this);
-                MenuItem mniHideMainWindow = CreateMenuItem("Show Main window", mniHideMainWindow_Click);
+            if(Window_Main == null) {
+                Window_Main = new wndMain(this);
+                MenuItem mniHideMainWindow = CreateMenuItem("Show", mniHideMainWindow_Click);
                 cm.Items.Add(mniHideMainWindow);
             } else {
-                if(_wndM.IsLoaded == false) { //Closed
-                    _wndM = new wndMain(this);
-                    MenuItem mniShowMainWindow = CreateMenuItem("Show Main window", mniShowMainWindow_Click);
+                if(Window_Main.IsLoaded == false) { //Closed
+                    Window_Main = new wndMain(this);
+                    MenuItem mniShowMainWindow = CreateMenuItem("Show", mniShowMainWindow_Click);
                     cm.Items.Add(mniShowMainWindow);
                 } else { //Not closed
-                    if(_wndM.IsVisible) { //Visible
-                        MenuItem mniHideMainWindow = CreateMenuItem("Hide Main window", mniHideMainWindow_Click);
+                    if(Window_Main.IsVisible) { //Visible
+                        MenuItem mniHideMainWindow = CreateMenuItem("Hide", mniHideMainWindow_Click);
                         cm.Items.Add(mniHideMainWindow);
                     } else { //Hidden in tray icon
-                        MenuItem mniShowMainWindow = CreateMenuItem("Show Main window", mniShowMainWindow_Click);
+                        MenuItem mniShowMainWindow = CreateMenuItem("Show", mniShowMainWindow_Click);
                         cm.Items.Add(mniShowMainWindow);
                     }
                 }
             }
 
             cm.Items.Add(new Separator());
-            if(_manuallyEnableTimerVisual) {
+            if(ManuallyEnableTimerVisual) {
                 MenuItem mniManuallyEnableTimer = CreateMenuItem("Start timer", mniManuallyEnableTimer_Click);
                 cm.Items.Add(mniManuallyEnableTimer);
             }
@@ -204,30 +241,30 @@ namespace EasyChampionSelection.ECS {
             MenuItem mniExit = CreateMenuItem("Exit", mniExit_Click);
             cm.Items.Add(mniExit);
 
-            _tbm.Tb.ContextMenu = cm;
+            MyTaskbarManager.MyTaskbarIcon.ContextMenu = cm;
         }
 
         private void mniShowMainWindow_Click(object sender, RoutedEventArgs e) {
-            _wndM.Show();
-            _wndM.ShowInTaskbar = true;
+            Window_Main.Show();
+            Window_Main.ShowInTaskbar = true;
         }
 
         private void mniHideMainWindow_Click(object sender, RoutedEventArgs e) {
-            _wndM.Hide();
-            _wndM.ShowInTaskbar = false;
+            Window_Main.Hide();
+            Window_Main.ShowInTaskbar = false;
         }
 
         private void mniManuallyEnableTimer_Click(object sender, RoutedEventArgs e) {
-            _manuallyEnableTimerVisual = false;
+            ManuallyEnableTimerVisual = false;
             MyLolClientVisualHelper.StartTimer();
         }
 
         private void mniContactCreator_Click(object sender, RoutedEventArgs e) {
-            if(_wndCC == null) {
-                _wndCC = new wndContactCreator();
-                _wndCC.Show();
+            if(Window_ContactCreator == null) {
+                Window_ContactCreator = new wndContactCreator();
+                Window_ContactCreator.Show();
             } else {
-                _wndCC.Show();
+                Window_ContactCreator.Show();
             }
         }
 
@@ -238,15 +275,15 @@ namespace EasyChampionSelection.ECS {
         #endregion TaskbarIcon
 
         public void UpdateClientOverlay() {
-            if(_wndCO != null) {
-                if(_wndCO.IsLoaded) {
-                    _wndCO.Close();
+            if(Window_ClientOverlay != null) {
+                if(Window_ClientOverlay.IsLoaded) {
+                    Window_ClientOverlay.Close();
                 }
             }
-            _wndCO = new wndClientOverload(MyGroupManager, _lcvh._MyPinvokeLolClient);
-            MyLolClientVisualHelper._wndCO = _wndCO;
 
-            MyTaskbarManager.DisplayPopup("Your lolclient.exe process just got updated.", false, null);
+            Window_ClientOverlay = new wndClientOverload(MyGroupManager, MyLolClientVisualHelper.MyPinvokeLolClient, DisplayPopup);
+
+            DisplayPopup("Your lolclient.exe process just got updated.", false, null);
         }
     }
 }

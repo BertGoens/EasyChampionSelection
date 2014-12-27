@@ -9,20 +9,20 @@ namespace EasyChampionSelection.Helper_Windows {
     /// </summary>
     public partial class wndErrorHelper : Window {
 
-        private StaticTaskbarManager _MyTaskbarManager;
+        private Action<string, bool, Window> _displayPopup;
         private Exception _error;
 
         private wndErrorHelper() {
             InitializeComponent();
         }
 
-        public wndErrorHelper(Exception error, StaticTaskbarManager tbm) : this() {
+        public wndErrorHelper(Exception error, Action<string, bool, Window> DisplayPopup) : this() {
             if(error == null) {
                 throw new ArgumentNullException();
             }
 
             _error = error;
-            _MyTaskbarManager = tbm;
+            _displayPopup = DisplayPopup;
 
             txtErrorMessage.Text = _error.ToString();
         }
@@ -34,7 +34,6 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void btnSaveError_Click(object sender, RoutedEventArgs e) {
-            Directory.CreateDirectory(StaticSerializer.FullPath_ErrorFile.Substring(0, StaticSerializer.FullPath_ErrorFile.LastIndexOf(@"\")));
             using(StreamWriter sw = new StreamWriter(StaticSerializer.FullPath_ErrorFile, true)) {
                 if(_error.InnerException != null) {
                     sw.WriteLine("InnerException");
@@ -46,7 +45,7 @@ namespace EasyChampionSelection.Helper_Windows {
                 sw.WriteLine();
             }
 
-            _MyTaskbarManager.DisplayPopup("Saved!", false, this);
+            _displayPopup("Saved!", false, this);
         }
     }
 }

@@ -12,7 +12,7 @@
     <Grid Background="{StaticResource windowHelperBackground}">
         <Button x:Name="btnAddChampion" Content="Add" HorizontalAlignment="Left" Margin="20,80,0,0" VerticalAlignment="Top" Width="75" Click="btnAddChampion_Click" IsDefault="True"/>
         <Label x:Name="lblNewChampionInfo" Content="New champion name:" HorizontalAlignment="Left" Margin="15,9,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtNewChampionName" HorizontalAlignment="Left" Height="23" Margin="15,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" TextChanged="txtNewChampion_TextChanged"/>
+        <TextBox x:Name="txtNewChampionName" HorizontalAlignment="Left" Height="23" Margin="15,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" TextChanged="txtNewChampion_TextChanged" VerticalContentAlignment="Center"/>
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="105,80,0,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click" IsCancel="True"/>
     </Grid>
 </Window>

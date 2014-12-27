@@ -52,7 +52,6 @@ namespace EasyChampionSelection.Helper_Windows {
 
             if(_lolClientImage != null) {
                 try {
-                    Directory.CreateDirectory(StaticSerializer.FullPath_ClientImage.Substring(0, StaticSerializer.FullPath_ClientImage.LastIndexOf(@"\")));
                     _ClientBitmap.Save(StaticSerializer.FullPath_ClientImage, ImageFormat.Jpeg);
                 } catch(Exception ex) {
                     ex.ToString();
