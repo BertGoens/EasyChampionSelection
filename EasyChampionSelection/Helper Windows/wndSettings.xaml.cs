@@ -32,11 +32,12 @@ namespace EasyChampionSelection.Helper_Windows {
             txtApiKey.Text = s.UserApiKey;
             chkShowMainFormOnBoot.IsChecked = s.ShowMainFormOnLaunch;
 
-            lblChampionSearchBar.Content = "Champion Searchbar: " + _s.ChampionSearchbarRelativePos.ToString();
-            lblClientOverlay.Content = "Client Overlay: " + _s.ClientOverlayRelativePos.ToString();
-            lblTeamChat.Content = "Team Chat: " + _s.TeamChatRelativePos.ToString();
+            lblChampionSearchBar.Content += " " +_s.ChampionSearchbarRelativePos.ToString();
+            lblClientOverlay.Content += " " + _s.ClientOverlayRelativePos.ToString();
+            lblTeamChat.Content += " " +_s.TeamChatRelativePos.ToString();
 
-            lblApplicationpath.Content = "Application path: " + StaticSerializer.applicationPath();
+            lblApplicationpath.Content += " " + StaticSerializer.applicationPath();
+            lblAppDataPath.Content += " " + StaticSerializer.userAppDataPath();
 
             if(_lcg == null && !File.Exists(StaticSerializer.FullPath_ClientImage)) {
                 btnConfigClientOverlay.IsEnabled = false;
@@ -48,11 +49,11 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
        private void _s_TeamChatChanged(Settings sender, EventArgs e) {
-            lblTeamChat.Content = "Team Chat: " + _s.TeamChatRelativePos.ToString();
+            lblTeamChat.Content = "Team Chatbar: " + _s.TeamChatRelativePos.ToString();
         }
 
         private void _s_ClientOverlayChanged(Settings sender, EventArgs e) {
-            lblClientOverlay.Content = "Client Overlay: " + _s.ClientOverlayRelativePos.ToString();
+            lblClientOverlay.Content = "ECS Overlay: " + _s.ClientOverlayRelativePos.ToString();
         }
 
         private void _s_ChampionSearchbarChanged(Settings sender, EventArgs e) {
@@ -104,6 +105,8 @@ namespace EasyChampionSelection.Helper_Windows {
             Process.Start(StaticSerializer.applicationPath());
         }
 
-        
+        private void lblApplicationAppData_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+            Process.Start(StaticSerializer.userAppDataPath());
+        }        
     }
 }

@@ -35,8 +35,10 @@ namespace EasyChampionSelection.Helper_Windows {
 
             if(File.Exists(StaticSerializer.FullPath_ClientImage)) {
                 _ClientBitmap = new Bitmap(StaticSerializer.FullPath_ClientImage);
-                _lolClientImage =StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap);
+                _lolClientImage = StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap);
                 Visualize_lolClientImage();
+            } else {
+                btnGetCurrentClientImage_Click(null, null);
             }
         }
 
@@ -70,21 +72,7 @@ namespace EasyChampionSelection.Helper_Windows {
             } 
         }
 
-        private void btnShowHideOverlay_Click(object sender, RoutedEventArgs e) {
-            if(btnShowHideOverlay.Content.ToString() == "Hide overlay") {
-                expOptions.IsExpanded = false;
-                spThumbSizeInfo.Visibility = Visibility.Hidden;
-                btnShowHideOverlay.Content = "Show overlay";
-            } else {
-                expOptions.IsExpanded = true;
-                spThumbSizeInfo.Visibility = System.Windows.Visibility.Visible;
-                btnShowHideOverlay.Content = "Hide overlay";
-            }
-        }
-
         private void rdbOnChecked(object sender, RoutedEventArgs e) {
-            btnShowHideOverlay.Visibility = Visibility.Visible;
-
             spThumbSizeInfo.Visibility = System.Windows.Visibility.Visible;
 
             //Saved position rectangle

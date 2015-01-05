@@ -1,7 +1,10 @@
 ﻿<Window x:Class="EasyChampionSelection.Helper_Windows.wndSettings"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ECS Settings" Height="301" Width="400" Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg">
+        Title="ECS Settings"
+        Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg"
+        SizeToContent="WidthAndHeight"
+        >
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -9,17 +12,42 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Background="{StaticResource windowHelperBackground}">
-        <Label Content="API-key" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtApiKey" HorizontalAlignment="Left" Height="23" Margin="65,14,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="240" VerticalContentAlignment="Center" TextChanged="txtApiKey_TextChanged" MaxLines="1" MaxLength="36"/>
-        <TextBlock Margin="310,15,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://developer.riotgames.com/">Get API key</Hyperlink>
-        </TextBlock>
-        <CheckBox x:Name="chkShowMainFormOnBoot" Content="Show Main form on launch" HorizontalAlignment="Left" Margin="10,63,0,0" VerticalAlignment="Top" Checked="chkShowMainFormOnBoot_Checked" Unchecked="chkShowMainFormOnBoot_Unchecked" />
-        <Label x:Name="lblChampionSearchBar" Content="Champion SearchBar:" HorizontalAlignment="Left" Margin="10,105,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="lblTeamChat" Content="Team Chatbar:" HorizontalAlignment="Left" Margin="10,131,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="lblClientOverlay" Content="Client Overlay:" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="btnConfigClientOverlay" Content="Configure Client Overlay" HorizontalAlignment="Left" Margin="10,194,0,0" VerticalAlignment="Top" Width="139" Click="OpenConfigClientOverlay"/>
-        <Label x:Name="lblApplicationpath" Content="Application path: " HorizontalAlignment="Left" Margin="10,234,0,0" VerticalAlignment="Top" MouseDoubleClick="lblApplicationpath_MouseDoubleClick" />
-    </Grid>
+
+    <StackPanel Background="{StaticResource windowHelperBackground}"
+                Orientation="Vertical" 
+                    >
+        
+        <GroupBox Header="API-key"
+                  Margin="10,5,5,5">
+            <StackPanel Orientation="Horizontal">
+                <TextBox x:Name="txtApiKey" HorizontalAlignment="Left" Height="23" Margin="10,5,5,5" TextWrapping="Wrap" VerticalAlignment="Top" Width="240" VerticalContentAlignment="Center" TextChanged="txtApiKey_TextChanged" MaxLines="1" MaxLength="36"/>
+                <TextBlock Margin="5,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://developer.riotgames.com/">Get API key</Hyperlink>
+                </TextBlock>
+            </StackPanel>
+        </GroupBox>
+
+        <CheckBox x:Name="chkShowMainFormOnBoot" Content="Show Main form on launch" HorizontalAlignment="Left" Margin="10,5,5,5" VerticalAlignment="Top" Checked="chkShowMainFormOnBoot_Checked" Unchecked="chkShowMainFormOnBoot_Unchecked" />
+
+        <GroupBox Header="Client Overlay" 
+                      Margin="10,5,5,5" 
+                      >
+            <StackPanel Orientation="Vertical">
+                <Label x:Name="lblChampionSearchBar" Content="Champion Searchbar:" HorizontalAlignment="Left" Margin="5,5,5,0" VerticalAlignment="Top"/>
+                <Label x:Name="lblTeamChat" Content="Team Chatbar:" HorizontalAlignment="Left" Margin="5,5,5,0" VerticalAlignment="Top"/>
+                <Label x:Name="lblClientOverlay" Content="ECS Overlay:" HorizontalAlignment="Left" Margin="5,5,5,0" VerticalAlignment="Top"/>
+                <Button x:Name="btnConfigClientOverlay" Content="Configure" HorizontalAlignment="Right" Margin="5,5,5,0" VerticalAlignment="Bottom" Width="75" Click="OpenConfigClientOverlay"/>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Header="Application" 
+                      Margin="10,5,5,5"
+                      >
+            <StackPanel Orientation="Vertical">
+                <Label x:Name="lblApplicationpath" Content="Executive path: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,5,0" MouseDoubleClick="lblApplicationpath_MouseDoubleClick" />
+                <Label x:Name="lblAppDataPath" Content="AppData path: " HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,5,0" MouseDoubleClick="lblApplicationAppData_MouseDoubleClick" />
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+
 </Window>

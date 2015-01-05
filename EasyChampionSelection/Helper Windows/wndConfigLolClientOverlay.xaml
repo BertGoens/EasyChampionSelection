@@ -42,15 +42,6 @@
                 VerticalAlignment="Top" 
                 Click="btnGetCurrentClientImage_Click" Width="144"/>
 
-        <Button x:Name="btnShowHideOverlay"
-                Content="Hide overlay" 
-                HorizontalAlignment="Left"
-                Margin="10,50,0,-1" 
-                VerticalAlignment="Top"
-                Width="75"
-                Visibility="Hidden" 
-                Click="btnShowHideOverlay_Click"/>
-
         <Expander x:Name="expOptions"
                   Header="Modify:" 
                   HorizontalAlignment="Left" 

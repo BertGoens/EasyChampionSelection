@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 
 namespace EasyChampionSelection {
@@ -9,37 +10,56 @@ namespace EasyChampionSelection {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
+        Semaphore sema;
+        bool shouldRelease = false;
+        const string appName = "Easy Champion Selection"; //Used as semaphore lock
+
         private AppRuntimeResources arr;
 
         private void Application_Startup(object sender, StartupEventArgs e) {
-            bool isNotRunFromProgramFiles = false;
-            double dotNetVersion = 0;
-            if(!isRunFromProgramFiles()) {
-                isNotRunFromProgramFiles = true;
-            }
+            SingleInstanceCheck();
 
-            if(!VersionFromRegistryIs_4_5()) {
-                dotNetVersion = 5;
-            }
+            /*double dotNetVersion = DotnetRegistryVersion();*/
 
             arr = new AppRuntimeResources();
             if(arr.MySettings.ShowMainFormOnLaunch) {
                 arr.Window_Main.Show();
             }
 
-            if(isNotRunFromProgramFiles) {
-                arr.DisplayPopup("Please run ECS from /Program Files (x86)/! \nElse we can't request the lolClient UI.", true, null);
+            if(isRunFromProgramFiles()) {
+                arr.DisplayPopup("Please run " + appName + " from /Program Files (x86)/! \nElse we can't request the lolClient UI.", true, null);
             }
-            if(dotNetVersion < 4.5) {
-                arr.DisplayPopup("Please download .NET 4.5.", true, null);
-            }
-            
+
         }
 
         private void Application_Exit(object sender, ExitEventArgs e) {
-            arr.SaveSerializedData();
-            arr.Dispose();
+            if(shouldRelease) { //Are we the application holding on to the resources?
+                sema.Release();
+                arr.SaveSerializedData();
+                arr.Dispose();
+            }
+
             Application.Current.Shutdown();
+        }
+
+        private void SingleInstanceCheck() {
+            //Check for duplicates running, close if there is already an Easy Champion Selection running
+            bool result = Semaphore.TryOpenExisting(appName, out sema);
+            if(result) { // we have another instance running
+                App.Current.Shutdown();
+            } else { //New instance
+                try {
+                    sema = new Semaphore(1, 1, appName);
+                } catch {
+                    App.Current.Shutdown(); //
+                }
+            }
+
+            if(!sema.WaitOne(0)) {
+                App.Current.Shutdown();
+            } else {
+                shouldRelease = true;
+            }
         }
 
         private bool isRunFromProgramFiles() {
@@ -52,7 +72,7 @@ namespace EasyChampionSelection {
             return false;
         }
 
-        private static double versionToDouble(string version) {
+        private double versionToDouble(string version) {
             if(version.Length < 1) {
                 return 0;
             }
@@ -77,9 +97,9 @@ namespace EasyChampionSelection {
             return double.Parse(numbersOnly);
         }
 
-        private static bool VersionFromRegistryIs_4_5() {
+        private double DotnetRegistryVersion() {
             double cVersion = 0;
-            double thisVersion;
+            double thisVersion = 0;
 
             // Opens the registry key for the .NET Framework entry. 
             using(RegistryKey ndpKey =
@@ -97,7 +117,7 @@ namespace EasyChampionSelection {
                         }
                         string sp = versionKey.GetValue("SP", "").ToString();
                         string install = versionKey.GetValue("Install", "").ToString();
-                                                
+
                         if(name != "") {
                             continue;
                         }
@@ -114,11 +134,7 @@ namespace EasyChampionSelection {
                     }
                 }
             }
-            if(cVersion < 4.5) {
-                return false;
-            } else {
-                return true;
-            }
+            return cVersion;
         }
     }
 }

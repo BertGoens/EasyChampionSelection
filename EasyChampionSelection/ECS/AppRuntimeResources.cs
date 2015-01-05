@@ -7,6 +7,10 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace EasyChampionSelection.ECS {
+    /// <summary>
+    /// Class where all runtime resources are managed.
+    /// They mostly have to do with detecting the client, managing groups and displaying popups
+    /// </summary>
     public class AppRuntimeResources {
         public const string AppName = "Easy Champion Selection";
 

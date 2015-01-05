@@ -23,12 +23,17 @@ namespace EasyChampionSelection {
             InitializeComponent();
         }
 
-        public wndMain(AppRuntimeResources arr)
-            : this() {
+        public wndMain(AppRuntimeResources arr) : this() {
             _ARR = arr;
+
+            //Ensure our window is visible (I hate it when other programs splash over a user wants to open this program)
+            this.Activate();
+            this.Topmost = true;
+            this.Topmost = false;
+            this.Focus();
         }
 
-        #region Events
+        #region UI Events
 
         public void Load(object sender, RoutedEventArgs e) {
             //Visualize the data
@@ -328,9 +333,7 @@ namespace EasyChampionSelection {
         }
 
         #endregion ContextMenus
-        #endregion Events
-
-        #region Private Behavior
+        #endregion UI Events
 
         private MenuItem CreateMenuItem(String Header, RoutedEventHandler ClickEventHandler) {
             MenuItem mniMI = new MenuItem();
@@ -338,8 +341,6 @@ namespace EasyChampionSelection {
             mniMI.Click += ClickEventHandler;
             return mniMI;
         }
-
-        #endregion Private Behavior
 
         #region Public Behavior
 

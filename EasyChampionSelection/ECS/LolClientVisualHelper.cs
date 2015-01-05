@@ -5,6 +5,9 @@ using System.Windows;
 using System.Windows.Threading;
 
 namespace EasyChampionSelection.ECS {
+    /// <summary>
+    /// The visual code of the lolClient.
+    /// </summary>
     public class LolClientVisualHelper {
 
         #region Properties
@@ -14,7 +17,7 @@ namespace EasyChampionSelection.ECS {
         private Action<string, bool, Window> _DisplayPopup;
 
         private wndClientOverload _wndCO;
-        private StaticPinvokeLolClient _MyPinvokeLolClient;
+        private StaticPinvokeLolClient _MyPinvokeLolClient; // The not visual code is all in here
         private bool _ManuallyEnableTimerVisual;
 
         private TimeSpan _tmspTimerClienActiveInterval;

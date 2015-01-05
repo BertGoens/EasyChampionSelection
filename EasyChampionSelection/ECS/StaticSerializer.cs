@@ -13,24 +13,26 @@ namespace EasyChampionSelection.ECS {
     /// It will automatically create directories of requested files if needed.
     /// </summary>
     public static class StaticSerializer {
+        private const string appName = "Easy Champion Selection";
+
         // @\Save\
-        private static string _fullPath_ClientImage = applicationPath() + Folder_SaveData + Object_ClientImage;
-        private static string _fullPath_Settings = applicationPath() + Folder_SaveData + Object_Settings;
-        private static string _fullPath_AllChampions = applicationPath() + Folder_SaveData + Object_AllChampions;
-        private static string _fullPath_GroupManager = applicationPath() + Folder_SaveData + Object_GroupManager;
+        private static string _fullPath_ClientImage = userAppDataPath() + Folder_SaveData + Object_ClientImage;
+        private static string _fullPath_Settings = userAppDataPath() + Folder_SaveData + Object_Settings;
+        private static string _fullPath_AllChampions = userAppDataPath() + Folder_SaveData + Object_AllChampions;
+        private static string _fullPath_GroupManager = userAppDataPath() + Folder_SaveData + Object_GroupManager;
 
         // @\Error\
-        private static string _fullPath_ErrorFile = applicationPath() + Folder_ErrorData + DateTime.Today.ToString("d").Replace("/", "_") + ".txt";
+        private static string _fullPath_ErrorFile = userAppDataPath() + Folder_ErrorData + DateTime.Today.ToString("d").Replace("/", "_") + ".txt";
 
         //Local folders
-        private const string Folder_SaveData = @"\Save\";
-        private const string Folder_ErrorData = @"\Error\";
+        private const string Folder_SaveData = @"\Save";
+        private const string Folder_ErrorData = @"\Error";
 
         //Local files
-        private const string Object_GroupManager = "Groups.ser";
-        private const string Object_AllChampions = "AllChampions.ser";
-        private const string Object_Settings = "Settings.ser";
-        private const string Object_ClientImage = "ClientImage.jpg";
+        private const string Object_GroupManager = @"\Groups.ser";
+        private const string Object_AllChampions = @"\AllChampions.ser";
+        private const string Object_Settings = @"\Settings.ser";
+        private const string Object_ClientImage = @"\ClientImage.jpg";
 
         #region Getters
         public static string FullPath_ClientImage {
@@ -80,45 +82,8 @@ namespace EasyChampionSelection.ECS {
         private static void CheckDirToPath(string fullPath) {
             string dirToPath = fullPath.Substring(0, fullPath.LastIndexOf(@"\"));
             if(!Directory.Exists(dirToPath)) {
-                
-                if (HasFolderWritePermission(dirToPath)) { //Check if we need admin rights to write the directory
-                    Directory.CreateDirectory(dirToPath);
-                } else {
-                    CreateEndDirectoryAdminRights(dirToPath); 
-                }
+                Directory.CreateDirectory(dirToPath);
             }
-        }
-
-        /// <summary>
-        /// Will check if we have access to write to a directory
-        /// </summary>
-        private static bool HasFolderWritePermission(string destDir) {
-            if(string.IsNullOrEmpty(destDir) || !Directory.Exists(destDir))
-                return false;
-            try {
-                DirectorySecurity security = Directory.GetAccessControl(destDir);
-                SecurityIdentifier users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
-                foreach(AuthorizationRule rule in security.GetAccessRules(true, true, typeof(SecurityIdentifier))) {
-                    if(rule.IdentityReference == users) {
-                        FileSystemAccessRule rights = ((FileSystemAccessRule)rule);
-                        if(rights.AccessControlType == AccessControlType.Allow) {
-                            if(rights.FileSystemRights == (rights.FileSystemRights | FileSystemRights.Modify))
-                                return true;
-                        }
-                    }
-                }
-                return false;
-            } catch {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Will require admin rights to create a directory
-        /// </summary>
-        [PrincipalPermission(SecurityAction.Demand, Role = @"BUILTIN\Administrators")]
-        private static void CreateEndDirectoryAdminRights(string dir) {
-            Directory.CreateDirectory(dir);
         }
 
         /// <summary>
@@ -130,6 +95,14 @@ namespace EasyChampionSelection.ECS {
             r = r.Replace("file:/", "");
             r = r.Replace(@"file:\", "");
             return r;
+        }
+
+        /// <summary>
+        /// Returns the absolute path of the Application Data Folder where all the data is stored
+        /// </summary>
+        /// <returns></returns>
+        public static string userAppDataPath() {
+            return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\" + appName;
         }
 
         public static bool SerializeObject(object objectToSerialize, string fileName) {
