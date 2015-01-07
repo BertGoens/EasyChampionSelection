@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.Serialization;
 
 namespace EasyChampionSelection.ECS {
     [Serializable]
     public class Settings {
 
-        private Rectangle _rChampionSearchbarRelativePos;
-        private Rectangle _rTeamChatRelativePos;
-        private Rectangle _rClientOverlayRelativePos;
+        private Rectangle _rChampionSearchbarRelativePos = new Rectangle();
+        private Rectangle _rTeamChatRelativePos = new Rectangle();
+        private Rectangle _rClientOverlayRelativePos = new Rectangle();
 
-        private bool _showMainFormOnLaunch;
-        private string _userApiKey;
+        [OptionalField]
+        private bool _startLeagueWithEcs = false;
+        private bool _showMainFormOnLaunch = true;
+        private string _userApiKey = "";
+        [OptionalField]
+        private string _LeaguePath = "";
 
+        #region events
         public delegate void ChangedEventHandler(Settings sender, EventArgs e);
 
         /// <summary>
@@ -38,6 +44,7 @@ namespace EasyChampionSelection.ECS {
         [field:NonSerialized]
         public event ChangedEventHandler ApiKeyChanged;
 
+        #endregion events
         #region Getters & Setters
         /// <summary>
         /// Get or set the relative postition of the Champion Searchbar.
@@ -97,12 +104,37 @@ namespace EasyChampionSelection.ECS {
         }
 
         /// <summary>
+        /// Get or set if League Of Legends.exe should start whenever the user starts Easy Champion Selection
+        /// </summary>
+        public bool StartLeagueWithEcs {
+            get { return _startLeagueWithEcs; }
+            set {
+                if(value != _startLeagueWithEcs) {
+                    _startLeagueWithEcs = value; 
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get or set the Path to the league of legends launcher executable.
+        /// Likely C:/Riot Games/League of Legends/lol.launcher.exe
+        /// </summary>
+        public string LeaguePath {
+            get { return _LeaguePath; }
+            set {
+                if(value != null && value != _LeaguePath) {
+                    _LeaguePath = value;
+                }
+            }
+        }
+
+        /// <summary>
         /// Get or set the user given API key
         /// </summary>
         public string UserApiKey {
             get { return _userApiKey; }
             set {
-                if(value != null && value != _userApiKey && value.Length == 36) {
+                if(value != null && value != _userApiKey && (value.Length == 36 || value.Length == 0)) {
                     _userApiKey = value;
                     if(ApiKeyChanged != null) {
                         ApiKeyChanged(this, EventArgs.Empty);
@@ -113,12 +145,6 @@ namespace EasyChampionSelection.ECS {
 
         #endregion Getters & Setters
 
-        public Settings() {
-            this._showMainFormOnLaunch = true;
-            this._userApiKey = "";
-            this._rChampionSearchbarRelativePos = new Rectangle();
-            this._rClientOverlayRelativePos = new Rectangle();
-            this._rTeamChatRelativePos = new Rectangle();
-        }
+        public Settings() {}
     }
 }

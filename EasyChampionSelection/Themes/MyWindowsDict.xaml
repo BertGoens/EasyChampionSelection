@@ -10,12 +10,4 @@
         <GradientStop Color="#FF66A1C3" Offset="1"/>
         <GradientStop Color="#FF66B6C3"/>
     </LinearGradientBrush>
-    
-    <ControlTemplate x:Key="ThumbOldPosRectangleTemplate">
-        <Rectangle Fill="Blue" Opacity="0.8" />
-    </ControlTemplate>
-
-    <ControlTemplate x:Key="ThumbNewPosRectangleTemplate">
-        <Rectangle Fill="Red" Opacity="0.8" />
-    </ControlTemplate>
 </ResourceDictionary>

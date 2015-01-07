@@ -9,14 +9,14 @@ namespace EasyChampionSelection.Helper_Windows {
     /// </summary>
     public partial class wndErrorHelper : Window {
 
-        private Action<string, bool, Window> _displayPopup;
+        private Action<string> _displayPopup;
         private Exception _error;
 
         private wndErrorHelper() {
             InitializeComponent();
         }
 
-        public wndErrorHelper(Exception error, Action<string, bool, Window> DisplayPopup) : this() {
+        public wndErrorHelper(Exception error, Action<string> DisplayPopup) : this() {
             if(error == null) {
                 throw new ArgumentNullException();
             }
@@ -45,7 +45,7 @@ namespace EasyChampionSelection.Helper_Windows {
                 sw.WriteLine();
             }
 
-            _displayPopup("Saved!", false, this);
+            _displayPopup("Saved!");
         }
     }
 }

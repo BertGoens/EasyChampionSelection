@@ -1,6 +1,7 @@
 ﻿using EasyChampionSelection.Helper_Windows;
 using RiotSharp;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -15,7 +16,7 @@ namespace EasyChampionSelection.ECS {
         public const string AppName = "Easy Champion Selection";
 
         private StaticTaskbarManager _tbm;
-        private Action<string, bool, Window> _displayPopup;
+        private Action<string> _displayPopup;
 
         private StaticGroupManager _gm;
         private Settings _s;
@@ -40,7 +41,7 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// Routed method from StaticTaskbarManager
         /// </summary>
-        public Action<string, bool, Window> DisplayPopup {
+        public Action<string> DisplayPopup {
             get { return _displayPopup; }
         }
 
@@ -114,9 +115,28 @@ namespace EasyChampionSelection.ECS {
             LoadSerializedGroupManager();
             LoadAllChampions(); //Load all champions (Riot api or local)
 
-            MyLolClientVisualHelper = new LolClientVisualHelper(MySettings, UpdateClientOverlay, DisplayPopup);
+            MyLolClientVisualHelper = new LolClientVisualHelper(MySettings, DisplayPopup);
+            MyLolClientVisualHelper.NewLeagueClient += MyLolClientVisualHelper_NewLeagueClient;
 
             Window_Main = new wndMain(this);
+
+
+            if(MySettings.StartLeagueWithEcs) {
+                if(MySettings.LeaguePath.Length > 0) {
+                    if(MyLolClientVisualHelper.MyPinvokeLolClient == null) {
+                        try {
+                            FileInfo fi = new FileInfo(MySettings.LeaguePath);
+                            Process.Start(new ProcessStartInfo(fi.FullName));                            
+                        } catch(Exception) {
+                        }
+                    }
+                }
+            }
+
+            if(MySettings.ShowMainFormOnLaunch) {
+                Window_Main.Show();
+                Window_Main.EnsureVisibility();
+            }
         }
 
         public void SaveSerializedData() {
@@ -151,7 +171,7 @@ namespace EasyChampionSelection.ECS {
         }
 
         public async void LoadAllChampionsRiotApi() {
-            DisplayPopup("Loading champions with API", false, null);
+            DisplayPopup("Loading champions with API");
             AllChampions.RemoveAllChampions();
             if(MySettings.UserApiKey.Length == 36) {
                 try {
@@ -164,11 +184,11 @@ namespace EasyChampionSelection.ECS {
                     }
 
                 } catch(RiotSharpException ex) {
-                    DisplayPopup("Trouble loading trough the api: \n" + ex.ToString(), true, null);
+                    DisplayPopup("Trouble loading trough the api: \n" + ex.ToString());
                 } catch(NullReferenceException) {
                 }
             } else {
-               DisplayPopup("No correct API key found, get one at https://developer.riotgames.com/", true, null);
+               DisplayPopup("No correct API key found, get one at https://developer.riotgames.com/");
             }
 
         }
@@ -278,7 +298,7 @@ namespace EasyChampionSelection.ECS {
 
         #endregion TaskbarIcon
 
-        public void UpdateClientOverlay() {
+        private void MyLolClientVisualHelper_NewLeagueClient(LolClientVisualHelper sender, EventArgs e) {
             if(Window_ClientOverlay != null) {
                 if(Window_ClientOverlay.IsLoaded) {
                     Window_ClientOverlay.Close();
@@ -287,7 +307,7 @@ namespace EasyChampionSelection.ECS {
 
             Window_ClientOverlay = new wndClientOverload(MyGroupManager, MyLolClientVisualHelper.MyPinvokeLolClient, DisplayPopup);
 
-            DisplayPopup("Your lolclient.exe process just got updated.", false, null);
+            DisplayPopup("Your lolclient.exe process just got updated.");
         }
     }
 }

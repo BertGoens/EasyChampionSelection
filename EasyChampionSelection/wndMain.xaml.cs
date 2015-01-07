@@ -23,19 +23,10 @@ namespace EasyChampionSelection {
             InitializeComponent();
         }
 
-        public wndMain(AppRuntimeResources arr) : this() {
+        public wndMain(AppRuntimeResources arr)
+            : this() {
             _ARR = arr;
 
-            //Ensure our window is visible (I hate it when other programs splash over a user wants to open this program)
-            this.Activate();
-            this.Topmost = true;
-            this.Topmost = false;
-            this.Focus();
-        }
-
-        #region UI Events
-
-        public void Load(object sender, RoutedEventArgs e) {
             //Visualize the data
             DisplayGroups();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
@@ -46,7 +37,11 @@ namespace EasyChampionSelection {
                 _ARR.MyGroupManager.getGroup(i).NameChanged += MyGroupManager_ChampionList_NameChanged;
             }
             _ARR.MySettings.ApiKeyChanged += MySettings_ApiKeyChanged;
+
+            _ARR.MyLolClientVisualHelper.NewLeagueClient += MyLolClientVisualHelper_NewLeagueClient;
         }
+
+        #region UI Events
 
         private void AllChampions_ChampionsChanged(ChampionList sender, EventArgs e) {
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
@@ -72,17 +67,26 @@ namespace EasyChampionSelection {
             Process.Start(new ProcessStartInfo("https://github.com/BertGoens/EasyChampionSelection"));
         }
 
+        private void MyLolClientVisualHelper_NewLeagueClient(LolClientVisualHelper sender, EventArgs e) {
+            if(_wndST != null) {
+                if(_wndST.IsLoaded) {
+                    if(_wndST.IsConfigLolClientOverlayOpened()) {
+                        _wndST.CloseChild_WindowConfigLolClientOverlay();
+                        _wndST.OpenChild_WindowConfigClientOverlay();
+                    }
+                }
+            }
+        }
+
         private void btnSettings_Click(object sender, RoutedEventArgs e) {
             if(_wndST != null) {
-                if(_wndST.IsLoaded == false) {
-                    _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientVisualHelper.MyPinvokeLolClient);
-                    _wndST.Owner = this;
+                if(_wndST.IsLoaded) {
+                    _wndST.Focus();
+                    return;
                 }
-            } else {
-                _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientVisualHelper.MyPinvokeLolClient);
-                _wndST.Owner = this;
             }
 
+            _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientVisualHelper, _ARR.DisplayPopup);
             _wndST.Show();
         }
 
@@ -92,7 +96,7 @@ namespace EasyChampionSelection {
                 wndCR.Owner = this;
                 wndCR.ShowDialog();
             } catch(Exception) {
-                _ARR.DisplayPopup("Woops, something went wrong!", true, this);
+                _ARR.DisplayPopup("Woops, something went wrong!");
             }
 
         }
@@ -104,7 +108,7 @@ namespace EasyChampionSelection {
                 wndAG.ShowDialog();
                 DisplayGroups();
             } catch(Exception) {
-                _ARR.DisplayPopup("Woops, something went wrong!", true, this);
+                _ARR.DisplayPopup("Woops, something went wrong!");
             }
         }
 
@@ -342,7 +346,15 @@ namespace EasyChampionSelection {
             return mniMI;
         }
 
+
         #region Public Behavior
+        public void EnsureVisibility() {
+            //Ensure our window is visible (I hate it when other programs splash over a user wants to open this program)
+            this.Activate();
+            this.Topmost = true;
+            this.Topmost = false;
+            this.Focus();
+        }
 
         public void DisplayGroups() {
             int selectedItemIndex = lsbGroups.SelectedIndex;
@@ -366,7 +378,7 @@ namespace EasyChampionSelection {
 
             int groupsAfterOperation = lsbGroups.Items.Count;
             if(groupsAfterOperation != groupCountBeforeOperation) {
-                if(selectedItemIndex+1 > groupsAfterOperation) {
+                if(selectedItemIndex + 1 > groupsAfterOperation) {
                     selectedItemIndex = -1;
                 }
             }

@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
-using System.Collections.Generic;
 
 namespace EasyChampionSelection.Helper_Windows {
     /// <summary>
@@ -22,16 +21,23 @@ namespace EasyChampionSelection.Helper_Windows {
         private const int _cBaseImageHeight = 600;
         private Bitmap _ClientBitmap;
         private BitmapSource _lolClientImage;
+        private bool recursiveFlag = false;
+        private Action<string> _displayPopup;
 
-        public wndConfigLolClientOverlay(StaticPinvokeLolClient lcg, Settings ecsSettings) {
-            if(ecsSettings != null) {
-                _lcg = lcg;
-                _ecsSettings = ecsSettings;
+        private wndConfigLolClientOverlay() {
+            InitializeComponent();
+        }
+
+        public wndConfigLolClientOverlay(StaticPinvokeLolClient lcg, Settings ecsSettings, Action<string> DisplayPopup)
+            : this() {
+            if(ecsSettings == null || DisplayPopup == null) {
+                throw new ArgumentNullException();
             }
 
-            InitializeComponent();
-            txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
-            txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
+            _lcg = lcg;
+            _ecsSettings = ecsSettings;
+            _displayPopup = DisplayPopup;
+
 
             if(File.Exists(StaticSerializer.FullPath_ClientImage)) {
                 _ClientBitmap = new Bitmap(StaticSerializer.FullPath_ClientImage);
@@ -64,17 +70,17 @@ namespace EasyChampionSelection.Helper_Windows {
         private void btnGetCurrentClientImage_Click(object sender, RoutedEventArgs e) {
             if(_lcg != null) {
                 _ClientBitmap = _lcg.GetLeagueClientAsBitmap(); // Get bitmap of league client
-                _lolClientImage =  StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap); //Convert bitmap to bitmapsource
+                _lolClientImage = StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap); //Convert bitmap to bitmapsource
 
                 if(_lolClientImage != null) {
                     Visualize_lolClientImage();
                 }
-            } 
+            } else {
+                _displayPopup("No league client found. if you just started one please reopen this window.");
+            }
         }
 
         private void rdbOnChecked(object sender, RoutedEventArgs e) {
-            spThumbSizeInfo.Visibility = System.Windows.Visibility.Visible;
-
             //Saved position rectangle
             RadioButton rdbSender = (RadioButton)sender;
             Rectangle SavedPosition = new Rectangle();
@@ -87,50 +93,27 @@ namespace EasyChampionSelection.Helper_Windows {
             }
 
             if(SavedPosition.Width > 0 && SavedPosition.Height > 0) {
-                txtNewThumbWidth.Text = Math.Abs(SavedPosition.Width).ToString();
-                txtNewThumbHeight.Text = Math.Abs(SavedPosition.Height).ToString();
-                TransformRectangle(thmbPos, SavedPosition);
+                TransformRectangle(ccPos, SavedPosition);
             } else {
-                txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
-                txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
                 CreateNewThumb();
             }
 
-            thmbPos.Visibility = System.Windows.Visibility.Visible;
+            ccPos.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void rdbChampionSearchbar_SavePosition(object sender, RoutedEventArgs e) {
-            Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(thmbPos), (int)Canvas.GetTop(thmbPos), (int)thmbPos.Width, (int)thmbPos.Height);
+            Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(ccPos), (int)Canvas.GetTop(ccPos), (int)ccPos.Width, (int)ccPos.Height);
             _ecsSettings.ChampionSearchbarRelativePos = repositionRectangle;
         }
 
         private void rdbTeamChat_SavePosition(object sender, RoutedEventArgs e) {
-            Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(thmbPos), (int)Canvas.GetTop(thmbPos), (int)thmbPos.Width, (int)thmbPos.Height);
+            Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(ccPos), (int)Canvas.GetTop(ccPos), (int)ccPos.Width, (int)ccPos.Height);
             _ecsSettings.TeamChatRelativePos = repositionRectangle;
         }
 
         private void rdbClientOverlay_SavePosition(object sender, RoutedEventArgs e) {
-            Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(thmbPos), (int)Canvas.GetTop(thmbPos), (int)thmbPos.Width, (int)thmbPos.Height);
+            Rectangle repositionRectangle = new Rectangle((int)Canvas.GetLeft(ccPos), (int)Canvas.GetTop(ccPos), (int)ccPos.Width, (int)ccPos.Height);
             _ecsSettings.ClientOverlayRelativePos = repositionRectangle;
-        }
-
-        private void txtNewThumbWidth_TextChanged(object sender, TextChangedEventArgs e) {
-            int newWidth = 0;
-            if(int.TryParse(txtNewThumbWidth.Text, out newWidth)) {
-                newWidth = Math.Abs(newWidth);
-                thmbPos.Width = newWidth;
-            } else {
-                thmbPos.Width = _cBaseThumbWidth;
-            }
-        }
-
-        private void txtNewThumbHeight_TextChanged(object sender, TextChangedEventArgs e) {
-            int newHeight = 0;
-            if(int.TryParse(txtNewThumbHeight.Text, out newHeight)) {
-                thmbPos.Height = Math.Abs(newHeight);
-            } else {
-                thmbPos.Height = _cBaseThumbHeight;
-            }
         }
 
         private void thmbPos_OnDragDelta(object sender, DragDeltaEventArgs e) {
@@ -170,31 +153,52 @@ namespace EasyChampionSelection.Helper_Windows {
             double widthMiddle = _ClientBitmap.Width / 2;
             double heightMiddle = _ClientBitmap.Height / 2;
 
-            Canvas.SetLeft(thmbPos, widthMiddle);
-            Canvas.SetTop(thmbPos, heightMiddle);
+            Canvas.SetLeft(ccPos, widthMiddle);
+            Canvas.SetTop(ccPos, heightMiddle);
+            ccPos.Width = _cBaseThumbWidth;
 
-            int tWidth;
-            if(int.TryParse(txtNewThumbWidth.Text, out tWidth)) {
-                thmbPos.Width = Math.Abs(tWidth);
-            } else {
-                thmbPos.Width = _cBaseThumbWidth;
-                txtNewThumbWidth.Text = _cBaseThumbWidth.ToString();
-            }
 
-            int tHeight;
-            if(int.TryParse(txtNewThumbHeight.Text, out tHeight)) {
-                thmbPos.Height = Math.Abs(tHeight);
-            } else {
-                thmbPos.Height = _cBaseThumbHeight;
-                txtNewThumbHeight.Text = _cBaseThumbHeight.ToString();
-            }
+            ccPos.Height = _cBaseThumbHeight;
         }
 
-        private void TransformRectangle(Thumb rectRepos, Rectangle newPosition) {
+        private void TransformRectangle(ContentControl rectRepos, Rectangle newPosition) {
             rectRepos.Width = newPosition.Width;
             rectRepos.Height = newPosition.Height;
             Canvas.SetLeft(rectRepos, newPosition.X);
             Canvas.SetTop(rectRepos, newPosition.Y);
+        }
+
+        private void ccPos_LayoutUpdated(object sender, EventArgs e) {
+            if(recursiveFlag) {
+                return;
+            }
+            recursiveFlag = true; //Ensures we don't go into a recursive loop as this event will be called on every layout update
+
+            if(_ClientBitmap != null) {
+                if(ccPos.Width > cvRectangles.Width) {
+                    ccPos.Width = _ClientBitmap.Width;
+                }
+                if(ccPos.Height > cvRectangles.Height) {
+                    ccPos.Height = _ClientBitmap.Height;
+                }
+
+                if(sender != null) {
+                    ContentControl tSender = (ContentControl)sender;
+
+                    int MostRightPixel = (int)Canvas.GetRight(tSender);
+                    if(MostRightPixel > _ClientBitmap.Width) {
+                        Canvas.SetLeft(tSender, _ClientBitmap.Width - (_ClientBitmap.Width - MostRightPixel));
+
+                    }
+
+                    int MostBottomPixel = (int)Canvas.GetBottom(tSender);
+                    if(MostBottomPixel > _ClientBitmap.Height) {
+                        Canvas.SetTop(tSender, _ClientBitmap.Height - (_ClientBitmap.Height - MostBottomPixel));
+                    }
+                }
+            }
+
+            recursiveFlag = false; //Don't forget to disable it
         }
 
     }

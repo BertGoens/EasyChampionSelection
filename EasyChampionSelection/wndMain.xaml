@@ -5,14 +5,13 @@
         Title="Easy Champion Selection"
         Height="467" 
         Width="434"
-        Loaded="Load"
         Icon="Resources/LolIcon.jpg"
         >
     
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Resources/MyResourceDictionary.xaml" />
+                <ResourceDictionary Source="/Themes/MyWindowsDict.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>

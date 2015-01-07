@@ -10,11 +10,25 @@ namespace EasyChampionSelection.ECS {
     /// </summary>
     public class LolClientVisualHelper {
 
+        public delegate void LolClientVisualHelperHanlder(LolClientVisualHelper sender, EventArgs e);
+
+        /// <summary>
+        /// Occurs when a new league client is found
+        /// There is only 1 lolclient.exe possible so the old one gets deleted.
+        /// </summary>
+        [field: NonSerialized]
+        public event LolClientVisualHelperHanlder NewLeagueClient;
+
+        /// <summary>
+        /// Occurs when an old client is closed
+        /// </summary>
+        [field: NonSerialized]
+        public event LolClientVisualHelperHanlder ClientClosed;
+
         #region Properties
 
         private Settings _MySettings;
-        private Action _UpdateClientOverlay;
-        private Action<string, bool, Window> _DisplayPopup;
+        private Action<string> _DisplayPopup;
 
         private wndClientOverload _wndCO;
         private StaticPinvokeLolClient _MyPinvokeLolClient; // The not visual code is all in here
@@ -50,9 +64,8 @@ namespace EasyChampionSelection.ECS {
             _tmrCheckForChampSelect.Tick += tmrCheckForChampSelect_Tick;
         }
 
-        public LolClientVisualHelper(Settings MySettings, Action UpdateClientOverlay, Action<string, bool, Window> DisplayPopup) : this() {
+        public LolClientVisualHelper(Settings MySettings, Action<string> DisplayPopup) : this() {
             _MySettings = MySettings;
-            _UpdateClientOverlay = UpdateClientOverlay;
             _DisplayPopup = DisplayPopup;
             StartTimer();
         }
@@ -67,6 +80,9 @@ namespace EasyChampionSelection.ECS {
             _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
             DeleteOldStaticLolClientGraphics(); //Delete all references to client dependent classes with events
             _tmrCheckForChampSelect.Start();
+            if(ClientClosed != null) {
+                ClientClosed(this, EventArgs.Empty);
+            }
         }
 
         private void tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
@@ -139,9 +155,12 @@ namespace EasyChampionSelection.ECS {
             if(LeagueOfLegendsClientProcess != null) {
                 DeleteOldStaticLolClientGraphics();
 
+                _MyPinvokeLolClient = null;
                  _MyPinvokeLolClient = StaticPinvokeLolClient.GetInstance(LeagueOfLegendsClientProcess, _MySettings);
 
-                 _UpdateClientOverlay();
+                 if (NewLeagueClient != null) {
+                     NewLeagueClient(this, EventArgs.Empty);
+                 }
             }
         }
     }

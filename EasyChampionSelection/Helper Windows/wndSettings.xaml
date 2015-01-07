@@ -3,12 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ECS Settings"
         Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg"
-        SizeToContent="WidthAndHeight"
+        SizeToContent="Height"
+        Width="400"
+        Closing="Window_Closing"
         >
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Resources/MyResourceDictionary.xaml" />
+                <ResourceDictionary Source="/Themes/MyWindowsDict.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -16,18 +18,43 @@
     <StackPanel Background="{StaticResource windowHelperBackground}"
                 Orientation="Vertical" 
                     >
-        
+
+        <GroupBox Header="Basic Requirements"
+                  x:Name="gbBasicRequirements"
+                  Margin="10,5,5,5"
+                  Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel x:Name="spDotNetVersion" Visibility="Collapsed" Orientation="Horizontal" Margin="5,5,5,5">
+                    <Label x:Name="lblDotNetVersion" Content=".NET Version: "  />
+                    <Button x:Name="btnGoogleLatestDotNetVersion" Content="Google latest version" Margin="2,2,2,2" HorizontalAlignment="Right" Click="btnGoogleLatestDotNetVersion_Click" />
+                </StackPanel>
+                <Label x:Name="lblProgramFiles" Content="Not run from /Program Files(x86)/" Visibility="Collapsed" MouseDoubleClick="lblProgramFiles_MouseDoubleClick" />
+            </StackPanel>
+        </GroupBox>
         <GroupBox Header="API-key"
                   Margin="10,5,5,5">
             <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="txtApiKey" HorizontalAlignment="Left" Height="23" Margin="10,5,5,5" TextWrapping="Wrap" VerticalAlignment="Top" Width="240" VerticalContentAlignment="Center" TextChanged="txtApiKey_TextChanged" MaxLines="1" MaxLength="36"/>
-                <TextBlock Margin="5,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <TextBox x:Name="txtApiKey" Height="23" Margin="5,5,5,5" TextWrapping="Wrap" Width="240" VerticalContentAlignment="Center" TextChanged="txtApiKey_TextChanged" MaxLines="1" MaxLength="36"/>
+                <TextBlock Margin="5,5,5,5" VerticalAlignment="Center">
                         <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://developer.riotgames.com/">Get API key</Hyperlink>
                 </TextBlock>
             </StackPanel>
         </GroupBox>
 
-        <CheckBox x:Name="chkShowMainFormOnBoot" Content="Show Main form on launch" HorizontalAlignment="Left" Margin="10,5,5,5" VerticalAlignment="Top" Checked="chkShowMainFormOnBoot_Checked" Unchecked="chkShowMainFormOnBoot_Unchecked" />
+
+        <GroupBox Header="Startup"
+                  Margin="10,5,5,5">
+            <StackPanel Orientation="Vertical">
+                <CheckBox x:Name="chkShowMainFormOnLaunch" Content="Show Main form on launch" Margin="10,5,5,5" Checked="chkShowMainFormOnBoot_CheckChanged" Unchecked="chkShowMainFormOnBoot_CheckChanged" />
+                <CheckBox x:Name="chkStartLeagueWithECS" Content="Start League Of Legends with Easy Champion Selection" Margin="10,5,5,5" Checked="chkStartLeagueWithECS_CheckChanged" Unchecked="chkStartLeagueWithECS_CheckChanged" />
+                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Label Content="League Path:" DockPanel.Dock="Left" />
+                    <TextBox x:Name="txtLeaguePath" DockPanel.Dock="Right" Margin="0,2,5,2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" MouseDoubleClick="txtLeaguePath_MouseDoubleClick" />
+                </DockPanel>
+                <Button x:Name="btnSaveLeaguePath" Content="Save" HorizontalContentAlignment="Center" HorizontalAlignment="Right" Margin="0,-24,5,5" Click="btnSaveLeaguePath_Click" Padding="2"/>
+            </StackPanel>
+        </GroupBox>
+
 
         <GroupBox Header="Client Overlay" 
                       Margin="10,5,5,5" 
@@ -36,7 +63,7 @@
                 <Label x:Name="lblChampionSearchBar" Content="Champion Searchbar:" HorizontalAlignment="Left" Margin="5,5,5,0" VerticalAlignment="Top"/>
                 <Label x:Name="lblTeamChat" Content="Team Chatbar:" HorizontalAlignment="Left" Margin="5,5,5,0" VerticalAlignment="Top"/>
                 <Label x:Name="lblClientOverlay" Content="ECS Overlay:" HorizontalAlignment="Left" Margin="5,5,5,0" VerticalAlignment="Top"/>
-                <Button x:Name="btnConfigClientOverlay" Content="Configure" HorizontalAlignment="Right" Margin="5,5,5,0" VerticalAlignment="Bottom" Width="75" Click="OpenConfigClientOverlay"/>
+                <Button x:Name="btnConfigClientOverlay" Content="Configure" HorizontalAlignment="Right" Margin="5,5,5,0" VerticalAlignment="Bottom" Width="75" Click="btnConfigClientOverlay_Click"/>
             </StackPanel>
         </GroupBox>
 

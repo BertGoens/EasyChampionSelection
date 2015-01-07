@@ -40,11 +40,9 @@ namespace EasyChampionSelection.ECS {
             _myTaskbarIcon.MenuActivation = PopupActivationMode.RightClick;
         }
 
-        public void DisplayPopup(string message, bool isErrorMessage, Window sender = null) {
-            if(sender != null) {
-                if(!isErrorMessage && !sender.IsLoaded) {
-                    return;
-                }
+        public void DisplayPopup(string message) {
+            if(message == null) {
+                return;
             }
 
             try {

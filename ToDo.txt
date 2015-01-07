@@ -1,8 +1,5 @@
 Make YT Tutorial
 
-wndConfigClientOverlay: Thumb mag niet groter zijn dan client image
-Als de client gedetect wordt moet settings button clickbaar worden
-
 Find out how LSI creates its own categories and the game accepts them?!
 
 DO
@@ -13,6 +10,4 @@ Check if our application needs an update
 
 For Distribution:
 ? Save in /Program Files/ (uiAccess=True > Must be saved in this folder)
-Save as /Program Files/Easy Champion Selection/ECS.Exe
-Installer Must include the .Net 4.5 network
-Don't fuck up the application link and give it a target path!
+Save as /Program Files/Easy Champion Selection/*.exe

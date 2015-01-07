@@ -235,6 +235,7 @@ namespace EasyChampionSelection.ECS {
             //Clear old text (select all - delete)
             System.Windows.Forms.SendKeys.SendWait("^A");
             System.Windows.Forms.SendKeys.SendWait("{BACKSPACE}");
+            System.Windows.Forms.SendKeys.Flush();
             //Enter new text
             System.Windows.Forms.SendKeys.SendWait(text);
             System.Windows.Forms.SendKeys.Flush();

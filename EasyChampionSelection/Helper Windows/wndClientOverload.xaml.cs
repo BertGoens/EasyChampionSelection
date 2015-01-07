@@ -19,7 +19,7 @@ namespace EasyChampionSelection {
             InitializeComponent();
         }
 
-        public wndClientOverload(StaticGroupManager gmGroupManager, StaticPinvokeLolClient lcg, Action<string, bool, Window> DisplayPopup) : this() {
+        public wndClientOverload(StaticGroupManager gmGroupManager, StaticPinvokeLolClient lcg, Action<string> DisplayPopup) : this() {
             if(gmGroupManager != null && lcg != null) {
                 this._gm = gmGroupManager;
                 this._lcg = lcg;
@@ -29,7 +29,7 @@ namespace EasyChampionSelection {
                     _gm.getGroup(i).NameChanged += _groupManager_ChampionList_NameChanged;
                 }
             } else {
-                DisplayPopup("wndClientOverload has null parameters!", true, this);
+                DisplayPopup("wndClientOverload has null parameters!");
             }
 
             Redraw();

@@ -6,13 +6,14 @@
         Width="250" 
         Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg" 
         ShowInTaskbar="True" 
-        ResizeMode="CanResizeWithGrip"
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        >
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Resources/MyResourceDictionary.xaml" />
+                <ResourceDictionary Source="/Themes/MyWindowsDict.xaml" />
+                <ResourceDictionary Source="/Themes/Controls/MyThumb/MyThumbDict.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -27,12 +28,12 @@
                 HorizontalAlignment="Left" 
                 VerticalAlignment="Top" 
                 Margin="10,20,10,0" >
-            <Thumb Name="thmbPos" 
-                   DragDelta="thmbPos_OnDragDelta" 
-                   Canvas.Left="150" 
-                   Canvas.Top="20" 
-                   Template="{StaticResource ThumbNewPosRectangleTemplate}" 
-                   Visibility="Hidden" />
+            <ContentControl x:Name="ccPos"
+                            Canvas.Left="150"
+                            Canvas.Top="20"
+                            Visibility="Hidden" 
+                            LayoutUpdated="ccPos_LayoutUpdated"
+                            />
         </Canvas>
 
         <Button x:Name="btnGetCurrentClientImage" 
@@ -78,57 +79,5 @@
                              Unchecked="rdbClientOverlay_SavePosition"/>
             </StackPanel>
         </Expander>
-
-
-        <StackPanel x:Name="spThumbSizeInfo"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top" 
-                    Margin="320,0,0,0"
-                    Background="YellowGreen"
-                    Opacity="0.8"
-                    Visibility="Hidden"
-                     >
-            <Label Content="Thumb size:" 
-               Margin="0,0,0,0"
-               />
-            <StackPanel Orientation="Horizontal" 
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top">
-                <Label Content="Width"
-                       HorizontalAlignment="Left" 
-                       VerticalAlignment="Top" 
-                       Margin="5,0,4,0"/>
-                <TextBox x:Name="txtNewThumbWidth"
-                        HorizontalAlignment="Left"
-                        Height="23" 
-                        Margin="0,0,0,0" 
-                        TextWrapping="Wrap" 
-                        VerticalAlignment="Top"
-                        Width="50" 
-                        VerticalContentAlignment="Center"
-                        TextChanged="txtNewThumbWidth_TextChanged"
-                         />
-            </StackPanel>
-            
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top">
-                <Label Content="Height"
-                       HorizontalAlignment="Left" 
-                       Margin="5,0,0,0"
-                       VerticalAlignment="Top"
-                       />
-                <TextBox x:Name="txtNewThumbHeight" 
-                        HorizontalAlignment="Left"
-                        Height="23"
-                        Margin="0,0,10,10"
-                        TextWrapping="Wrap" 
-                        VerticalAlignment="Top" 
-                        Width="50" 
-                        VerticalContentAlignment="Center" 
-                        TextChanged="txtNewThumbHeight_TextChanged" 
-                         />
-            </StackPanel>
-        </StackPanel>
     </Grid>
 </Window>

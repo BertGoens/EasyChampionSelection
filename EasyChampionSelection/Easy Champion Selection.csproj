@@ -167,7 +167,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Resources\MyResourceDictionary.xaml">
+    <Page Include="Themes\Controls\MyThumb\MyThumbDict.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\MyWindowsDict.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -182,6 +186,9 @@
     <Compile Include="Helper Windows\wndSettings.xaml.cs">
       <DependentUpon>wndSettings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Themes\Controls\MyThumb\MoveThumb.cs" />
+    <Compile Include="Themes\Controls\MyThumb\ResizeThumb.cs" />
+    <Compile Include="Themes\Controls\MyThumb\SizeAdorner.cs" />
     <Compile Include="wndMain.xaml.cs">
       <DependentUpon>wndMain.xaml</DependentUpon>
       <SubType>Code</SubType>
