@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace EasyChampionSelection.Helper_Windows {
     /// <summary>
@@ -68,6 +68,24 @@ namespace EasyChampionSelection.Helper_Windows {
 
             lcvh.NewLeagueClient += lcvh_NewLeagueClient;
             lcvh.ClientClosed += lcvh_ClientClosed;
+
+            DispatcherTimer dptm = new DispatcherTimer(DispatcherPriority.Loaded);
+            dptm.Interval = new TimeSpan(0, 0, 5);
+            dptm.Tick += dptm_Tick;
+            dptm.Start();
+        }
+
+        void dptm_Tick(object sender, EventArgs e) {
+            DispatcherTimer dptm = (DispatcherTimer)sender;
+            dptm.Stop();
+            showDownloadNewVersion();
+        }
+
+        private async void showDownloadNewVersion() {
+            if(_s.Version < await _s.OnlineVersion()) {
+                spVersion.Visibility = System.Windows.Visibility.Visible;
+                lblVersion.Content = "Your version: " + _s.Version + ", latest version: " + await _s.OnlineVersion();
+            }
         }
 
         private void lcvh_ClientClosed(LolClientVisualHelper sender, EventArgs e) {
@@ -183,6 +201,23 @@ namespace EasyChampionSelection.Helper_Windows {
             }
         }
 
+        private void btnGoogleLatestDotNetVersion_Click(object sender, RoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo(@"https://www.google.be/search?q=latest+.net+4.5+version"));
+        }
+
+        private void lblProgramFiles_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+            Process.Start(new ProcessStartInfo(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)));
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            CloseChild_WindowConfigLolClientOverlay();
+            StaticSerializer.SerializeObject(_s, StaticSerializer.FullPath_Settings);
+        }
+
+        private void btnDownloadPageNewVersion_Click(object sender, RoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo(@"https://github.com/BertGoens/EasyChampionSelection"));
+        }
+
         private bool isRunFromProgramFiles() {
             string path = AppDomain.CurrentDomain.BaseDirectory.ToString();
             string programfileX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
@@ -256,19 +291,6 @@ namespace EasyChampionSelection.Helper_Windows {
                 }
             }
             return cVersion;
-        }
-
-        private void btnGoogleLatestDotNetVersion_Click(object sender, RoutedEventArgs e) {
-            Process.Start(new ProcessStartInfo(@"https://www.google.be/search?q=latest+.net+4.5+version"));
-        }
-
-        private void lblProgramFiles_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-            Process.Start(new ProcessStartInfo(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)));
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            CloseChild_WindowConfigLolClientOverlay();
-            StaticSerializer.SerializeObject(_s, StaticSerializer.FullPath_Settings);
         }
     }
 }

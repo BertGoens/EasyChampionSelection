@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Drawing;
+using System.Net;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 
 namespace EasyChampionSelection.ECS {
     [Serializable]
     public class Settings {
+        [OptionalField]
+        private const double basicVersion = 1.0;
 
         private Rectangle _rChampionSearchbarRelativePos = new Rectangle();
         private Rectangle _rTeamChatRelativePos = new Rectangle();
         private Rectangle _rClientOverlayRelativePos = new Rectangle();
 
-        [OptionalField]
         private bool _startLeagueWithEcs = false;
         private bool _showMainFormOnLaunch = true;
         private string _userApiKey = "";
-        [OptionalField]
         private string _LeaguePath = "";
+        private double _version = basicVersion;
+        private DateTime _lastVersionCheck = DateTime.Today;
+        private double _onlineVersion = basicVersion;
 
         #region events
         public delegate void ChangedEventHandler(Settings sender, EventArgs e);
@@ -41,7 +46,7 @@ namespace EasyChampionSelection.ECS {
         /// <summary>
         /// Occurs when the api key is changed.
         /// </summary>
-        [field:NonSerialized]
+        [field: NonSerialized]
         public event ChangedEventHandler ApiKeyChanged;
 
         #endregion events
@@ -110,7 +115,7 @@ namespace EasyChampionSelection.ECS {
             get { return _startLeagueWithEcs; }
             set {
                 if(value != _startLeagueWithEcs) {
-                    _startLeagueWithEcs = value; 
+                    _startLeagueWithEcs = value;
                 }
             }
         }
@@ -143,8 +148,56 @@ namespace EasyChampionSelection.ECS {
             }
         }
 
+        /// <summary>
+        /// Returns this version of Easy Champion Selection
+        /// </summary>
+        public double Version {
+            get { return _version; }
+            set {
+                if(value != _version) {
+                    _version = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the last date we checked the version
+        /// </summary>
+        public DateTime LastVersionCheck {
+            get { return _lastVersionCheck; }
+            private set {
+                if(value != null && value != _lastVersionCheck) {
+                    _lastVersionCheck = value;
+                }
+            }
+        }
+
+
         #endregion Getters & Setters
 
-        public Settings() {}
+        public Settings() { }
+
+        public async Task<double> OnlineVersion() {
+            if(LastVersionCheck < DateTime.Today) {
+                _onlineVersion = await EcsVersion();
+            }
+            return _onlineVersion;
+        }
+
+        private async Task<double> EcsVersion() {
+            try {
+                double ver = basicVersion;
+                using(WebClient client = new WebClient()) {
+                    string reply = await client.DownloadStringTaskAsync(@"https://github.com/BertGoens/EasyChampionSelection/blob/master/Version.txt");
+                    if(double.TryParse(reply, out ver)) {
+                        LastVersionCheck = DateTime.Today;
+                        ver = double.Parse(reply);
+                    }
+                }
+                return ver;
+            } catch(Exception) {
+                return basicVersion;
+            }
+        }
     }
 }

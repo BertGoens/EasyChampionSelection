@@ -31,6 +31,19 @@
                 <Label x:Name="lblProgramFiles" Content="Not run from /Program Files(x86)/" Visibility="Collapsed" MouseDoubleClick="lblProgramFiles_MouseDoubleClick" />
             </StackPanel>
         </GroupBox>
+        
+        <GroupBox x:Name="spVersion"
+                  Header="Version"
+                  Margin="10,5,5,5"
+                  BorderBrush="#FFFF6149"
+                  Visibility="Collapsed"
+                  >
+            <DockPanel>
+                <Label x:Name="lblVersion" Content="Version: " />
+                <Button x:Name="btnDownloadPageNewVersion" Margin="3,3,3,3" Content="Take me to the download page" HorizontalAlignment="Right" Click="btnDownloadPageNewVersion_Click" />
+            </DockPanel>
+        </GroupBox>
+        
         <GroupBox Header="API-key"
                   Margin="10,5,5,5">
             <StackPanel Orientation="Horizontal">

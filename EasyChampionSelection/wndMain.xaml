@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tb="http://www.hardcodet.net/taskbar" 
         Title="Easy Champion Selection"
-        Height="467" 
-        Width="434"
+        MaxWidth="440"
+        Width="440"
+        Height="410"
         Icon="Resources/LolIcon.jpg"
         >
     
@@ -15,34 +16,50 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Background="{StaticResource windowMainBackground}">
+    <Grid Background="{StaticResource windowMainBackground}" >
 
-        <Button x:Name="btnNewGroup" Content="New" HorizontalAlignment="Left" Margin="175,35,0,0" VerticalAlignment="Top" Width="75" Click="btnNewGroup_Click"/>
-
-        <ListBox x:Name="lsbGroups" HorizontalAlignment="Left" Height="138" Margin="10,32,0,0" VerticalAlignment="Top" Width="160" 
-                 SelectionChanged="lsbGroups_SelectionChanged" 
-                 PreviewMouseRightButtonDown="lsbGroups_PreviewMouseRightButtonDown"
-                 />
-
-        <Label x:Name="lblGroupsCount" Content="Groups:" Margin="10,6,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="51"/>
-        <Button x:Name="btnDeleteGroup" Content="Delete" HorizontalAlignment="Left" Margin="175,60,0,0" VerticalAlignment="Top" Width="75" Click="btnDeleteGroup_Click"/>
-
-        <ListBox x:Name="lsbChampionsInGroup" Margin="10,220,5,11" SelectionMode="Multiple" HorizontalAlignment="Left" Width="160" RenderTransformOrigin="0.5,0.5"
-                 PreviewMouseRightButtonDown="lsbChampionsInGroup_PreviewMouseRightButtonDown"
-                 />
-
-        <ListBox x:Name="lsbAllChampions" HorizontalAlignment="Left" Margin="255,220,0,11" Width="160" SelectionMode="Multiple" 
-                 PreviewMouseRightButtonDown="lsbAllChampions_PreviewMouseRightButtonDown"
-                 />
-
-        <Button x:Name="btnRemoveChampionsFromCurrentGroup" Content="&gt;&gt;" Margin="175,315,0,0" Click="RemoveChampionsFromCurrentGroup" HorizontalAlignment="Left" Width="75" Height="20" VerticalAlignment="Top"/>
-        <Button x:Name="btnAddChampionsToCurrentGroup" Content="&lt;&lt;" Margin="175,290,0,0" Click="AddChampionsToCurrentGroup" HorizontalAlignment="Left" Width="75" Height="20" VerticalAlignment="Top"/>
-        <Label x:Name="lblCurrentGroupChampions" Content="Champions in group:" HorizontalAlignment="Left" Margin="10,194,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="lblAllChampionsInfo" Content="All champions:" HorizontalAlignment="Left" Margin="255,194,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtFilterForAllChampions" HorizontalAlignment="Left" Height="23" Margin="255,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" BorderBrush="#FF8493BD" MouseEnter="txtFilterForAllChampions_MouseEnter" MouseLeave="txtFilterForAllChampions_MouseLeave" TextChanged="txtFilterForAllChampions_TextChanged" MaxLength="100" MaxLines="1" VerticalContentAlignment="Center"/>
-        <Label x:Name="lblFilterInfo" Content="Filter" HorizontalAlignment="Left" Margin="255,163,0,0" VerticalAlignment="Top" Foreground="#FF686767" VerticalContentAlignment="Center" Cursor="IBeam"/>
-        <Button x:Name="btnCredits" Content="Credits" HorizontalAlignment="Left" Margin="340,60,0,0" VerticalAlignment="Top" Width="75" Click="btnCredits_Click"/>
-        <Button x:Name="btnSettings" Content="Settings" HorizontalAlignment="Left" Margin="340,35,0,0" VerticalAlignment="Top" Width="75" Click="btnSettings_Click"/>
-        <Button x:Name="btnGuide" Content="Guide" HorizontalAlignment="Left" Margin="340,10,0,0" VerticalAlignment="Top" Width="75" Click="btnGuide_Click"/>
+        <DockPanel Margin="5">
+            <DockPanel DockPanel.Dock="Top">
+                <StackPanel Orientation="Vertical">
+                    <Label x:Name="lblGroupsCount" Content="Groups:" Margin="5,2" />
+                    <ListBox x:Name="lsbGroups" Margin="5,0" MinHeight="138" MinWidth="160" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                        SelectionChanged="lsbGroups_SelectionChanged" PreviewMouseRightButtonDown="lsbGroups_PreviewMouseRightButtonDown" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="0,30,0,0">
+                    <Button x:Name="btnNewGroup" Margin="2" Content="New" Width="75" Click="btnNewGroup_Click"/>
+                    <Button x:Name="btnDeleteGroup" Margin="2" Content="Delete" Width="75" Click="btnDeleteGroup_Click"/>
+                </StackPanel>
+                
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="0,0,5,0">
+                    <Button x:Name="btnGuide" Margin="0,2" Content="Guide" Width="75" Click="btnGuide_Click"/>
+                    <Button x:Name="btnSettings" Margin="0,2" Content="Settings" Width="75" Click="btnSettings_Click"/>
+                    <Button x:Name="btnCredits" Margin="0,2" Content="Credits"  Width="75" Click="btnCredits_Click"/>
+                </StackPanel>
+            </DockPanel>
+            
+            <DockPanel DockPanel.Dock="Bottom" Margin="0,5,0,0">
+                <StackPanel Orientation="Vertical">
+                    <Label x:Name="lblCurrentGroupChampions" Content="Champions in group:"/>
+                    <ListBox x:Name="lsbChampionsInGroup" Margin="5" SelectionMode="Multiple" MinWidth="160" MinHeight="165" VerticalContentAlignment="Stretch"
+                        PreviewMouseRightButtonDown="lsbChampionsInGroup_PreviewMouseRightButtonDown" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Vertical" Margin="5,0">
+                    <Button x:Name="btnRemoveChampionsFromCurrentGroup" Content="&gt;&gt;" Margin="0,70,0,0" Click="RemoveChampionsFromCurrentGroup" Width="75" Height="20" />
+                    <Button x:Name="btnAddChampionsToCurrentGroup" Content="&lt;&lt;" Margin="0,5,0,0" Click="AddChampionsToCurrentGroup" Width="75" Height="20" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Vertical">
+                    <TextBox x:Name="txtFilterForAllChampions" Height="23" Margin="0,0,5,0" TextWrapping="Wrap" MinWidth="160" HorizontalContentAlignment="Stretch"
+                             MouseEnter="txtFilterForAllChampions_MouseEnter" MouseLeave="txtFilterForAllChampions_MouseLeave" 
+                             TextChanged="txtFilterForAllChampions_TextChanged" MaxLength="100" MaxLines="1" VerticalContentAlignment="Center"/>
+                    <Label x:Name="lblFilterInfo" Content="Filter" Margin="0,-25,0,0"  Foreground="#FF686767" Cursor="IBeam"/>
+                    <Label x:Name="lblAllChampionsInfo" Content="All champions:" />
+                    <ListBox x:Name="lsbAllChampions" MinWidth="160" SelectionMode="Multiple" MinHeight="150" VerticalContentAlignment="Stretch"
+                        PreviewMouseRightButtonDown="lsbAllChampions_PreviewMouseRightButtonDown" />
+                </StackPanel>
+            </DockPanel>
+        </DockPanel>
     </Grid>
 </Window>

@@ -3,7 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ECS Error Helper"
         Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg" 
-        Height="520"
+        MinHeight="420"
+        Height="420"
+        MinWidth="400"
         Width="400"
         >
     <Window.Resources>
@@ -15,61 +17,23 @@
     </Window.Resources>
 
     <Grid Background="{StaticResource windowHelperBackground}">
-
-        <TextBlock HorizontalAlignment="Left" 
-                   Margin="10,10,-51,0" 
-                   VerticalAlignment="Top">
-                        Woops! You recieved an error. <LineBreak />
-                        If you can reproduce this error consider sending it to me.<LineBreak/>
-                        You will have to manually start the timer again: <LineBreak />
-                        Right click on the Tray-Icon > Start timer
-        </TextBlock>
-
-        <Label Content="Error Message:" 
-               HorizontalAlignment="Left" 
-               Margin="10,106,0,0" 
-               VerticalAlignment="Top"/>
-        
-        <TextBox x:Name="txtErrorMessage" 
-                 HorizontalAlignment="Left" 
-                 Height="172" 
-                 Margin="11,137,0,0" 
-                 TextWrapping="NoWrap" 
-                 VerticalAlignment="Top" 
-                 Width="372" IsReadOnly="True"
-                 />
-
-        <Label Content="Your comment:" 
-               HorizontalAlignment="Left" 
-               Margin="10,314,0,0"
-               VerticalAlignment="Top"
-               />
-        
-        <Button x:Name="btnSaveError"
-            Content="Save Error Log" 
-                HorizontalAlignment="Left"
-                Margin="291,459,0,0" 
-                VerticalAlignment="Top"
-                Width="92"
-                Click="btnSaveError_Click"
-                />
-        
-        <TextBox x:Name="txtErrorUserComment"
-                 HorizontalAlignment="Left" 
-                 Height="109" 
-                 Margin="10,345,0,0" 
-                 TextWrapping="Wrap"  
-                 VerticalAlignment="Top" 
-                 Width="372"
-                 />
-        
-        <Button x:Name="btnSendError"
-            Content="Send Error"
-                HorizontalAlignment="Left"
-                Margin="10,459,0,0"
-                VerticalAlignment="Top"
-                Width="75"
-                Click="btnSendError_Click"
-                />
+        <DockPanel Margin="5">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Margin="3,10" FontSize="14">
+                    Woops! You recieved an error. <LineBreak />
+                    If you can reproduce this error consider sending it to me.<LineBreak/>
+                    You will have to manually start the timer again: <LineBreak />
+                    Right click on the Tray-Icon > Start timer
+                </TextBlock>
+                <Label Content="Error Message:" />
+                <TextBox x:Name="txtErrorMessage" MinHeight="100" TextWrapping="NoWrap" MinWidth="372" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                <Label Content="Your comment:" />
+                <TextBox x:Name="txtErrorUserComment" MinHeight="100" TextWrapping="Wrap" MinWidth="372" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <Button x:Name="btnSendError" Content="Send Error" Width="75" Click="btnSendError_Click" />
+                    <Button x:Name="btnSaveError" Margin="5,0" Content="Save Error Log" HorizontalAlignment="Right" Width="92" Click="btnSaveError_Click" />
+                </StackPanel>
+            </StackPanel>
+        </DockPanel>
     </Grid>
 </Window>

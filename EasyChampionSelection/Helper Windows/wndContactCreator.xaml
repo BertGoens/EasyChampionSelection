@@ -3,8 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ECS Contact Creator"
         Icon="/EasyChampionSelection;component/Resources/LolIcon.jpg" 
-        Height="350"
-        Width="300" 
+        MinHeight="340"
+        Height="340"
+        MinWidth="300" 
+        Width="300"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterOwner">
     
@@ -17,74 +19,27 @@
     </Window.Resources>
     
     <Grid Background="{StaticResource windowHelperBackground}">
-        <Label Content="To:" 
-               HorizontalAlignment="Left"
-               Margin="10,10,0,0" 
-               VerticalAlignment="Top"
-               />
-        <Label Content="EasyChampionSelection@gmail.com" 
-               HorizontalAlignment="Left"
-               Margin="78,10,0,0" 
-               VerticalAlignment="Top"
-               />
-        
-        <Label Content="From:" 
-               HorizontalAlignment="Left"
-               Margin="10,41,0,0" 
-               VerticalAlignment="Top"
-               />
-        <TextBox x:Name="txtFromSender" 
-                 HorizontalAlignment="Left"
-                 Height="23"
-                 Margin="78,41,0,0"
-                 TextWrapping="Wrap"
-                 VerticalAlignment="Top" 
-                 Width="204" VerticalContentAlignment="Center"
-                 />
-        
-        <Label Content="Password:" 
-               HorizontalAlignment="Left" 
-               Margin="10,67,0,0" 
-               VerticalAlignment="Top"
-               />
-        <PasswordBox x:Name="txtFromPassword" 
-                     HorizontalAlignment="Left"
-                     Margin="78,71,0,0"
-                     VerticalAlignment="Top"
-                     Width="204"
-                     Height="23" VerticalContentAlignment="Center"
-                     />
+        <DockPanel Margin="5">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <StackPanel Orientation="Vertical" Margin="5,10,0,0">
+                    <Label Content="To:" />
+                    <Label Content="From:" />
+                    <Label Content="Password:" />
+                    <Label Content="Subject:" />
+                </StackPanel>
 
-        <Label Content="Subject:" 
-               HorizontalAlignment="Left"
-               Margin="10,98,0,0" 
-               VerticalAlignment="Top"
-               />
-        <TextBox x:Name="txtSubject" 
-                 HorizontalAlignment="Left"
-                 Height="23" 
-                 Margin="78,101,0,0" 
-                 TextWrapping="Wrap" 
-                 VerticalAlignment="Top" 
-                 Width="204" VerticalContentAlignment="Center"
-                 />
-        
-        <TextBox x:Name="txtBody" 
-                 HorizontalAlignment="Left" 
-                 Height="138" 
-                 Margin="10,145,0,10" 
-                 TextWrapping="Wrap"
-                 VerticalAlignment="Top"
-                 Width="272"
-                 />
-        
-        <Button x:Name="btnSendMail"
-                Content="Send"
-                HorizontalAlignment="Left" 
-                Margin="209,291,0,0" 
-                VerticalAlignment="Top"
-                Width="75"
-                Click="btnSendMail_Click"
-                />
+                <StackPanel Orientation="Vertical" Margin="5,10,0,0">
+                    <Label Content="EasyChampionSelection@gmail.com" />
+                    <TextBox x:Name="txtFromSender" Margin="0,2" Height="23" TextWrapping="Wrap" MinWidth="200" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" />
+                    <PasswordBox x:Name="txtFromPassword" Margin="0,2" MinWidth="204" Height="23" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" />
+                    <TextBox x:Name="txtSubject" Margin="0,2" Height="23" TextWrapping="Wrap" MinWidth="204" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" />
+                </StackPanel>
+            </StackPanel>
+            
+            <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom" Margin="8">
+                <TextBox x:Name="txtBody" MinHeight="138" TextWrapping="Wrap" MinWidth="272" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" />
+                <Button x:Name="btnSendMail" Margin="0,10" Content="Send" Width="75" Click="btnSendMail_Click" />
+            </StackPanel>
+        </DockPanel>
     </Grid>
 </Window>
