@@ -69,4 +69,4 @@ Hiding the main window this way will also hide it from your task bar.
 You can set it up to always hide this way in the settings.
 
 #Download
-No executible file has been provided yet.
+[Dropbox Beta download](https://dl.dropboxusercontent.com/u/105633860/Beta_ECS.rar)
