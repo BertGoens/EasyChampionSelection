@@ -101,17 +101,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ECS\AppRuntimeResources.cs" />
-    <Compile Include="ECS\ChampionList.cs" />
-    <Compile Include="ECS\LolClientVisualHelper.cs" />
-    <Compile Include="ECS\Settings.cs" />
-    <Compile Include="ECS\StaticGroupManager.cs" />
-    <Compile Include="ECS\GroupManagerEventArgs.cs" />
-    <Compile Include="ECS\GroupManagerEventOperation.cs" />
+    <Compile Include="ECS\AppRuntimeResources\AppRuntimeResourcesManager.cs" />
+    <Compile Include="ECS\AppRuntimeResources\LolClient\LolClientState.cs" />
+    <Compile Include="ECS\RiotGameData\ChampionList.cs" />
+    <Compile Include="ECS\AppRuntimeResources\LolClient\LolClientVisualHelper.cs" />
+    <Compile Include="ECS\AppRuntimeResources\EcsSettings.cs" />
+    <Compile Include="ECS\RiotGameData\GroupManager\StaticGroupManager.cs" />
+    <Compile Include="ECS\RiotGameData\GroupManager\GroupManagerEventArgs.cs" />
+    <Compile Include="ECS\RiotGameData\GroupManager\GroupManagerEventOperation.cs" />
     <Compile Include="ECS\StaticImageUtilities.cs" />
-    <Compile Include="ECS\StaticPinvokeLolClient.cs" />
+    <Compile Include="ECS\AppRuntimeResources\LolClient\StaticPinvokeLolClient.cs" />
     <Compile Include="ECS\StaticSerializer.cs" />
-    <Compile Include="ECS\StaticTaskbarManager.cs" />
+    <Compile Include="ECS\AppRuntimeResources\TrayIcon\StaticTaskbarManager.cs" />
     <Compile Include="Helper Windows\FancyBalloon.xaml.cs">
       <DependentUpon>FancyBalloon.xaml</DependentUpon>
     </Compile>

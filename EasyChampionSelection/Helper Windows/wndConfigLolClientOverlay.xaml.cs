@@ -1,8 +1,11 @@
 ﻿using EasyChampionSelection.ECS;
+using EasyChampionSelection.ECS.AppRuntimeResources;
+using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
 using System;
+using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -14,7 +17,7 @@ namespace EasyChampionSelection.Helper_Windows {
     /// </summary>
     public partial class wndConfigLolClientOverlay : Window {
         private StaticPinvokeLolClient _lcg;
-        private Settings _ecsSettings;
+        private EcsSettings _ecsSettings;
         private const int _cBaseThumbWidth = 50;
         private const int _cBaseThumbHeight = 50;
         private const int _cBaseImageWidth = 800;
@@ -24,11 +27,55 @@ namespace EasyChampionSelection.Helper_Windows {
         private bool recursiveFlag = false;
         private Action<string> _displayPopup;
 
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        static extern int SetActiveWindow(int hwnd);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool ShowWindow(IntPtr hWnd, ShowWindowEnum flags);
+        private enum ShowWindowEnum {
+            Hide = 0,
+            ShowNormal = 1,
+            ShowMinimized = 2,
+            ShowMaximized = 3,
+            Maximize = 3,
+            ShowNormalNoActivate = 4,
+            Show = 5,
+            Minimize = 6,
+            ShowMinNoActivate = 7,
+            ShowNoActivate = 8,
+            Restore = 9,
+            ShowDefault = 10,
+            ForceMinimized = 11
+        };
+
+        private void BringWindowToFront() {
+            //get the process
+            Process[] bProcess = Process.GetProcessesByName("lolclient");
+            //check if the process is nothing or not.
+            if(bProcess.Length > 0) {
+                //get the (int) hWnd of the process
+                int hwnd = (int)bProcess[0].MainWindowHandle;
+                //check if its nothing
+                if(hwnd != 0) {
+                    //if the handle is other than 0, then set the active window
+                    SetActiveWindow(hwnd);
+                } else {
+                    //we can assume that it is fully hidden or minimized, so lets show it!
+                    ShowWindow(bProcess[0].Handle, ShowWindowEnum.Restore);
+                    SetActiveWindow((int)bProcess[0].MainWindowHandle);
+                }
+            }
+        }
+
         private wndConfigLolClientOverlay() {
             InitializeComponent();
         }
 
-        public wndConfigLolClientOverlay(StaticPinvokeLolClient lcg, Settings ecsSettings, Action<string> DisplayPopup)
+        public wndConfigLolClientOverlay(StaticPinvokeLolClient lcg, EcsSettings ecsSettings, Action<string> DisplayPopup)
             : this() {
             if(ecsSettings == null || DisplayPopup == null) {
                 throw new ArgumentNullException();
@@ -38,9 +85,8 @@ namespace EasyChampionSelection.Helper_Windows {
             _ecsSettings = ecsSettings;
             _displayPopup = DisplayPopup;
 
-
             if(File.Exists(StaticSerializer.FullPath_ClientImage)) {
-                _ClientBitmap = new Bitmap(StaticSerializer.FullPath_ClientImage);
+                _ClientBitmap = new Bitmap(StaticImageUtilities.LoadImageFromFile(StaticSerializer.FullPath_ClientImage));
                 _lolClientImage = StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap);
                 Visualize_lolClientImage();
             } else {
@@ -60,7 +106,8 @@ namespace EasyChampionSelection.Helper_Windows {
 
             if(_lolClientImage != null) {
                 try {
-                    _ClientBitmap.Save(StaticSerializer.FullPath_ClientImage, ImageFormat.Jpeg);
+                    _ClientBitmap.Save(StaticSerializer.FullPath_ClientImage);
+                    _ClientBitmap.Dispose();
                 } catch(Exception ex) {
                     ex.ToString();
                 }
@@ -76,7 +123,7 @@ namespace EasyChampionSelection.Helper_Windows {
                     Visualize_lolClientImage();
                 }
             } else {
-                _displayPopup("No league client found. if you just started one please reopen this window.");
+                _displayPopup("No league client found. if you just started one please re-open this window.");
             }
         }
 

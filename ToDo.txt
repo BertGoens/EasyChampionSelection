@@ -3,7 +3,6 @@ Make YT Tutorial
 Find out how LSI creates its own categories and the game accepts them?!
 
 Modify TaskbarIcon (dll?) so it supports multiple popups
-Check if our application needs an update: https://github.com/BertGoens/EasyChampionSelection/blob/master/ToDo.txt
 
 For Distribution:
 ? Save in /Program Files/ (uiAccess=True > Must be saved in this folder)

@@ -1,4 +1,6 @@
 ﻿using EasyChampionSelection.ECS;
+using EasyChampionSelection.ECS.AppRuntimeResources;
+using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
@@ -12,7 +14,7 @@ namespace EasyChampionSelection.Helper_Windows {
     /// Interaction logic for wndSettings.xaml
     /// </summary>
     public partial class wndSettings : Window {
-        private Settings _s;
+        private EcsSettings _s;
         private LolClientVisualHelper _lcvh;
         private wndConfigLolClientOverlay _wndCLCO;
         private Action<string> _displayMessage;
@@ -21,7 +23,7 @@ namespace EasyChampionSelection.Helper_Windows {
             InitializeComponent();
         }
 
-        public wndSettings(Settings s, LolClientVisualHelper lcvh, Action<string> DisplayMessage)
+        public wndSettings(EcsSettings s, LolClientVisualHelper lcvh, Action<string> DisplayMessage)
             : this() {
             if(s == null || lcvh == null || DisplayMessage == null) {
                 throw new ArgumentNullException();
@@ -101,15 +103,15 @@ namespace EasyChampionSelection.Helper_Windows {
             }
         }
 
-        private void _s_TeamChatChanged(Settings sender, EventArgs e) {
+        private void _s_TeamChatChanged(EcsSettings sender, EventArgs e) {
             lblTeamChat.Content = "Team Chatbar: " + _s.TeamChatRelativePos.ToString();
         }
 
-        private void _s_ClientOverlayChanged(Settings sender, EventArgs e) {
+        private void _s_ClientOverlayChanged(EcsSettings sender, EventArgs e) {
             lblClientOverlay.Content = "ECS Overlay: " + _s.ClientOverlayRelativePos.ToString();
         }
 
-        private void _s_ChampionSearchbarChanged(Settings sender, EventArgs e) {
+        private void _s_ChampionSearchbarChanged(EcsSettings sender, EventArgs e) {
             lblChampionSearchBar.Content = "Champion Searchbar: " + _s.ChampionSearchbarRelativePos.ToString();
         }
 
@@ -140,6 +142,7 @@ namespace EasyChampionSelection.Helper_Windows {
 
         private void txtApiKey_TextChanged(object sender, TextChangedEventArgs e) {
             _s.UserApiKey = txtApiKey.Text;
+            _displayMessage("Loading champions with API");
         }
 
         private void chkShowMainFormOnBoot_CheckChanged(object sender, RoutedEventArgs e) {
@@ -182,23 +185,30 @@ namespace EasyChampionSelection.Helper_Windows {
             Process.Start(StaticSerializer.userAppDataPath());
         }
 
-        private void btnSaveLeaguePath_Click(object sender, RoutedEventArgs e) {
-            if(txtLeaguePath.Text.Contains(".exe")) {
-                _s.LeaguePath = txtLeaguePath.Text;
-                _displayMessage("Path saved!");
-            } else {
-                _displayMessage("Your path must include the .exe file!");
+        private void txtLeaguePath_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Title = "Select the league of legends launcher";
+            string leageDir = _s.LeaguePath;
+            if(leageDir.Length > 0) {
+                leageDir = leageDir.Substring(0, leageDir.LastIndexOf("\\"));
+                if(Directory.Exists(leageDir)) {
+                    dlg.InitialDirectory = leageDir;
+                }
+            }
+            // Set filter for file extension and default file extension
+            dlg.DefaultExt = "lol.launcher.exe";
+            dlg.Filter = "lol.launcher.exe|lol.launcher.exe";
+            dlg.FileOk += dlg_FileOk;
+            // Display OpenFileDialog by calling ShowDialog method
+            if(dlg.ShowDialog(this) == true) {
+                _s.LeaguePath = dlg.FileName;
             }
         }
 
-        private void txtLeaguePath_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-            if(txtLeaguePath.Text.Length > 0) {
-                try {
-                    FileInfo fi = new FileInfo(txtLeaguePath.Text);
-                    Process.Start(new ProcessStartInfo(fi.DirectoryName));
-                } catch(Exception) {
-                }
-            }
+        void dlg_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
+            OpenFileDialog dlg = (OpenFileDialog)sender;
+            _s.LeaguePath = dlg.FileName;
+            txtLeaguePath.Text = dlg.FileName;
         }
 
         private void btnGoogleLatestDotNetVersion_Click(object sender, RoutedEventArgs e) {

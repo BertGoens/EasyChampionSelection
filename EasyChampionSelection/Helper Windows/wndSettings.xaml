@@ -64,7 +64,6 @@
                     <Label Content="League Path:" DockPanel.Dock="Left" />
                     <TextBox x:Name="txtLeaguePath" DockPanel.Dock="Right" Margin="0,2,5,2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" MouseDoubleClick="txtLeaguePath_MouseDoubleClick" />
                 </DockPanel>
-                <Button x:Name="btnSaveLeaguePath" Content="Save" HorizontalContentAlignment="Center" HorizontalAlignment="Right" Margin="0,-24,5,5" Click="btnSaveLeaguePath_Click" Padding="2"/>
             </StackPanel>
         </GroupBox>
 

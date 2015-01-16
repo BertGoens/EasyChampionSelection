@@ -1,4 +1,5 @@
-﻿using EasyChampionSelection.ECS;
+﻿using EasyChampionSelection.ECS.AppRuntimeResources;
+using System.Security.Principal;
 using System.Threading;
 using System.Windows;
 
@@ -9,13 +10,12 @@ namespace EasyChampionSelection {
     public partial class App : Application {
         Semaphore sema;
         bool shouldRelease = false;
-        const string appName = "Easy Champion Selection"; //Used as semaphore lock
 
-        private AppRuntimeResources arr;
+        private AppRuntimeResourcesManager arr;
 
         private void Application_Startup(object sender, StartupEventArgs e) {
             SingleInstanceCheck();
-            arr = new AppRuntimeResources();
+            arr = new AppRuntimeResourcesManager();
         }
 
         private void Application_Exit(object sender, ExitEventArgs e) {
@@ -30,12 +30,13 @@ namespace EasyChampionSelection {
 
         private void SingleInstanceCheck() {
             //Check for duplicates running, close if there is already an Easy Champion Selection running
-            bool result = Semaphore.TryOpenExisting(appName, out sema);
+            string semaLock = getSemaLock();
+            bool result = Semaphore.TryOpenExisting(semaLock, out sema);
             if(result) { // we have another instance running
                 App.Current.Shutdown();
             } else { //New instance
                 try {
-                    sema = new Semaphore(1, 1, appName);
+                    sema = new Semaphore(1, 1, semaLock);
                 } catch {
                     App.Current.Shutdown(); //
                 }
@@ -46,6 +47,12 @@ namespace EasyChampionSelection {
             } else {
                 shouldRelease = true;
             }
+        }
+
+        private string getSemaLock() {
+            string semaLock = WindowsIdentity.GetCurrent().Name + ":Easy Champion Selection";
+            semaLock = semaLock.Replace("\\", ":");
+            return semaLock;
         }
     }
 }

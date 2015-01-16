@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EasyChampionSelection.ECS {
+namespace EasyChampionSelection.ECS.RiotGameData {
 
     /// <summary>
     /// A class that manages champions (as string only)

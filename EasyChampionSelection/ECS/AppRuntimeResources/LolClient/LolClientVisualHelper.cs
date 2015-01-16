@@ -1,10 +1,11 @@
-﻿using EasyChampionSelection.Helper_Windows;
+﻿using EasyChampionSelection.ECS.AppRuntimeResources;
+using EasyChampionSelection.Helper_Windows;
 using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace EasyChampionSelection.ECS {
+namespace EasyChampionSelection.ECS.AppRuntimeResources.LolClient {
     /// <summary>
     /// The visual code of the lolClient.
     /// </summary>
@@ -27,7 +28,7 @@ namespace EasyChampionSelection.ECS {
 
         #region Properties
 
-        private Settings _MySettings;
+        private EcsSettings _MySettings;
         private Action<string> _DisplayPopup;
 
         private wndClientOverload _wndCO;
@@ -64,7 +65,8 @@ namespace EasyChampionSelection.ECS {
             _tmrCheckForChampSelect.Tick += tmrCheckForChampSelect_Tick;
         }
 
-        public LolClientVisualHelper(Settings MySettings, Action<string> DisplayPopup) : this() {
+        public LolClientVisualHelper(EcsSettings MySettings, Action<string> DisplayPopup)
+            : this() {
             _MySettings = MySettings;
             _DisplayPopup = DisplayPopup;
             StartTimer();
@@ -85,20 +87,35 @@ namespace EasyChampionSelection.ECS {
             }
         }
 
+        public static bool isIngame() {
+            Process[] gameClient = Process.GetProcessesByName("League of Legends");
+            if(gameClient.Length > 0) {
+                return true;
+            }
+            return false;
+        }
+
+        public static bool isLolClientStarted() {
+            Process[] p = Process.GetProcessesByName("lolclient"); //Look for the lolClient process
+            if(p.Length > 0) {
+                return true;
+            }
+            return false;
+        }
+
         private void tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
             _tmrCheckForChampSelect.Stop();
 
             try {
                 //Check if player is ingame
-                Process[] gameClient = Process.GetProcessesByName("League of Legends");
-                if(gameClient.Length > 0) {
+                if(isIngame()) {
                     _tmrCheckForChampSelect.Interval = _tmspTimerAfkInterval;
                 } else {
                     _tmrCheckForChampSelect.Interval = _tmspTimerClienActiveInterval;
 
                     Process[] p = Process.GetProcessesByName("lolclient"); //Look for the lolClient process
-                    if( _MyPinvokeLolClient == null) {
-                        if(p.Length > 0) {
+                    if(_MyPinvokeLolClient == null) {
+                        if(isLolClientStarted()) {
                             NewStaticLolClientGraphics(p[0]);
                         } else {
                             UserClosedClient();
@@ -113,7 +130,7 @@ namespace EasyChampionSelection.ECS {
 
                     bool clientExists = false;
                     for(int i = 0; i < p.Length; i++) {
-                        if(p[i].Id ==  _MyPinvokeLolClient.getProcessLolClient().Id) {
+                        if(p[i].Id == _MyPinvokeLolClient.getProcessLolClient().Id) {
                             clientExists = true;
                             break;
                         }
@@ -123,8 +140,8 @@ namespace EasyChampionSelection.ECS {
                         NewStaticLolClientGraphics(p[0]);
                     }
 
-                    if( _MyPinvokeLolClient.isLolClientFocussed() ||  _MyPinvokeLolClient.isEasyChampionSelectionFoccussed()) {
-                        if( _MyPinvokeLolClient.isInChampSelect()) {
+                    if(_MyPinvokeLolClient.isLolClientFocussed() || _MyPinvokeLolClient.isEasyChampionSelectionFoccussed()) {
+                        if(_MyPinvokeLolClient.isInChampSelect()) {
                             Window_ClientOverlay.Visibility = System.Windows.Visibility.Visible;
                         } else {
                             Window_ClientOverlay.Visibility = System.Windows.Visibility.Hidden;
@@ -148,7 +165,7 @@ namespace EasyChampionSelection.ECS {
                 Window_ClientOverlay = null;
             }
 
-             _MyPinvokeLolClient = null;
+            _MyPinvokeLolClient = null;
         }
 
         private void NewStaticLolClientGraphics(Process LeagueOfLegendsClientProcess) {
@@ -156,11 +173,11 @@ namespace EasyChampionSelection.ECS {
                 DeleteOldStaticLolClientGraphics();
 
                 _MyPinvokeLolClient = null;
-                 _MyPinvokeLolClient = StaticPinvokeLolClient.GetInstance(LeagueOfLegendsClientProcess, _MySettings);
+                _MyPinvokeLolClient = StaticPinvokeLolClient.GetInstance(LeagueOfLegendsClientProcess, _MySettings);
 
-                 if (NewLeagueClient != null) {
-                     NewLeagueClient(this, EventArgs.Empty);
-                 }
+                if(NewLeagueClient != null) {
+                    NewLeagueClient(this, EventArgs.Empty);
+                }
             }
         }
     }

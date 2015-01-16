@@ -1,10 +1,11 @@
-﻿using EasyChampionSelection.ECS;
+﻿using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
+using EasyChampionSelection.ECS.RiotGameData;
+using EasyChampionSelection.ECS.RiotGameData.GroupManager;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 
 namespace EasyChampionSelection {
     /// <summary>

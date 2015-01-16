@@ -1,4 +1,8 @@
 ﻿using EasyChampionSelection.ECS;
+using EasyChampionSelection.ECS.AppRuntimeResources;
+using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
+using EasyChampionSelection.ECS.RiotGameData;
+using EasyChampionSelection.ECS.RiotGameData.GroupManager;
 using EasyChampionSelection.Helper_Windows;
 using System;
 using System.Diagnostics;
@@ -14,7 +18,7 @@ namespace EasyChampionSelection {
 
         #region Properties & Attributes
 
-        private AppRuntimeResources _ARR;
+        private AppRuntimeResourcesManager _ARR;
         private wndSettings _wndST;
 
         #endregion Properties & Attributes
@@ -23,7 +27,7 @@ namespace EasyChampionSelection {
             InitializeComponent();
         }
 
-        public wndMain(AppRuntimeResources arr)
+        public wndMain(AppRuntimeResourcesManager arr)
             : this() {
             _ARR = arr;
 
@@ -58,7 +62,7 @@ namespace EasyChampionSelection {
             DisplayGroups();
         }
 
-        private void MySettings_ApiKeyChanged(Settings sender, EventArgs e) {
+        private void MySettings_ApiKeyChanged(EcsSettings sender, EventArgs e) {
             _ARR.LoadAllChampionsRiotApi();
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
         }
@@ -175,6 +179,16 @@ namespace EasyChampionSelection {
                 lblFilterInfo.Visibility = System.Windows.Visibility.Hidden;
             }
             DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
+        }
+
+        private void lblFilterInfo_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
+            lblFilterInfo.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        private void lblFilterInfo_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) {
+            if(txtFilterForAllChampions.Text.Length < 1) {
+                lblFilterInfo.Visibility = System.Windows.Visibility.Visible;
+            }
         }
 
         #region ContextMenus

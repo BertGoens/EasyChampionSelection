@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EasyChampionSelection.ECS {
+namespace EasyChampionSelection.ECS.RiotGameData.GroupManager {
 
     /// <summary>
     /// A EventArgs class for GroupManager to determine the actions.

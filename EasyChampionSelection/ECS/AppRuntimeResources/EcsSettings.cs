@@ -4,10 +4,13 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
-namespace EasyChampionSelection.ECS {
+namespace EasyChampionSelection.ECS.AppRuntimeResources {
+    /// <summary>
+    /// Settings class for Easy Champion Selection
+    /// </summary>
     [Serializable]
-    public class Settings {
-        [OptionalField]
+    public class EcsSettings {
+        //[OptionalField]
         private const double basicVersion = 1.0;
 
         private Rectangle _rChampionSearchbarRelativePos = new Rectangle();
@@ -23,7 +26,7 @@ namespace EasyChampionSelection.ECS {
         private double _onlineVersion = basicVersion;
 
         #region events
-        public delegate void ChangedEventHandler(Settings sender, EventArgs e);
+        public delegate void ChangedEventHandler(EcsSettings sender, EventArgs e);
 
         /// <summary>
         /// Occurs when the ChampionSearchbar is moved or reseized.
@@ -175,8 +178,11 @@ namespace EasyChampionSelection.ECS {
 
         #endregion Getters & Setters
 
-        public Settings() { }
+        public EcsSettings() { }
 
+        /// <summary>
+        /// Checks the lastest online version (refreshes once a day)
+        /// </summary>
         public async Task<double> OnlineVersion() {
             if(LastVersionCheck < DateTime.Today) {
                 _onlineVersion = await EcsVersion();
@@ -184,6 +190,9 @@ namespace EasyChampionSelection.ECS {
             return _onlineVersion;
         }
 
+        /// <summary>
+        /// Uses a webclient to ask the latest Version.txt from our master tree
+        /// </summary>
         private async Task<double> EcsVersion() {
             try {
                 double ver = basicVersion;

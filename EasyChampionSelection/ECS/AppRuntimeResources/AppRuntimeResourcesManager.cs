@@ -1,4 +1,8 @@
-﻿using EasyChampionSelection.Helper_Windows;
+﻿using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
+using EasyChampionSelection.ECS.AppRuntimeResources.TrayIcon;
+using EasyChampionSelection.ECS.RiotGameData;
+using EasyChampionSelection.ECS.RiotGameData.GroupManager;
+using EasyChampionSelection.Helper_Windows;
 using RiotSharp;
 using System;
 using System.Diagnostics;
@@ -7,19 +11,19 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace EasyChampionSelection.ECS {
+namespace EasyChampionSelection.ECS.AppRuntimeResources {
     /// <summary>
     /// Class where all runtime resources are managed.
     /// They mostly have to do with detecting the client, managing groups and displaying popups
     /// </summary>
-    public class AppRuntimeResources {
+    public class AppRuntimeResourcesManager {
         public const string AppName = "Easy Champion Selection";
 
         private StaticTaskbarManager _tbm;
         private Action<string> _displayPopup;
 
         private StaticGroupManager _gm;
-        private Settings _s;
+        private EcsSettings _s;
         private ChampionList _allChampions;
 
         private LolClientVisualHelper _lcvh;
@@ -31,8 +35,7 @@ namespace EasyChampionSelection.ECS {
 
         private StaticTaskbarManager MyTaskbarManager {
             get { return _tbm; }
-            set 
-            {
+            set {
                 _tbm = value;
                 _displayPopup = _tbm.DisplayPopup;
             }
@@ -50,7 +53,7 @@ namespace EasyChampionSelection.ECS {
             set { _gm = value; }
         }
 
-        public Settings MySettings {
+        public EcsSettings MySettings {
             get { return _s; }
             private set { _s = value; }
         }
@@ -69,8 +72,7 @@ namespace EasyChampionSelection.ECS {
         /// Routed property from LolClientVisualHelper
         /// </summary>
         public wndClientOverload Window_ClientOverlay {
-            get
-            {
+            get {
                 if(MyLolClientVisualHelper == null) {
                     return null;
                 }
@@ -79,10 +81,9 @@ namespace EasyChampionSelection.ECS {
                 }
                 return MyLolClientVisualHelper.Window_ClientOverlay;
             }
-            private set 
-            {
+            private set {
                 if(MyLolClientVisualHelper != null) {
-                    MyLolClientVisualHelper.Window_ClientOverlay = value; 
+                    MyLolClientVisualHelper.Window_ClientOverlay = value;
                 }
             }
         }
@@ -107,7 +108,7 @@ namespace EasyChampionSelection.ECS {
 
         #endregion
 
-        public AppRuntimeResources() {
+        public AppRuntimeResourcesManager() {
             MyTaskbarManager = StaticTaskbarManager.getInstance(AppName);
             MyTaskbarManager.MyTaskbarIcon.PreviewTrayContextMenuOpen += Tb_PreviewTrayContextMenuOpen; //Taskbar ContextMenu binding
 
@@ -122,11 +123,11 @@ namespace EasyChampionSelection.ECS {
 
 
             if(MySettings.StartLeagueWithEcs) {
-                if(MySettings.LeaguePath.Length > 0) {
-                    if(MyLolClientVisualHelper.MyPinvokeLolClient == null) {
+                if(!LolClientVisualHelper.isIngame() && !LolClientVisualHelper.isLolClientStarted()) {
+                    if(MySettings.LeaguePath.Length > 0) {
                         try {
                             FileInfo fi = new FileInfo(MySettings.LeaguePath);
-                            Process.Start(new ProcessStartInfo(fi.FullName));                            
+                            Process.Start(new ProcessStartInfo(fi.FullName));
                         } catch(Exception) {
                         }
                     }
@@ -153,12 +154,12 @@ namespace EasyChampionSelection.ECS {
 
         private void LoadSettings() {
             if(File.Exists(StaticSerializer.FullPath_Settings)) {
-                MySettings = (Settings)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_Settings);
+                MySettings = (EcsSettings)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_Settings);
                 if(MySettings == null) {
-                    MySettings = new Settings();
+                    MySettings = new EcsSettings();
                 }
             } else {
-                MySettings = new Settings();
+                MySettings = new EcsSettings();
             }
         }
 
@@ -171,7 +172,6 @@ namespace EasyChampionSelection.ECS {
         }
 
         public async void LoadAllChampionsRiotApi() {
-            DisplayPopup("Loading champions with API");
             AllChampions.RemoveAllChampions();
             if(MySettings.UserApiKey.Length == 36) {
                 try {
@@ -188,7 +188,7 @@ namespace EasyChampionSelection.ECS {
                 } catch(NullReferenceException) {
                 }
             } else {
-               DisplayPopup("No correct API key found, get one at https://developer.riotgames.com/");
+                DisplayPopup("No correct API key found, get one at https://developer.riotgames.com/");
             }
 
         }
@@ -257,7 +257,7 @@ namespace EasyChampionSelection.ECS {
                 cm.Items.Add(mniManuallyEnableTimer);
             }
 
-            MenuItem mniContactCreator = CreateMenuItem("Contact creator", mniContactCreator_Click);
+            MenuItem mniContactCreator = CreateMenuItem("Contact Creator", mniContactCreator_Click);
             cm.Items.Add(mniContactCreator);
 
             cm.Items.Add(new Separator());

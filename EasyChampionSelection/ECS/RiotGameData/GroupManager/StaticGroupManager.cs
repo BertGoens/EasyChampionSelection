@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EasyChampionSelection.ECS {
+namespace EasyChampionSelection.ECS.RiotGameData.GroupManager {
 
     /// <summary>
     /// A managing class that handles <c>ChampionList</c>

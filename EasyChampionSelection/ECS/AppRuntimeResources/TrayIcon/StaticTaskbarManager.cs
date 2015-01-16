@@ -3,7 +3,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 
-namespace EasyChampionSelection.ECS {
+namespace EasyChampionSelection.ECS.AppRuntimeResources.TrayIcon {
     public sealed class StaticTaskbarManager {
         private static string _appName;
         private static StaticTaskbarManager _instance;

@@ -1,4 +1,5 @@
-﻿using EasyChampionSelection.ECS;
+﻿using EasyChampionSelection.ECS.RiotGameData;
+using EasyChampionSelection.ECS.RiotGameData.GroupManager;
 using System;
 using System.Windows;
 using System.Windows.Controls;
