@@ -3,7 +3,7 @@
 namespace EasyChampionSelection.ECS.RiotGameData.GroupManager {
 
     /// <summary>
-    /// A EventArgs class for GroupManager to determine the actions.
+    /// An EventArgs class for GroupManager to determine the actions.
     /// </summary>
     public class GroupManagerEventArgs: EventArgs {
         /// <summary>

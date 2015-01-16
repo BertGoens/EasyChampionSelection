@@ -103,8 +103,8 @@
     </ApplicationDefinition>
     <Compile Include="ECS\AppRuntimeResources\AppRuntimeResourcesManager.cs" />
     <Compile Include="ECS\AppRuntimeResources\LolClient\LolClientState.cs" />
+    <Compile Include="ECS\AppRuntimeResources\LolClient\PinvokeLolClientEventArgs.cs" />
     <Compile Include="ECS\RiotGameData\ChampionList.cs" />
-    <Compile Include="ECS\AppRuntimeResources\LolClient\LolClientVisualHelper.cs" />
     <Compile Include="ECS\AppRuntimeResources\EcsSettings.cs" />
     <Compile Include="ECS\RiotGameData\GroupManager\StaticGroupManager.cs" />
     <Compile Include="ECS\RiotGameData\GroupManager\GroupManagerEventArgs.cs" />
@@ -122,8 +122,8 @@
     <Compile Include="Helper Windows\wndAddGroup.xaml.cs">
       <DependentUpon>wndAddGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helper Windows\wndClientOverload.xaml.cs">
-      <DependentUpon>wndClientOverload.xaml</DependentUpon>
+    <Compile Include="Helper Windows\wndClientOverlay.xaml.cs">
+      <DependentUpon>wndClientOverlay.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helper Windows\wndConfigLolClientOverlay.xaml.cs">
       <DependentUpon>wndConfigLolClientOverlay.xaml</DependentUpon>
@@ -198,7 +198,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Helper Windows\wndClientOverload.xaml">
+    <Page Include="Helper Windows\wndClientOverlay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

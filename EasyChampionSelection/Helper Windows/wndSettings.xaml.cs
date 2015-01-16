@@ -15,7 +15,7 @@ namespace EasyChampionSelection.Helper_Windows {
     /// </summary>
     public partial class wndSettings : Window {
         private EcsSettings _s;
-        private LolClientVisualHelper _lcvh;
+        private StaticPinvokeLolClient _pilc;
         private wndConfigLolClientOverlay _wndCLCO;
         private Action<string> _displayMessage;
 
@@ -23,21 +23,21 @@ namespace EasyChampionSelection.Helper_Windows {
             InitializeComponent();
         }
 
-        public wndSettings(EcsSettings s, LolClientVisualHelper lcvh, Action<string> DisplayMessage)
+        public wndSettings(EcsSettings s, StaticPinvokeLolClient pilc, Action<string> DisplayMessage)
             : this() {
-            if(s == null || lcvh == null || DisplayMessage == null) {
+            if(s == null || pilc == null || DisplayMessage == null) {
                 throw new ArgumentNullException();
             }
 
             _s = s;
             _displayMessage = DisplayMessage;
-            _lcvh = lcvh;
+            _pilc = pilc;
 
             _s.ChampionSearchbarChanged += _s_ChampionSearchbarChanged;
             _s.ClientOverlayChanged += _s_ClientOverlayChanged;
             _s.TeamChatChanged += _s_TeamChatChanged;
 
-            _wndCLCO = new wndConfigLolClientOverlay(_lcvh.MyPinvokeLolClient, _s, _displayMessage);
+            _wndCLCO = new wndConfigLolClientOverlay(pilc, _s, _displayMessage);
 
             double dotNetVersion = DotnetRegistryVersion();
             if(dotNetVersion < 4.5) {
@@ -64,17 +64,37 @@ namespace EasyChampionSelection.Helper_Windows {
             lblApplicationpath.Content += " " + StaticSerializer.applicationPath();
             lblAppDataPath.Content += " " + StaticSerializer.userAppDataPath();
 
-            if(lcvh.MyPinvokeLolClient == null && !File.Exists(StaticSerializer.FullPath_ClientImage)) {
+            if(pilc.ClientState == LolClientState.NoClient && !File.Exists(StaticSerializer.FullPath_ClientImage)) {
                 btnConfigClientOverlay.IsEnabled = false;
             }
 
-            lcvh.NewLeagueClient += lcvh_NewLeagueClient;
-            lcvh.ClientClosed += lcvh_ClientClosed;
+            pilc.LolClientStateChanged += pilc_LolClientStateChanged;
 
             DispatcherTimer dptm = new DispatcherTimer(DispatcherPriority.Loaded);
             dptm.Interval = new TimeSpan(0, 0, 5);
             dptm.Tick += dptm_Tick;
             dptm.Start();
+        }
+
+        void pilc_LolClientStateChanged(StaticPinvokeLolClient sender, EventArgs e) {
+            if(_pilc.ClientState == LolClientState.NoClient) {
+
+            }
+            switch(_pilc.ClientState) {
+                case LolClientState.NoClient:
+                    if(!File.Exists(StaticSerializer.FullPath_ClientImage)) {
+                        btnConfigClientOverlay.IsEnabled = false;
+                    }
+                    break;
+                case LolClientState.Client_Undefined:
+                    btnConfigClientOverlay.IsEnabled = true;
+                    if(IsConfigLolClientOverlayOpened()) {
+                        OpenChild_WindowConfigClientOverlay();
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         void dptm_Tick(object sender, EventArgs e) {
@@ -87,19 +107,6 @@ namespace EasyChampionSelection.Helper_Windows {
             if(_s.Version < await _s.OnlineVersion()) {
                 spVersion.Visibility = System.Windows.Visibility.Visible;
                 lblVersion.Content = "Your version: " + _s.Version + ", latest version: " + await _s.OnlineVersion();
-            }
-        }
-
-        private void lcvh_ClientClosed(LolClientVisualHelper sender, EventArgs e) {
-            if(!File.Exists(StaticSerializer.FullPath_ClientImage)) {
-                btnConfigClientOverlay.IsEnabled = false;
-            }
-        }
-
-        private void lcvh_NewLeagueClient(LolClientVisualHelper sender, EventArgs e) {
-            btnConfigClientOverlay.IsEnabled = true;
-            if(IsConfigLolClientOverlayOpened()) {
-                OpenChild_WindowConfigClientOverlay();
             }
         }
 
@@ -129,20 +136,11 @@ namespace EasyChampionSelection.Helper_Windows {
             return false;
         }
 
-        /// <summary>
-        /// Closes wndConfigLolClientOverlay
-        /// </summary>
-        public void CloseChild_WindowConfigLolClientOverlay() {
-            if(_wndCLCO != null) {
-                if(_wndCLCO.IsLoaded) {
-                    _wndCLCO.Close();
-                }
-            }
-        }
-
         private void txtApiKey_TextChanged(object sender, TextChangedEventArgs e) {
-            _s.UserApiKey = txtApiKey.Text;
-            _displayMessage("Loading champions with API");
+            if(_s.UserApiKey != txtApiKey.Text) {
+                _s.UserApiKey = txtApiKey.Text;
+                _displayMessage("Loading champions with API");
+            }
         }
 
         private void chkShowMainFormOnBoot_CheckChanged(object sender, RoutedEventArgs e) {
@@ -173,7 +171,7 @@ namespace EasyChampionSelection.Helper_Windows {
                 }
             }
 
-            _wndCLCO = new wndConfigLolClientOverlay(_lcvh.MyPinvokeLolClient, _s, _displayMessage);
+            _wndCLCO = new wndConfigLolClientOverlay(_pilc, _s, _displayMessage);
             _wndCLCO.Show();
         }
 
@@ -220,7 +218,7 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            CloseChild_WindowConfigLolClientOverlay();
+            _wndCLCO.Close();
             StaticSerializer.SerializeObject(_s, StaticSerializer.FullPath_Settings);
         }
 

@@ -19,7 +19,7 @@ namespace EasyChampionSelection.ECS {
         private static string _fullPath_GroupManager = userAppDataPath() + Folder_SaveData + Object_GroupManager;
 
         // @\Error\
-        private static string _fullPath_ErrorFile = userAppDataPath() + Folder_ErrorData + DateTime.Today.ToString("d").Replace("/", "_") + ".txt";
+        private static string _fullPath_ErrorFile = userAppDataPath() + Folder_ErrorData + "\\" + DateTime.Today.ToString("d").Replace("/", "_") + ".txt";
 
         //Local folders
         private const string Folder_SaveData = @"\Save";

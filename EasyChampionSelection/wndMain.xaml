@@ -20,11 +20,11 @@
 
         <DockPanel Margin="5">
             <DockPanel DockPanel.Dock="Top">
-                <StackPanel Orientation="Vertical">
-                    <Label x:Name="lblGroupsCount" Content="Groups:" Margin="5,2" />
-                    <ListBox x:Name="lsbGroups" Margin="5,0" MinHeight="138" MinWidth="160" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                <DockPanel>
+                    <Label DockPanel.Dock="Top" x:Name="lblGroupsCount" Content="Groups:" Margin="5,2" />
+                    <ListBox DockPanel.Dock="Bottom" x:Name="lsbGroups" Margin="5,0" MinHeight="138" MaxHeight="200" MinWidth="160" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                         SelectionChanged="lsbGroups_SelectionChanged" PreviewMouseRightButtonDown="lsbGroups_PreviewMouseRightButtonDown" />
-                </StackPanel>
+                </DockPanel>
                 
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="0,30,0,0">
                     <Button x:Name="btnNewGroup" Margin="2" Content="New" Width="75" Click="btnNewGroup_Click"/>
@@ -39,26 +39,26 @@
             </DockPanel>
             
             <DockPanel DockPanel.Dock="Bottom" Margin="0,5,0,0">
-                <StackPanel Orientation="Vertical">
-                    <Label x:Name="lblCurrentGroupChampions" Content="Champions in group:"/>
-                    <ListBox x:Name="lsbChampionsInGroup" Margin="5" SelectionMode="Multiple" MinWidth="160" MinHeight="165" VerticalContentAlignment="Stretch"
+                <DockPanel>
+                    <Label DockPanel.Dock="Top" x:Name="lblCurrentGroupChampions" Content="Champions in group:"/>
+                    <ListBox DockPanel.Dock="Bottom" x:Name="lsbChampionsInGroup" Margin="5" SelectionMode="Multiple" MinWidth="160" MinHeight="165" VerticalContentAlignment="Stretch"
                         PreviewMouseRightButtonDown="lsbChampionsInGroup_PreviewMouseRightButtonDown" />
-                </StackPanel>
+                </DockPanel>
                 
                 <StackPanel Orientation="Vertical" Margin="5,0">
                     <Button x:Name="btnRemoveChampionsFromCurrentGroup" Content="&gt;&gt;" Margin="0,70,0,0" Click="RemoveChampionsFromCurrentGroup" Width="75" Height="20" />
                     <Button x:Name="btnAddChampionsToCurrentGroup" Content="&lt;&lt;" Margin="0,5,0,0" Click="AddChampionsToCurrentGroup" Width="75" Height="20" />
                 </StackPanel>
                 
-                <StackPanel Orientation="Vertical">
-                    <TextBox x:Name="txtFilterForAllChampions" Height="23" Margin="0,0,5,0" TextWrapping="Wrap" MinWidth="160" HorizontalContentAlignment="Stretch"
+                <DockPanel>
+                    <TextBox DockPanel.Dock="Top" x:Name="txtFilterForAllChampions" Height="23" Margin="0,0,5,0" TextWrapping="Wrap" MinWidth="160" HorizontalContentAlignment="Stretch"
                              MouseEnter="txtFilterForAllChampions_MouseEnter" MouseLeave="txtFilterForAllChampions_MouseLeave" 
                              TextChanged="txtFilterForAllChampions_TextChanged" MaxLength="100" MaxLines="1" VerticalContentAlignment="Center"/>
-                    <Label x:Name="lblFilterInfo" Content="Filter" Margin="0,-25,0,0"  Foreground="#FF686767" Cursor="IBeam" MouseEnter="lblFilterInfo_MouseEnter" MouseLeave="lblFilterInfo_MouseLeave" />
-                    <Label x:Name="lblAllChampionsInfo" Content="All champions:" />
-                    <ListBox x:Name="lsbAllChampions" MinWidth="160" SelectionMode="Multiple" MinHeight="150" VerticalContentAlignment="Stretch"
+                    <Label DockPanel.Dock="Top" x:Name="lblFilterInfo" Content="Filter" Margin="0,-25,0,0"  Foreground="#FF686767" Cursor="IBeam" MouseEnter="lblFilterInfo_MouseEnter" MouseLeave="lblFilterInfo_MouseLeave" />
+                    <Label DockPanel.Dock="Top" x:Name="lblAllChampionsInfo" Content="All champions:" />
+                    <ListBox DockPanel.Dock="Bottom" x:Name="lsbAllChampions" MinWidth="160" SelectionMode="Multiple" MinHeight="150" VerticalContentAlignment="Stretch"
                         PreviewMouseRightButtonDown="lsbAllChampions_PreviewMouseRightButtonDown" />
-                </StackPanel>
+                </DockPanel>
             </DockPanel>
         </DockPanel>
     </Grid>

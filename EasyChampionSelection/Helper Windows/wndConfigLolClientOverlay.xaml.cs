@@ -24,52 +24,10 @@ namespace EasyChampionSelection.Helper_Windows {
         private const int _cBaseImageHeight = 600;
         private Bitmap _ClientBitmap;
         private BitmapSource _lolClientImage;
-        private bool recursiveFlag = false;
+        //Recursive flags (can't make them optional parameters cause it apparantly doens't work with event delegates)
+        private bool recursiveFlag_ccPos_LayoutUpdated = false;
+        private bool recursiveFlag_btnGetCurrentClientImage_Click = false;
         private Action<string> _displayPopup;
-
-        [DllImport("user32.dll")]
-        static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        static extern int SetActiveWindow(int hwnd);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool ShowWindow(IntPtr hWnd, ShowWindowEnum flags);
-        private enum ShowWindowEnum {
-            Hide = 0,
-            ShowNormal = 1,
-            ShowMinimized = 2,
-            ShowMaximized = 3,
-            Maximize = 3,
-            ShowNormalNoActivate = 4,
-            Show = 5,
-            Minimize = 6,
-            ShowMinNoActivate = 7,
-            ShowNoActivate = 8,
-            Restore = 9,
-            ShowDefault = 10,
-            ForceMinimized = 11
-        };
-
-        private void BringWindowToFront() {
-            //get the process
-            Process[] bProcess = Process.GetProcessesByName("lolclient");
-            //check if the process is nothing or not.
-            if(bProcess.Length > 0) {
-                //get the (int) hWnd of the process
-                int hwnd = (int)bProcess[0].MainWindowHandle;
-                //check if its nothing
-                if(hwnd != 0) {
-                    //if the handle is other than 0, then set the active window
-                    SetActiveWindow(hwnd);
-                } else {
-                    //we can assume that it is fully hidden or minimized, so lets show it!
-                    ShowWindow(bProcess[0].Handle, ShowWindowEnum.Restore);
-                    SetActiveWindow((int)bProcess[0].MainWindowHandle);
-                }
-            }
-        }
 
         private wndConfigLolClientOverlay() {
             InitializeComponent();
@@ -109,21 +67,29 @@ namespace EasyChampionSelection.Helper_Windows {
                     _ClientBitmap.Save(StaticSerializer.FullPath_ClientImage);
                     _ClientBitmap.Dispose();
                 } catch(Exception ex) {
-                    ex.ToString();
+                    _displayPopup(ex.ToString());
                 }
             }
         }
 
         private void btnGetCurrentClientImage_Click(object sender, RoutedEventArgs e) {
-            if(_lcg != null) {
-                _ClientBitmap = _lcg.GetLeagueClientAsBitmap(); // Get bitmap of league client
-                _lolClientImage = StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap); //Convert bitmap to bitmapsource
+            _ClientBitmap = _lcg.GetLeagueClientAsBitmap(); // Get bitmap of league client
 
-                if(_lolClientImage != null) {
-                    Visualize_lolClientImage();
+            if(_ClientBitmap == null) {
+                if(!recursiveFlag_btnGetCurrentClientImage_Click) {
+                    _lcg.BringClientToFront();
+                    recursiveFlag_btnGetCurrentClientImage_Click = true;
+                    btnGetCurrentClientImage_Click(this, e);
+                } else {
+                    recursiveFlag_btnGetCurrentClientImage_Click = false;
+                    _displayPopup("Can't find active client - clientState: " + _lcg.ClientState.ToString());
                 }
-            } else {
-                _displayPopup("No league client found. if you just started one please re-open this window.");
+            }
+            
+            _lolClientImage = StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap); //Convert bitmap to bitmapsource
+
+            if(_lolClientImage != null) {
+                Visualize_lolClientImage();
             }
         }
 
@@ -216,10 +182,10 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void ccPos_LayoutUpdated(object sender, EventArgs e) {
-            if(recursiveFlag) {
+            if(recursiveFlag_ccPos_LayoutUpdated) {
                 return;
             }
-            recursiveFlag = true; //Ensures we don't go into a recursive loop as this event will be called on every layout update
+            recursiveFlag_ccPos_LayoutUpdated = true; //Ensures we don't go into a recursive loop as this event will be called on every layout update
 
             if(_ClientBitmap != null) {
                 if(ccPos.Width > cvRectangles.Width) {
@@ -245,7 +211,7 @@ namespace EasyChampionSelection.Helper_Windows {
                 }
             }
 
-            recursiveFlag = false; //Don't forget to disable it
+            recursiveFlag_ccPos_LayoutUpdated = false; //Don't forget to disable it
         }
 
     }

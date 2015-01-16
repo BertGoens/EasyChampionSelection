@@ -27,8 +27,7 @@ namespace EasyChampionSelection {
             InitializeComponent();
         }
 
-        public wndMain(AppRuntimeResourcesManager arr)
-            : this() {
+        public wndMain(AppRuntimeResourcesManager arr) : this() {
             _ARR = arr;
 
             //Visualize the data
@@ -41,8 +40,6 @@ namespace EasyChampionSelection {
                 _ARR.MyGroupManager.getGroup(i).NameChanged += MyGroupManager_ChampionList_NameChanged;
             }
             _ARR.MySettings.ApiKeyChanged += MySettings_ApiKeyChanged;
-
-            _ARR.MyLolClientVisualHelper.NewLeagueClient += MyLolClientVisualHelper_NewLeagueClient;
         }
 
         #region UI Events
@@ -71,17 +68,6 @@ namespace EasyChampionSelection {
             Process.Start(new ProcessStartInfo("https://github.com/BertGoens/EasyChampionSelection"));
         }
 
-        private void MyLolClientVisualHelper_NewLeagueClient(LolClientVisualHelper sender, EventArgs e) {
-            if(_wndST != null) {
-                if(_wndST.IsLoaded) {
-                    if(_wndST.IsConfigLolClientOverlayOpened()) {
-                        _wndST.CloseChild_WindowConfigLolClientOverlay();
-                        _wndST.OpenChild_WindowConfigClientOverlay();
-                    }
-                }
-            }
-        }
-
         private void btnSettings_Click(object sender, RoutedEventArgs e) {
             if(_wndST != null) {
                 if(_wndST.IsLoaded) {
@@ -90,7 +76,7 @@ namespace EasyChampionSelection {
                 }
             }
 
-            _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientVisualHelper, _ARR.DisplayPopup);
+            _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientProcessInvokeHandler, _ARR.DisplayPopup);
             _wndST.Show();
         }
 

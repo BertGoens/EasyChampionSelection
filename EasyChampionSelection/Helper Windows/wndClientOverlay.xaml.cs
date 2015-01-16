@@ -1,4 +1,5 @@
-﻿using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
+﻿using EasyChampionSelection.ECS.AppRuntimeResources;
+using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
 using EasyChampionSelection.ECS.RiotGameData;
 using EasyChampionSelection.ECS.RiotGameData.GroupManager;
 using System;
@@ -15,25 +16,51 @@ namespace EasyChampionSelection {
 
         private StaticGroupManager _gm;
         private StaticPinvokeLolClient _lcg;
+        private Action<string> _displayPopup;
 
         private wndClientOverload() {
             InitializeComponent();
         }
 
         public wndClientOverload(StaticGroupManager gmGroupManager, StaticPinvokeLolClient lcg, Action<string> DisplayPopup) : this() {
-            if(gmGroupManager != null && lcg != null) {
+            if(gmGroupManager != null && lcg != null && DisplayPopup != null) {
                 this._gm = gmGroupManager;
                 this._lcg = lcg;
+                this._displayPopup = DisplayPopup;
+
                 _gm.GroupsChanged += _groupManager_GroupsChanged;
-                _lcg.OnLeagueClientReposition += OnLeagueClientReposition;
                 for(int i = 0; i < _gm.GroupCount; i++) {
                     _gm.getGroup(i).NameChanged += _groupManager_ChampionList_NameChanged;
                 }
+
+                _lcg.OnLeagueClientReposition += OnLeagueClientReposition;
+                _lcg.LolClientFocussed += _lcg_LolClientFocussed;
+                _lcg.LolClientFocusLost += _lcg_LolClientFocusLost;
+                _lcg.LolClientStateChanged += _lcg_LolClientStateChanged;
+
             } else {
-                DisplayPopup("wndClientOverload has null parameters!");
+                DisplayPopup("wndClientlay.xaml.cs has null parameters!");
             }
 
             Redraw();
+        }
+
+        void _lcg_LolClientStateChanged(StaticPinvokeLolClient sender, EventArgs e) {
+            if(sender.ClientState != LolClientState.InChampSelect) {
+                Visibility = System.Windows.Visibility.Collapsed;
+            } else {
+                Visibility = System.Windows.Visibility.Visible;
+            }
+        }
+
+        void _lcg_LolClientFocusLost(StaticPinvokeLolClient sender, EventArgs e) {
+            Visibility = Visibility.Collapsed;
+        }
+
+        void _lcg_LolClientFocussed(StaticPinvokeLolClient sender, EventArgs e) {
+            if(_lcg.ClientState == LolClientState.InChampSelect) {
+                Visibility = System.Windows.Visibility.Visible;
+            }            
         }
 
         /// <summary>

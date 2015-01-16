@@ -40,7 +40,7 @@ namespace EasyChampionSelection.Helper_Windows {
                     sw.WriteLine(_error.InnerException.ToString());
                     sw.WriteLine();
                 }                
-                sw.WriteLine("_error.ToString()");
+                sw.WriteLine("Error");
                 sw.WriteLine(_error.ToString());
                 sw.WriteLine();
             }

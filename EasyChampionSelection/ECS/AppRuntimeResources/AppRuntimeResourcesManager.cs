@@ -26,10 +26,11 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         private EcsSettings _s;
         private ChampionList _allChampions;
 
-        private LolClientVisualHelper _lcvh;
+        private StaticPinvokeLolClient _pilc;
 
         private wndMain _wndM;
         private wndContactCreator _wndCC;
+        private wndClientOverload _wndCO;
 
         #region Getters & Setters
 
@@ -63,29 +64,14 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             private set { _allChampions = value; }
         }
 
-        public LolClientVisualHelper MyLolClientVisualHelper {
-            get { return _lcvh; }
-            private set { _lcvh = value; }
+        public StaticPinvokeLolClient MyLolClientProcessInvokeHandler {
+            get { return _pilc; }
+            private set { _pilc = value; }
         }
 
-        /// <summary>
-        /// Routed property from LolClientVisualHelper
-        /// </summary>
         public wndClientOverload Window_ClientOverlay {
-            get {
-                if(MyLolClientVisualHelper == null) {
-                    return null;
-                }
-                if(MyLolClientVisualHelper.Window_ClientOverlay == null) {
-                    return null;
-                }
-                return MyLolClientVisualHelper.Window_ClientOverlay;
-            }
-            private set {
-                if(MyLolClientVisualHelper != null) {
-                    MyLolClientVisualHelper.Window_ClientOverlay = value;
-                }
-            }
+            get { return _wndCO; }
+            private set { _wndCO = value; }
         }
 
         public wndMain Window_Main {
@@ -98,14 +84,6 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             set { _wndCC = value; }
         }
 
-        /// <summary>
-        /// Routed property from LolClientVisualHelper
-        /// </summary>
-        public bool ManuallyEnableTimerVisual {
-            get { return MyLolClientVisualHelper.ManuallyEnableTimerVisual; }
-            set { MyLolClientVisualHelper.ManuallyEnableTimerVisual = value; }
-        }
-
         #endregion
 
         public AppRuntimeResourcesManager() {
@@ -116,14 +94,13 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             LoadSerializedGroupManager();
             LoadAllChampions(); //Load all champions (Riot api or local)
 
-            MyLolClientVisualHelper = new LolClientVisualHelper(MySettings, DisplayPopup);
-            MyLolClientVisualHelper.NewLeagueClient += MyLolClientVisualHelper_NewLeagueClient;
+            MyLolClientProcessInvokeHandler = StaticPinvokeLolClient.GetInstance(MySettings, DisplayPopup);
 
             Window_Main = new wndMain(this);
-
+            Window_ClientOverlay = new wndClientOverload(MyGroupManager, MyLolClientProcessInvokeHandler, DisplayPopup);
 
             if(MySettings.StartLeagueWithEcs) {
-                if(!LolClientVisualHelper.isIngame() && !LolClientVisualHelper.isLolClientStarted()) {
+                if(MyLolClientProcessInvokeHandler.ClientState == LolClientState.NoClient) {
                     if(MySettings.LeaguePath.Length > 0) {
                         try {
                             FileInfo fi = new FileInfo(MySettings.LeaguePath);
@@ -252,7 +229,7 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             }
 
             cm.Items.Add(new Separator());
-            if(ManuallyEnableTimerVisual) {
+            if(MyLolClientProcessInvokeHandler.ManuallyEnableTimerVisual) {
                 MenuItem mniManuallyEnableTimer = CreateMenuItem("Start timer", mniManuallyEnableTimer_Click);
                 cm.Items.Add(mniManuallyEnableTimer);
             }
@@ -279,8 +256,7 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         }
 
         private void mniManuallyEnableTimer_Click(object sender, RoutedEventArgs e) {
-            ManuallyEnableTimerVisual = false;
-            MyLolClientVisualHelper.StartTimer();
+            MyLolClientProcessInvokeHandler.StartTimer();
         }
 
         private void mniContactCreator_Click(object sender, RoutedEventArgs e) {
@@ -298,16 +274,18 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
 
         #endregion TaskbarIcon
 
-        private void MyLolClientVisualHelper_NewLeagueClient(LolClientVisualHelper sender, EventArgs e) {
-            if(Window_ClientOverlay != null) {
-                if(Window_ClientOverlay.IsLoaded) {
-                    Window_ClientOverlay.Close();
-                }
-            }
+        //private void MyLolClientProcessInvokeHandler_NewLeagueClient(StaticPinvokeLolClient sender, PinvokeLolClientEventArgs e) {
+        //    if(e.CurrentState != LolClientState.NoClient && e.LastState == LolClientState.NoClient) {
+        //        if(Window_ClientOverlay != null) {
+        //            if(Window_ClientOverlay.IsLoaded) {
+        //                Window_ClientOverlay.Close();
+        //            }
+        //        }
 
-            Window_ClientOverlay = new wndClientOverload(MyGroupManager, MyLolClientVisualHelper.MyPinvokeLolClient, DisplayPopup);
+        //        Window_ClientOverlay = new wndClientOverload(MyGroupManager, MyLolClientProcessInvokeHandler, DisplayPopup);
 
-            DisplayPopup("Your lolclient.exe process just got updated.");
-        }
+        //        DisplayPopup("Your lolclient.exe process just got updated.");
+        //    }
+        //}
     }
 }
