@@ -3,7 +3,7 @@ EasyChampionSelection
 
 **Downloads are in the description below, not the Download ZIP button! That's if you want the source code.**
 
-A small programn to help relieve your stress in champion select.  
+A small program to help relieve your stress in champion select.  
 Ever had it occuring to you that in the heat of the moment you forgot your champion pool?  
 ECS will pop up a window for you so you'll never have to remember them again.
 It's smart enough to only show up when it's your turn to pick or ban.
@@ -69,4 +69,4 @@ Hiding the main window this way will also hide it from your task bar.
 You can set it up to always hide this way in the settings.
 
 #Download
-[Dropbox Beta download](https://dl.dropboxusercontent.com/u/105633860/Beta_ECS.rar)
+[Dropbox Beta download](https://dl.dropboxusercontent.com/u/105633860/Easy%20Champion%20Selection.msi)
