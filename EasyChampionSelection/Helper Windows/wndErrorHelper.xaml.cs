@@ -11,9 +11,11 @@ namespace EasyChampionSelection.Helper_Windows {
 
         private Action<string> _displayPopup;
         private Exception _error;
+        private wndContactCreator _wndConCreError;
 
         private wndErrorHelper() {
             InitializeComponent();
+            StaticWindowUtilities.EnsureVisibility(this);
         }
 
         public wndErrorHelper(Exception error, Action<string> DisplayPopup) : this() {
@@ -28,9 +30,13 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void btnSendError_Click(object sender, RoutedEventArgs e) {
-            wndContactCreator wndConCreError = new wndContactCreator(_error, txtErrorUserComment.Text);
-            wndConCreError.Owner = this;
-            wndConCreError.ShowDialog();
+            if(_wndConCreError == null) {
+                _wndConCreError = new wndContactCreator(_displayPopup, _error, txtErrorUserComment.Text);
+                _wndConCreError.Closed += (s, args) => _wndConCreError = null;
+            } else {
+                StaticWindowUtilities.EnsureVisibility(this);
+            }
+            _wndConCreError.Show();
         }
 
         private void btnSaveError_Click(object sender, RoutedEventArgs e) {
@@ -39,7 +45,7 @@ namespace EasyChampionSelection.Helper_Windows {
                     sw.WriteLine("InnerException");
                     sw.WriteLine(_error.InnerException.ToString());
                     sw.WriteLine();
-                }                
+                }
                 sw.WriteLine("Error");
                 sw.WriteLine(_error.ToString());
                 sw.WriteLine();

@@ -21,6 +21,7 @@ namespace EasyChampionSelection.Helper_Windows {
 
         private wndSettings() {
             InitializeComponent();
+            StaticWindowUtilities.EnsureVisibility(this);
         }
 
         public wndSettings(EcsSettings s, StaticPinvokeLolClient pilc, Action<string> DisplayMessage)
@@ -76,24 +77,11 @@ namespace EasyChampionSelection.Helper_Windows {
             dptm.Start();
         }
 
-        void pilc_LolClientStateChanged(StaticPinvokeLolClient sender, EventArgs e) {
-            if(_pilc.ClientState == LolClientState.NoClient) {
-
-            }
-            switch(_pilc.ClientState) {
-                case LolClientState.NoClient:
-                    if(!File.Exists(StaticSerializer.FullPath_ClientImage)) {
-                        btnConfigClientOverlay.IsEnabled = false;
-                    }
-                    break;
-                case LolClientState.Client_Undefined:
-                    btnConfigClientOverlay.IsEnabled = true;
-                    if(IsConfigLolClientOverlayOpened()) {
-                        OpenChild_WindowConfigClientOverlay();
-                    }
-                    break;
-                default:
-                    break;
+        void pilc_LolClientStateChanged(StaticPinvokeLolClient sender, PinvokeLolClientEventArgs e) {
+            if(e.CurrentState == LolClientState.NoClient) {
+                if(!File.Exists(StaticSerializer.FullPath_ClientImage)) {
+                    btnConfigClientOverlay.IsEnabled = false;
+                }
             }
         }
 
@@ -123,17 +111,13 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void btnConfigClientOverlay_Click(object sender, RoutedEventArgs e) {
-            OpenChild_WindowConfigClientOverlay();
-        }
-
-        /// <summary>
-        /// Is child window wndConfigLolClientOverlay open?
-        /// </summary>
-        public bool IsConfigLolClientOverlayOpened() {
-            if(_wndCLCO != null) {
-                return _wndCLCO.IsLoaded;
+            if(_wndCLCO == null) {
+                _wndCLCO = new wndConfigLolClientOverlay(_pilc, _s, _displayMessage);
+                _wndCLCO.Closed += (s, args) => _wndCLCO = null;
+            } else {
+                StaticWindowUtilities.EnsureVisibility(_wndCLCO);
             }
-            return false;
+            _wndCLCO.Show();
         }
 
         private void txtApiKey_TextChanged(object sender, TextChangedEventArgs e) {
@@ -162,17 +146,6 @@ namespace EasyChampionSelection.Helper_Windows {
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e) {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
-        }
-
-        public void OpenChild_WindowConfigClientOverlay() {
-            if(_wndCLCO != null) {
-                if(_wndCLCO.IsLoaded == true) {
-                    _wndCLCO.Close();
-                }
-            }
-
-            _wndCLCO = new wndConfigLolClientOverlay(_pilc, _s, _displayMessage);
-            _wndCLCO.Show();
         }
 
         private void lblApplicationpath_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {

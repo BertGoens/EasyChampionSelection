@@ -8,7 +8,7 @@ namespace EasyChampionSelection.ECS.RiotGameData.GroupManager {
     /// </summary>
     [Serializable]
     public sealed class StaticGroupManager {
-        private const int intMaxGroups = 12;
+        private const int intMaxGroups = 30;
         private List<ChampionList> lstGroupList;
         private static StaticGroupManager _instance;
 

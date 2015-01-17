@@ -1,4 +1,5 @@
-﻿using EasyChampionSelection.ECS.AppRuntimeResources;
+﻿using EasyChampionSelection.ECS;
+using EasyChampionSelection.ECS.AppRuntimeResources;
 using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
 using EasyChampionSelection.ECS.RiotGameData;
 using EasyChampionSelection.ECS.RiotGameData.GroupManager;
@@ -20,6 +21,7 @@ namespace EasyChampionSelection {
 
         private wndClientOverload() {
             InitializeComponent();
+            StaticWindowUtilities.EnsureVisibility(this);
         }
 
         public wndClientOverload(StaticGroupManager gmGroupManager, StaticPinvokeLolClient lcg, Action<string> DisplayPopup) : this() {

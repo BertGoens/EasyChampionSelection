@@ -20,6 +20,8 @@ namespace EasyChampionSelection {
 
         private AppRuntimeResourcesManager _ARR;
         private wndSettings _wndST;
+        private wndCredits _wndCR;
+        private wndAddGroup _wndAG;
 
         #endregion Properties & Attributes
 
@@ -40,6 +42,8 @@ namespace EasyChampionSelection {
                 _ARR.MyGroupManager.getGroup(i).NameChanged += MyGroupManager_ChampionList_NameChanged;
             }
             _ARR.MySettings.ApiKeyChanged += MySettings_ApiKeyChanged;
+
+            StaticWindowUtilities.EnsureVisibility(this);
         }
 
         #region UI Events
@@ -69,37 +73,33 @@ namespace EasyChampionSelection {
         }
 
         private void btnSettings_Click(object sender, RoutedEventArgs e) {
-            if(_wndST != null) {
-                if(_wndST.IsLoaded) {
-                    _wndST.Focus();
-                    return;
-                }
+            if(_wndST == null) {
+                _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientProcessInvokeHandler, _ARR.DisplayPopup);
+                _wndST.Closed += (s, args) => _wndST = null;
+            } else {
+                StaticWindowUtilities.EnsureVisibility(_wndST);
             }
-
-            _wndST = new wndSettings(_ARR.MySettings, _ARR.MyLolClientProcessInvokeHandler, _ARR.DisplayPopup);
             _wndST.Show();
         }
 
         private void btnCredits_Click(object sender, RoutedEventArgs e) {
-            try {
-                wndCredits wndCR = new wndCredits();
-                wndCR.Owner = this;
-                wndCR.ShowDialog();
-            } catch(Exception) {
-                _ARR.DisplayPopup("Woops, something went wrong!");
+            if(_wndCR == null) {
+                _wndCR = new wndCredits();
+                _wndCR.Closed += (s, args) => _wndCR = null;
+            } else {
+                StaticWindowUtilities.EnsureVisibility(_wndCR);
             }
-
+            _wndCR.Show();
         }
 
         private void btnNewGroup_Click(object sender, RoutedEventArgs e) {
-            try {
-                wndAddGroup wndAG = new wndAddGroup(_ARR.MyGroupManager);
-                wndAG.Owner = this;
-                wndAG.ShowDialog();
-                DisplayGroups();
-            } catch(Exception) {
-                _ARR.DisplayPopup("Woops, something went wrong!");
+            if(_wndAG == null) {
+                _wndAG = new wndAddGroup(_ARR.MyGroupManager);
+                _wndAG.Closed += (s, args) => { _wndAG = null; DisplayGroups(); };
+            } else {
+                StaticWindowUtilities.EnsureVisibility(_wndAG);
             }
+            _wndAG.Show();
         }
 
         private void btnDeleteGroup_Click(object sender, RoutedEventArgs e) {
@@ -348,13 +348,6 @@ namespace EasyChampionSelection {
 
 
         #region Public Behavior
-        public void EnsureVisibility() {
-            //Ensure our window is visible (I hate it when other programs splash over a user wants to open this program)
-            this.Activate();
-            this.Topmost = true;
-            this.Topmost = false;
-            this.Focus();
-        }
 
         public void DisplayGroups() {
             int selectedItemIndex = lsbGroups.SelectedIndex;
@@ -364,7 +357,7 @@ namespace EasyChampionSelection {
             for(int i = 0; i < _ARR.MyGroupManager.GroupCount; i++) {
                 lsbGroups.Items.Add(_ARR.MyGroupManager.getGroup(i));
             }
-            lblGroupsCount.Content = "Groups: " + lsbGroups.Items.Count + " / " + _ARR.MyGroupManager.MaxGroups;
+            lblGroupsCount.Content = "Groups: " + lsbGroups.Items.Count;
             if(_ARR.MyGroupManager.GroupCount == _ARR.MyGroupManager.MaxGroups) {
                 btnNewGroup.IsEnabled = false;
             } else {

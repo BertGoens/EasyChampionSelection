@@ -1,8 +1,5 @@
 Make YT Tutorial
 
-Saving the client image works but somehow my 'bad' image overwrites it as last save.
-Everything else should work correctly
-
 Find out how LSI creates its own categories and the game accepts them?!
 
 Modify TaskbarIcon (dll?) so it supports multiple popups

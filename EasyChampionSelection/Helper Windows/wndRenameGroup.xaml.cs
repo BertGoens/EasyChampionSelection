@@ -1,4 +1,5 @@
-﻿using EasyChampionSelection.ECS.RiotGameData;
+﻿using EasyChampionSelection.ECS;
+using EasyChampionSelection.ECS.RiotGameData;
 using EasyChampionSelection.ECS.RiotGameData.GroupManager;
 using System;
 using System.Windows;
@@ -12,17 +13,18 @@ namespace EasyChampionSelection {
         private StaticGroupManager _gm;
         private string _strGroupToRename;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public wndRenameGroup(StaticGroupManager gm, string strGroupToRename) {
+        private wndRenameGroup() {
+            InitializeComponent();
+            StaticWindowUtilities.EnsureVisibility(this);
+        }
+
+        public wndRenameGroup(StaticGroupManager gm, string strGroupToRename) : this() {
             if(gm != null && strGroupToRename != null) {
                 this._gm = gm;
                 this._strGroupToRename = strGroupToRename;
             } else {
                 throw new ArgumentNullException();
             }
-            InitializeComponent();
         }
 
         private void txtRenameGroup_TextChanged(object sender, TextChangedEventArgs e) {

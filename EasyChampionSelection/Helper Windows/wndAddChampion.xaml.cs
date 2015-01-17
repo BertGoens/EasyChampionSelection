@@ -1,4 +1,5 @@
-﻿using EasyChampionSelection.ECS.RiotGameData;
+﻿using EasyChampionSelection.ECS;
+using EasyChampionSelection.ECS.RiotGameData;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,14 +12,17 @@ namespace EasyChampionSelection {
 
         private ChampionList _allChamps;
 
-        public wndAddChampion(ChampionList allChamps) {
+        private wndAddChampion() {
+            InitializeComponent();
+            StaticWindowUtilities.EnsureVisibility(this);
+        }
+
+        public wndAddChampion(ChampionList allChamps) : this() {
             if(allChamps != null) {
                 this._allChamps = allChamps;
             } else {
                 throw new ArgumentNullException();
             }
-            
-            InitializeComponent();
         }
 
         private void txtNewChampion_TextChanged(object sender, TextChangedEventArgs e) {

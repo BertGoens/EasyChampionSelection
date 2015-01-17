@@ -375,9 +375,10 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources.LolClient {
                 }
             } catch(Exception ex) {
                 _ManuallyEnableTimerVisual = true;
-                wndErrorHelper wndEH = new wndErrorHelper(ex, _displayPopup);
-                wndEH.ShowDialog();
                 _tmrCheckForChampSelect.Stop();
+                wndErrorHelper wndEH = new wndErrorHelper(ex, _displayPopup);
+                wndEH.Show();
+                wndEH.Focus();
                 return;
             }
             _tmrCheckForChampSelect.Start();

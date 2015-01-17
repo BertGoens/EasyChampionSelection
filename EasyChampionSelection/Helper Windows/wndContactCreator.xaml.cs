@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EasyChampionSelection.ECS;
+using System;
 using System.Net;
 using System.Net.Mail;
 using System.Windows;
@@ -8,18 +9,25 @@ namespace EasyChampionSelection.Helper_Windows {
     /// Interaction logic for wndContactCreator.xaml
     /// </summary>
     public partial class wndContactCreator : Window {
-        public wndContactCreator() {
+
+        private Action<string> _displayMessage;
+
+        private wndContactCreator() {
             InitializeComponent();
+            StaticWindowUtilities.EnsureVisibility(this);
         }
 
-        public wndContactCreator(Exception error, string userComment) : this() {
+        public wndContactCreator(Action<string> DisplayMessage) : this() {
+            _displayMessage = DisplayMessage;
+        }
+
+        public wndContactCreator(Action<string> DisplayMessage, Exception error, string userComment) : this(DisplayMessage) {
             txtSubject.Text = "Error ";
             if(error.InnerException != null) {
                 txtSubject.Text += error.InnerException.ToString();
             }
             
-            txtBody.Text = "Hello, I've encountered this error today: \n" +
-                error.ToString();
+            txtBody.Text = "Hello, I've encountered this error today: \n" + error.ToString();
 
             if(userComment.Length > 0) {
                 txtBody.Text += "\n\n" + userComment;
@@ -28,15 +36,15 @@ namespace EasyChampionSelection.Helper_Windows {
 
         private void btnSendMail_Click(object sender, RoutedEventArgs e) {
             if(!txtFromSender.Text.Contains("@")) {
-                MessageBox.Show("Please use a valid email address!");
+                _displayMessage("Please use a valid email address!");
                 return;
             }
             if(txtFromPassword.Password.Length < 8) {
-                MessageBox.Show("Please use a valid password!");
+                _displayMessage("Please use a valid password!");
                 return;
             }
             if(txtBody.Text.Length < 20) {
-                MessageBox.Show("Please insert more text.");
+                _displayMessage("Please insert more text.");
                 return;
             }
 
@@ -61,13 +69,10 @@ namespace EasyChampionSelection.Helper_Windows {
                     Body = body
                 }) {
                     smtp.Send(message);
-                    MessageBox.Show("Thank you for you mail, I'll reach back as soon as possible!", this.Title);
+                    _displayMessage("Thank you for you mail, I'll reach back as soon as possible!");
                 }
-            } catch(SmtpException) {
-                MessageBox.Show("Are you using verification codes to access your account? "
-                    + "\nIf so please send your mail trough your browser.","Something went wrong!");
             } catch(Exception ex) {
-                MessageBox.Show(ex.ToString(),"Something went wrong!");
+                _displayMessage(ex.ToString() + "\nSomething went wrong!");
             }
         }
     }

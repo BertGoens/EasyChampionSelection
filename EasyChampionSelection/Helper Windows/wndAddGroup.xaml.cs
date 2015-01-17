@@ -1,4 +1,5 @@
-﻿using EasyChampionSelection.ECS.RiotGameData;
+﻿using EasyChampionSelection.ECS;
+using EasyChampionSelection.ECS.RiotGameData;
 using EasyChampionSelection.ECS.RiotGameData.GroupManager;
 using System;
 using System.Windows;
@@ -11,17 +12,16 @@ namespace EasyChampionSelection {
     public partial class wndAddGroup : Window {
         private StaticGroupManager _gm;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public wndAddGroup(StaticGroupManager gm) {
+        private wndAddGroup() {
+            InitializeComponent();
+            StaticWindowUtilities.EnsureVisibility(this);
+        }
+        public wndAddGroup(StaticGroupManager gm) : this() {
             if(gm != null) {
                 this._gm = gm;
             } else {
                 throw new ArgumentNullException();
             }
-
-            InitializeComponent();
         }
 
         private void txtNewGroupName_TextChanged(object sender, TextChangedEventArgs e) {

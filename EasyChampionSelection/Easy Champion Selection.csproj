@@ -113,6 +113,7 @@
     <Compile Include="ECS\AppRuntimeResources\LolClient\StaticPinvokeLolClient.cs" />
     <Compile Include="ECS\StaticSerializer.cs" />
     <Compile Include="ECS\AppRuntimeResources\TrayIcon\StaticTaskbarManager.cs" />
+    <Compile Include="ECS\StaticWindowUtilities.cs" />
     <Compile Include="Helper Windows\FancyBalloon.xaml.cs">
       <DependentUpon>FancyBalloon.xaml</DependentUpon>
     </Compile>

@@ -2,10 +2,8 @@
 using EasyChampionSelection.ECS.AppRuntimeResources;
 using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -31,10 +29,10 @@ namespace EasyChampionSelection.Helper_Windows {
 
         private wndConfigLolClientOverlay() {
             InitializeComponent();
+            StaticWindowUtilities.EnsureVisibility(this);
         }
 
-        public wndConfigLolClientOverlay(StaticPinvokeLolClient lcg, EcsSettings ecsSettings, Action<string> DisplayPopup)
-            : this() {
+        public wndConfigLolClientOverlay(StaticPinvokeLolClient lcg, EcsSettings ecsSettings, Action<string> DisplayPopup) : this() {
             if(ecsSettings == null || DisplayPopup == null) {
                 throw new ArgumentNullException();
             }
@@ -65,7 +63,6 @@ namespace EasyChampionSelection.Helper_Windows {
             if(_lolClientImage != null) {
                 try {
                     _ClientBitmap.Save(StaticSerializer.FullPath_ClientImage);
-                    _ClientBitmap.Dispose();
                 } catch(Exception ex) {
                     _displayPopup(ex.ToString());
                 }

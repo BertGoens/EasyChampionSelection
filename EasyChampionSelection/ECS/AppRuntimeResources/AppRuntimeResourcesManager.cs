@@ -97,6 +97,8 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             MyLolClientProcessInvokeHandler = StaticPinvokeLolClient.GetInstance(MySettings, DisplayPopup);
 
             Window_Main = new wndMain(this);
+            Window_Main.Closed += (s, args) => Window_Main = null;
+
             Window_ClientOverlay = new wndClientOverload(MyGroupManager, MyLolClientProcessInvokeHandler, DisplayPopup);
 
             if(MySettings.StartLeagueWithEcs) {
@@ -113,7 +115,6 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
 
             if(MySettings.ShowMainFormOnLaunch) {
                 Window_Main.Show();
-                Window_Main.EnsureVisibility();
             }
         }
 
@@ -160,9 +161,10 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
                         AllChampions.AddChampion(ChampionName);
                     }
 
-                } catch(RiotSharpException ex) {
-                    DisplayPopup("Trouble loading trough the api: \n" + ex.ToString());
+                } catch(RiotSharpException) {
+                    DisplayPopup("Trouble with loading champions trough the api");
                 } catch(NullReferenceException) {
+                    DisplayPopup("Internet problem while loading champions");
                 }
             } else {
                 DisplayPopup("No correct API key found, get one at https://developer.riotgames.com/");
@@ -210,22 +212,12 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
 
             if(Window_Main == null) {
                 Window_Main = new wndMain(this);
-                MenuItem mniHideMainWindow = CreateMenuItem("Show", mniHideMainWindow_Click);
+                Window_Main.Closed += (s, args) => Window_Main = null;
+                MenuItem mniHideMainWindow = CreateMenuItem("Show", mniShowMainWindow_Click);
                 cm.Items.Add(mniHideMainWindow);
             } else {
-                if(Window_Main.IsLoaded == false) { //Closed
-                    Window_Main = new wndMain(this);
-                    MenuItem mniShowMainWindow = CreateMenuItem("Show", mniShowMainWindow_Click);
-                    cm.Items.Add(mniShowMainWindow);
-                } else { //Not closed
-                    if(Window_Main.IsVisible) { //Visible
-                        MenuItem mniHideMainWindow = CreateMenuItem("Hide", mniHideMainWindow_Click);
-                        cm.Items.Add(mniHideMainWindow);
-                    } else { //Hidden in tray icon
-                        MenuItem mniShowMainWindow = CreateMenuItem("Show", mniShowMainWindow_Click);
-                        cm.Items.Add(mniShowMainWindow);
-                    }
-                }
+                MenuItem mniHideMainWindow = CreateMenuItem("Hide", mniHideMainWindow_Click);
+                cm.Items.Add(mniHideMainWindow);
             }
 
             cm.Items.Add(new Separator());
@@ -246,13 +238,15 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         }
 
         private void mniShowMainWindow_Click(object sender, RoutedEventArgs e) {
+            if(Window_Main == null) {
+                Window_Main = new wndMain(this);
+                Window_Main.Closed += (s, args) => Window_Main = null;
+            }
             Window_Main.Show();
-            Window_Main.ShowInTaskbar = true;
         }
 
         private void mniHideMainWindow_Click(object sender, RoutedEventArgs e) {
-            Window_Main.Hide();
-            Window_Main.ShowInTaskbar = false;
+            Window_Main.Close();
         }
 
         private void mniManuallyEnableTimer_Click(object sender, RoutedEventArgs e) {
@@ -261,11 +255,10 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
 
         private void mniContactCreator_Click(object sender, RoutedEventArgs e) {
             if(Window_ContactCreator == null) {
-                Window_ContactCreator = new wndContactCreator();
-                Window_ContactCreator.Show();
-            } else {
-                Window_ContactCreator.Show();
+                Window_ContactCreator = new wndContactCreator(_displayPopup);
+                Window_ContactCreator.Closed += (s, args) => Window_ContactCreator = null;
             }
+            Window_ContactCreator.Show();
         }
 
         private void mniExit_Click(object sender, RoutedEventArgs e) {
@@ -273,19 +266,5 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         }
 
         #endregion TaskbarIcon
-
-        //private void MyLolClientProcessInvokeHandler_NewLeagueClient(StaticPinvokeLolClient sender, PinvokeLolClientEventArgs e) {
-        //    if(e.CurrentState != LolClientState.NoClient && e.LastState == LolClientState.NoClient) {
-        //        if(Window_ClientOverlay != null) {
-        //            if(Window_ClientOverlay.IsLoaded) {
-        //                Window_ClientOverlay.Close();
-        //            }
-        //        }
-
-        //        Window_ClientOverlay = new wndClientOverload(MyGroupManager, MyLolClientProcessInvokeHandler, DisplayPopup);
-
-        //        DisplayPopup("Your lolclient.exe process just got updated.");
-        //    }
-        //}
     }
 }
