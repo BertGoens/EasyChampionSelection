@@ -23,14 +23,12 @@
                 <StackPanel Orientation="Vertical" Margin="5,10,0,0">
                     <Label Content="To:" />
                     <Label Content="From:" />
-                    <Label Content="Password:" />
                     <Label Content="Subject:" />
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Margin="5,10,0,0">
                     <Label Content="EasyChampionSelection@gmail.com" />
                     <TextBox x:Name="txtFromSender" Margin="0,2" Height="23" TextWrapping="Wrap" MinWidth="200" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" />
-                    <PasswordBox x:Name="txtFromPassword" Margin="0,2" MinWidth="204" Height="23" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" />
                     <TextBox x:Name="txtSubject" Margin="0,2" Height="23" TextWrapping="Wrap" MinWidth="204" VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch" />
                 </StackPanel>
             </StackPanel>

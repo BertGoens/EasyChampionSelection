@@ -1,4 +1,5 @@
-﻿using EasyChampionSelection.ECS.AppRuntimeResources;
+﻿using EasyChampionSelection.ECS;
+using EasyChampionSelection.ECS.AppRuntimeResources;
 using System.Security.Principal;
 using System.Threading;
 using System.Windows;
@@ -8,50 +9,47 @@ namespace EasyChampionSelection {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
-        Semaphore sema;
-        bool shouldRelease = false;
-
-        private AppRuntimeResourcesManager arr;
+        private static AppRuntimeResourcesManager arr;
+        private static readonly SingleInstance SingleInstance = new SingleInstance();
 
         private void Application_Startup(object sender, StartupEventArgs e) {
-            SingleInstanceCheck();
-            arr = new AppRuntimeResourcesManager();
+            if(SingleInstance.IsFirstInstance) {
+                SingleInstance.ArgumentsReceived += SingleInstanceParameter;
+                SingleInstance.ListenForArgumentsFromSuccessiveInstances();
+                // Do your other app logic
+                arr = new AppRuntimeResourcesManager();
+            } else {
+                //Tell it to show it's main window
+                SingleInstance.PassArgumentsToFirstInstance("Show");
+                // if there is an argument available, fire it
+                if(e.Args.Length > 0) {
+                    SingleInstance.PassArgumentsToFirstInstance(e.Args[0]);
+                }
+
+                Application.Current.Shutdown();
+            }
         }
 
         private void Application_Exit(object sender, ExitEventArgs e) {
-            if(shouldRelease) { //Are we the application holding on to the resources?
-                sema.Release();
+            if(SingleInstance.IsFirstInstance) { //First (unique) instance
+                SingleInstance.Dispose();
                 arr.Dispose();
             }
-
-            Application.Current.Shutdown();
         }
 
-        private void SingleInstanceCheck() {
-            //Check for duplicates running, close if there is already an Easy Champion Selection running
-            string semaLock = getSemaLock();
-            bool result = Semaphore.TryOpenExisting(semaLock, out sema);
-            if(result) { // we have another instance running
-                App.Current.Shutdown();
-            } else { //New instance
-                try {
-                    sema = new Semaphore(1, 1, semaLock);
-                } catch {
-                    App.Current.Shutdown(); //
-                }
-            }
-
-            if(!sema.WaitOne(0)) {
-                App.Current.Shutdown();
-            } else {
-                shouldRelease = true;
-            }
+        /// <summary>
+        ///     Handles the DispatcherUnhandledException event of the App control. 
+        ///     Makes sure that any unhandled exceptions produce an error report that includes a stack trace.
+        /// </summary>
+        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e) {
+            arr.DisplayPopup("An unhandled exception occurred: " + e.Exception.Message);
+            StaticErrorLogger.WriteErrorReport(e.Exception, "Unhandled!");
+            e.Handled = true;   // Prevent default unhandled exception processing
         }
 
-        private string getSemaLock() {
-            string semaLock = WindowsIdentity.GetCurrent().Name + ":Easy Champion Selection";
-            semaLock = semaLock.Replace("\\", ":");
-            return semaLock;
+        //Used to be static
+        private static void SingleInstanceParameter(object sender, GenericEventArgs<string> e) {
+                arr.Window_Main.Show();
         }
     }
 }

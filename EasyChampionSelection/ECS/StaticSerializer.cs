@@ -10,7 +10,7 @@ namespace EasyChampionSelection.ECS {
     /// It will automatically create directories of requested files if needed.
     /// </summary>
     public static class StaticSerializer {
-        private const string appName = "Easy Champion Selection";
+        public const string AppName = "Easy Champion Selection";
 
         // @\Save\
         private static string _fullPath_ClientImage = userAppDataPath() + Folder_SaveData + Object_ClientImage;
@@ -99,7 +99,7 @@ namespace EasyChampionSelection.ECS {
         /// </summary>
         /// <returns></returns>
         public static string userAppDataPath() {
-            return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\" + appName;
+            return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\" + AppName;
         }
 
         public static bool SerializeObject(object objectToSerialize, string fileName) {

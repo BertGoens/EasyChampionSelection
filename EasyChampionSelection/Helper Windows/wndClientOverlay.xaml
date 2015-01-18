@@ -6,12 +6,12 @@
     Height="40" 
     Width="300" 
     ShowInTaskbar="False" 
-    Topmost="True" 
     Focusable="False"
     WindowStyle="None"
     ShowActivated="False"
     ResizeMode="NoResize" 
-    Title="ECS lolClient Overlay" IsVisibleChanged="wndMyClientOverload_IsVisibleChanged">
+    Title="ECS lolClient Overlay"
+    IsVisibleChanged="wndMyClientOverload_IsVisibleChanged">
     
     <Grid>
         <Grid.Background>

@@ -89,6 +89,7 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         public AppRuntimeResourcesManager() {
             MyTaskbarManager = StaticTaskbarManager.getInstance(AppName);
             MyTaskbarManager.MyTaskbarIcon.PreviewTrayContextMenuOpen += Tb_PreviewTrayContextMenuOpen; //Taskbar ContextMenu binding
+            MyTaskbarManager.MyTaskbarIcon.TrayMouseDoubleClick += (s, args) => mniShowMainWindow_Click(s, args);
 
             LoadSettings(); //Load this first
             LoadSerializedGroupManager();
@@ -114,12 +115,21 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             }
 
             if(MySettings.ShowMainFormOnLaunch) {
-                Window_Main.Show();
+                Show_Window_Main();
             }
         }
 
         public void Dispose() {
             MyTaskbarManager.Dispose();
+        }
+
+        public void Show_Window_Main() {
+            if(Window_Main == null) {
+                Window_Main = new wndMain(this);
+                Window_Main.Closed += (s, args) => Window_Main = null;
+            }
+            Window_Main.Show();
+            StaticWindowUtilities.EnsureVisibility(Window_Main);
         }
 
         #region LoadSerializedData
@@ -237,11 +247,7 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         }
 
         private void mniShowMainWindow_Click(object sender, RoutedEventArgs e) {
-            if(Window_Main == null) {
-                Window_Main = new wndMain(this);
-                Window_Main.Closed += (s, args) => Window_Main = null;
-            }
-            Window_Main.Show();
+            Show_Window_Main();
         }
 
         private void mniHideMainWindow_Click(object sender, RoutedEventArgs e) {

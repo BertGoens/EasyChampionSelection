@@ -23,6 +23,8 @@ namespace EasyChampionSelection.Helper_Windows {
                 throw new ArgumentNullException();
             }
 
+            StaticErrorLogger.WriteErrorReport(_error, "Handled");
+
             _error = error;
             _displayPopup = DisplayPopup;
 
@@ -31,27 +33,12 @@ namespace EasyChampionSelection.Helper_Windows {
 
         private void btnSendError_Click(object sender, RoutedEventArgs e) {
             if(_wndConCreError == null) {
-                _wndConCreError = new wndContactCreator(_displayPopup, _error, txtErrorUserComment.Text);
+                _wndConCreError = new wndContactCreator(_displayPopup, _error);
                 _wndConCreError.Closed += (s, args) => _wndConCreError = null;
             } else {
                 StaticWindowUtilities.EnsureVisibility(this);
             }
             _wndConCreError.Show();
-        }
-
-        private void btnSaveError_Click(object sender, RoutedEventArgs e) {
-            using(StreamWriter sw = new StreamWriter(StaticSerializer.FullPath_ErrorFile, true)) {
-                if(_error.InnerException != null) {
-                    sw.WriteLine("InnerException");
-                    sw.WriteLine(_error.InnerException.ToString());
-                    sw.WriteLine();
-                }
-                sw.WriteLine("Error");
-                sw.WriteLine(_error.ToString());
-                sw.WriteLine();
-            }
-
-            _displayPopup("Saved!");
         }
     }
 }

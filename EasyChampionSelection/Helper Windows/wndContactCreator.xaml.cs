@@ -21,17 +21,10 @@ namespace EasyChampionSelection.Helper_Windows {
             _displayMessage = DisplayMessage;
         }
 
-        public wndContactCreator(Action<string> DisplayMessage, Exception error, string userComment) : this(DisplayMessage) {
+        public wndContactCreator(Action<string> DisplayMessage, Exception error) : this(DisplayMessage) {
             txtSubject.Text = "Error ";
-            if(error.InnerException != null) {
-                txtSubject.Text += error.InnerException.ToString();
-            }
-            
-            txtBody.Text = "Hello, I've encountered this error today: \n" + error.ToString();
 
-            if(userComment.Length > 0) {
-                txtBody.Text += "\n\n" + userComment;
-            }
+            txtBody.Text = "Hello, I've encountered this error today: \n" + StaticErrorLogger.FormalizeError(error, "Handled");
         }
 
         private void btnSendMail_Click(object sender, RoutedEventArgs e) {
@@ -39,40 +32,35 @@ namespace EasyChampionSelection.Helper_Windows {
                 _displayMessage("Please use a valid email address!");
                 return;
             }
-            if(txtFromPassword.Password.Length < 8) {
-                _displayMessage("Please use a valid password!");
-                return;
-            }
+
             if(txtBody.Text.Length < 20) {
                 _displayMessage("Please insert more text.");
                 return;
             }
 
-            MailAddress fromAddress = new MailAddress(txtFromSender.Text); 
-            MailAddress toAddress = new MailAddress("easychampionselection@gmail.com");
-            string fromPassword = txtFromPassword.Password;
-            string subject = "ECS:" + txtSubject.Text;
+            string to = "EasyChampionSelection@gmail.com";
+            string from = txtFromSender.Text;
+            string subject = txtSubject.Text;
             string body = txtBody.Text;
+            MailMessage message = new MailMessage(from, to, subject, body);
+            SmtpClient client = new SmtpClient {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                Timeout = 5000,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+            };
+            Console.WriteLine("Changing time out from {0} to 100.", client.Timeout);
+            client.Timeout = 100;
+            // Credentials are necessary if the server requires the client 
+            // to authenticate before it will send e-mail on the client's behalf.
+            client.Credentials = CredentialCache.DefaultNetworkCredentials;
 
             try {
-                SmtpClient smtp = new SmtpClient {
-                    Host = "smtp.gmail.com",
-                    Port = 587,
-                    EnableSsl = true,
-                    Timeout = 5000,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
-                };
-                using(MailMessage message = new MailMessage(fromAddress.Address, toAddress.Address) {
-                    Subject = subject,
-                    Body = body
-                }) {
-                    smtp.Send(message);
-                    _displayMessage("Thank you for you mail, I'll reach back as soon as possible!");
-                }
+                client.Send(message);
             } catch(Exception ex) {
-                _displayMessage(ex.ToString() + "\nSomething went wrong!");
+                _displayMessage("Problem encountered while sending mail, please try again!\n" + ex.Message);
             }
         }
     }

@@ -52,6 +52,7 @@ namespace EasyChampionSelection {
                 Visibility = System.Windows.Visibility.Collapsed;
             } else {
                 Visibility = System.Windows.Visibility.Visible;
+                StaticWindowUtilities.EnsureVisibility(this);
             }
         }
 
@@ -62,6 +63,7 @@ namespace EasyChampionSelection {
         void _lcg_LolClientFocussed(StaticPinvokeLolClient sender, EventArgs e) {
             if(_lcg.ClientState == LolClientState.InChampSelect) {
                 Visibility = System.Windows.Visibility.Visible;
+                StaticWindowUtilities.EnsureVisibility(this);
             }            
         }
 
@@ -236,6 +238,7 @@ namespace EasyChampionSelection {
             if(e.Property.Name == "IsVisible") {
                 if((bool)e.NewValue == true) {
                     RepositionClientOverlay();
+                    StaticWindowUtilities.EnsureVisibility(this);
                 }
             }
         }
