@@ -118,12 +118,6 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             }
         }
 
-        public void SaveSerializedData() {
-            StaticSerializer.SerializeObject(MyGroupManager, StaticSerializer.FullPath_GroupManager);
-            StaticSerializer.SerializeObject(AllChampions, StaticSerializer.FullPath_AllChampions);
-            StaticSerializer.SerializeObject(MySettings, StaticSerializer.FullPath_Settings);
-        }
-
         public void Dispose() {
             MyTaskbarManager.Dispose();
         }
@@ -133,12 +127,11 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         private void LoadSettings() {
             if(File.Exists(StaticSerializer.FullPath_Settings)) {
                 MySettings = (EcsSettings)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_Settings);
-                if(MySettings == null) {
-                    MySettings = new EcsSettings();
-                }
-            } else {
+            }
+            if(MySettings == null) {
                 MySettings = new EcsSettings();
             }
+            MySettings.SettingsChanged += (s, args) => StaticSerializer.SerializeObject(MySettings, StaticSerializer.FullPath_Settings);
         }
 
         private void LoadAllChampions() {
@@ -146,6 +139,10 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             LoadAllChampionsRiotApi(); //Use api to get all champions
             if(AllChampions.getCount() < 1) {
                 LoadAllChampionsLocal();
+            }
+            AllChampions.ChampionsChanged += (s, args) => StaticSerializer.SerializeObject(AllChampions, StaticSerializer.FullPath_AllChampions);
+            if(!File.Exists(StaticSerializer.FullPath_AllChampions)) {
+                StaticSerializer.SerializeObject(AllChampions, StaticSerializer.FullPath_AllChampions);
             }
         }
 
@@ -187,11 +184,13 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         private void LoadSerializedGroupManager() {
             if(File.Exists(StaticSerializer.FullPath_GroupManager)) {
                 MyGroupManager = (StaticGroupManager)StaticSerializer.DeSerializeObject(StaticSerializer.FullPath_GroupManager);
-                if(MyGroupManager == null) {
-                    NewGroupManager();
-                }
-            } else {
+            }
+            if(MyGroupManager == null) {
                 NewGroupManager();
+            }
+            MyGroupManager.GroupsChanged += (s, args) => StaticSerializer.SerializeObject(MyGroupManager, StaticSerializer.FullPath_GroupManager);
+            for(int i = 0; i < MyGroupManager.GroupCount; i++) {
+                MyGroupManager.getGroup(i).ChampionsChanged += (s, args) => StaticSerializer.SerializeObject(MyGroupManager, StaticSerializer.FullPath_GroupManager);
             }
         }
 

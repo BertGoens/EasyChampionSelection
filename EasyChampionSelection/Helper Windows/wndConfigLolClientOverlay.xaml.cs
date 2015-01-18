@@ -46,7 +46,9 @@ namespace EasyChampionSelection.Helper_Windows {
                 _lolClientImage = StaticImageUtilities.BitmapToBitmapSource(_ClientBitmap);
                 Visualize_lolClientImage();
             } else {
-                btnGetCurrentClientImage_Click(null, null);
+                if(_lcg.ClientState != LolClientState.NoClient) {
+                    btnGetCurrentClientImage_Click(null, null);
+                }
             }
         }
 

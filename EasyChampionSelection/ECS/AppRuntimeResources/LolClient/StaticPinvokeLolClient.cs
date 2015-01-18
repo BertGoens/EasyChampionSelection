@@ -257,7 +257,7 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources.LolClient {
         /// <summary>
         /// Private constructor, please use GetInstance() to use the class.
         /// </summary>
-        private StaticPinvokeLolClient(Process pLolClient, EcsSettings ecsSettings, Action<string> DisplayPopup) {
+        private StaticPinvokeLolClient(EcsSettings ecsSettings, Action<string> DisplayPopup) {
             _displayPopup = DisplayPopup;
             _ecsSettings = ecsSettings;
 
@@ -265,8 +265,8 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources.LolClient {
             _tmspTimerAfkInterval = new TimeSpan(0, 0, 10);
             _tmrCheckForChampSelect = new DispatcherTimer(DispatcherPriority.Background);
             _tmrCheckForChampSelect.Interval = _tmspTimerClienActiveInterval;
-            _tmrCheckForChampSelect.Tick += tmrCheckForChampSelect_Tick;
-            tmrCheckForChampSelect_Tick(null, EventArgs.Empty); //Manual search for gameclient regardless of timer tick timespan
+            _tmrCheckForChampSelect.Tick += _tmrCheckForChampSelect_Tick;
+            _tmrCheckForChampSelect_Tick(null, EventArgs.Empty); //Manual search for gameclient regardless of timer tick timespan
             _tmrCheckForChampSelect.Start();
         }
 
@@ -279,7 +279,7 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources.LolClient {
             if(ecsSettings == null || DisplayPopup == null) {
                 throw new ArgumentNullException();
             } else {
-                _instance = new StaticPinvokeLolClient(null, ecsSettings, DisplayPopup);
+                _instance = new StaticPinvokeLolClient(ecsSettings, DisplayPopup);
             }
 
             return _instance;
@@ -316,7 +316,7 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources.LolClient {
             ClientState = LolClientState.NoClient;
         }
 
-        private void tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
+        private void _tmrCheckForChampSelect_Tick(object sender, EventArgs e) {
             _tmrCheckForChampSelect.Stop();
 
             try {
@@ -469,10 +469,12 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources.LolClient {
         }
 
         /// <summary>
-        /// Returns a bitmap of the lol client
+        /// Returns a bitmap of the lol client (null if no client)
         /// </summary>
-        /// <returns></returns>
         public Bitmap GetLeagueClientAsBitmap() {
+            if(ClientState == LolClientState.NoClient) {
+                return null;
+            }
             // Old lol bounds
             Rectangle origLolBounds = new Rectangle(_rectLolBounds.X, _rectLolBounds.Y, _rectLolBounds.Width, _rectLolBounds.Height);
 

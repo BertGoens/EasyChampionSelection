@@ -21,7 +21,6 @@ namespace EasyChampionSelection {
         private void Application_Exit(object sender, ExitEventArgs e) {
             if(shouldRelease) { //Are we the application holding on to the resources?
                 sema.Release();
-                arr.SaveSerializedData();
                 arr.Dispose();
             }
 

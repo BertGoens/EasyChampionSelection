@@ -52,6 +52,12 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         [field: NonSerialized]
         public event ChangedEventHandler ApiKeyChanged;
 
+        /// <summary>
+        /// Occurs when the settings are updated.
+        /// </summary>
+        [field: NonSerialized]
+        public event ChangedEventHandler SettingsChanged;
+
         #endregion events
         #region Getters & Setters
         /// <summary>
@@ -64,6 +70,9 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
                     _rChampionSearchbarRelativePos = value;
                     if(ChampionSearchbarChanged != null) {
                         ChampionSearchbarChanged(this, EventArgs.Empty);
+                    }
+                    if(SettingsChanged != null) {
+                        SettingsChanged(this, EventArgs.Empty);
                     }
                 }
             }
@@ -80,6 +89,9 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
                     if(TeamChatChanged != null) {
                         TeamChatChanged(this, EventArgs.Empty);
                     }
+                    if(SettingsChanged != null) {
+                        SettingsChanged(this, EventArgs.Empty);
+                    }
                 }
             }
         }
@@ -95,6 +107,9 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
                     if(ClientOverlayChanged != null) {
                         ClientOverlayChanged(this, EventArgs.Empty);
                     }
+                    if(SettingsChanged != null) {
+                        SettingsChanged(this, EventArgs.Empty);
+                    }
                 }
             }
         }
@@ -107,6 +122,9 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             set {
                 if(value != _showMainFormOnLaunch) {
                     _showMainFormOnLaunch = value;
+                    if(SettingsChanged != null) {
+                        SettingsChanged(this, EventArgs.Empty);
+                    }
                 }
             }
         }
@@ -119,6 +137,9 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             set {
                 if(value != _startLeagueWithEcs) {
                     _startLeagueWithEcs = value;
+                    if(SettingsChanged != null) {
+                        SettingsChanged(this, EventArgs.Empty);
+                    }
                 }
             }
         }
@@ -132,6 +153,9 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             set {
                 if(value != null && value != _LeaguePath) {
                     _LeaguePath = value;
+                    if(SettingsChanged != null) {
+                        SettingsChanged(this, EventArgs.Empty);
+                    }
                 }
             }
         }
@@ -147,6 +171,9 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
                     if(ApiKeyChanged != null) {
                         ApiKeyChanged(this, EventArgs.Empty);
                     }
+                    if(SettingsChanged != null) {
+                        SettingsChanged(this, EventArgs.Empty);
+                    }
                 }
             }
         }
@@ -159,6 +186,9 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             set {
                 if(value != _version) {
                     _version = value;
+                    if(SettingsChanged != null) {
+                        SettingsChanged(this, EventArgs.Empty);
+                    }
                 }
             }
         }
@@ -171,6 +201,9 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
             private set {
                 if(value != null && value != _lastVersionCheck) {
                     _lastVersionCheck = value;
+                    if(SettingsChanged != null) {
+                        SettingsChanged(this, EventArgs.Empty);
+                    }
                 }
             }
         }

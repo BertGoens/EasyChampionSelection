@@ -326,7 +326,7 @@ namespace EasyChampionSelection {
                 _ARR.LoadAllChampionsLocal();
                 DisplayAllChampionsMinusInSelectedGroupAccordingToFilter();
             } else {
-                MessageBox.Show("No local saves found!", this.Title);
+                MessageBox.Show("No local save found!", this.Title);
             }
         }
 

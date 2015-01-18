@@ -4,6 +4,7 @@ using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -37,8 +38,6 @@ namespace EasyChampionSelection.Helper_Windows {
             _s.ChampionSearchbarChanged += _s_ChampionSearchbarChanged;
             _s.ClientOverlayChanged += _s_ClientOverlayChanged;
             _s.TeamChatChanged += _s_TeamChatChanged;
-
-            _wndCLCO = new wndConfigLolClientOverlay(pilc, _s, _displayMessage);
 
             double dotNetVersion = DotnetRegistryVersion();
             if(dotNetVersion < 4.5) {
@@ -190,11 +189,6 @@ namespace EasyChampionSelection.Helper_Windows {
             Process.Start(new ProcessStartInfo(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)));
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            _wndCLCO.Close();
-            StaticSerializer.SerializeObject(_s, StaticSerializer.FullPath_Settings);
-        }
-
         private void btnDownloadPageNewVersion_Click(object sender, RoutedEventArgs e) {
             Process.Start(new ProcessStartInfo(@"https://github.com/BertGoens/EasyChampionSelection"));
         }
@@ -231,7 +225,11 @@ namespace EasyChampionSelection.Helper_Windows {
             if(dotPos > -1) {
                 numbersOnly = numbersOnly.Insert(dotPos, ".");
             }
-            return double.Parse(numbersOnly);
+
+            numbersOnly = numbersOnly.Replace(",", ".");
+
+            double resultVer = double.Parse(numbersOnly, CultureInfo.GetCultureInfo("en-US"));
+            return resultVer;
         }
 
         private double DotnetRegistryVersion() {
