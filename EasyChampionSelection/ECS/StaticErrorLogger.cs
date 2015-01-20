@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EasyChampionSelection.ECS.Serialization;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -14,26 +15,25 @@ namespace EasyChampionSelection.ECS {
         public static void WriteErrorReport(Exception ex, string additional = "") {
             try {
                 using(StreamWriter f = new StreamWriter(StaticSerializer.FullPath_ErrorFile, true)) {
-                    f.WriteAsync(FormalizeError(ex, additional));
+                    f.Write(FormalizeError(ex, additional));
                 }
             } catch(Exception) {
             }
         }
 
         public static string FormalizeError(Exception ex, string additional = "") {
-            string versionString = "Version " + Assembly.GetExecutingAssembly().GetName().Version;
+            string res = "Error Report for " + StaticSerializer.AppName + Environment.NewLine;
 
-            string res = "Error Report for " + StaticSerializer.AppName;
-
-            res += versionString + "\n";
+            res += "Version " + Assembly.GetExecutingAssembly().GetName().Version + Environment.NewLine;
             if(!String.IsNullOrWhiteSpace(additional)) {
-                res += "Developer information: \n" + additional + "\n";
+                res += "Developer information: " + Environment.NewLine +
+                    additional + Environment.NewLine;
             }
 
-            res += "Exception information: \n";
-            res += ex.ToString() + "\n";
-            res += "Inner Exception information: \n";
-            res += ex.InnerException + "\n";
+            res += "Exception information:" + Environment.NewLine;
+            res += ex.ToString() + Environment.NewLine;
+            res += "Inner Exception information:" + Environment.NewLine;
+            res += ex.InnerException + Environment.NewLine;
 
             return res;
         }

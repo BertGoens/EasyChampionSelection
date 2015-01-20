@@ -8,6 +8,7 @@
     ShowInTaskbar="False" 
     Focusable="False"
     WindowStyle="None"
+    Topmost="True"
     ShowActivated="False"
     ResizeMode="NoResize" 
     Title="ECS lolClient Overlay"

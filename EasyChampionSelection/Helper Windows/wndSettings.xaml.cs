@@ -1,6 +1,6 @@
 ﻿using EasyChampionSelection.ECS;
-using EasyChampionSelection.ECS.AppRuntimeResources;
 using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
+using EasyChampionSelection.ECS.Serialization;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
@@ -77,10 +77,10 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         void pilc_LolClientStateChanged(StaticPinvokeLolClient sender, PinvokeLolClientEventArgs e) {
-            if(e.CurrentState == LolClientState.NoClient) {
-                if(!File.Exists(StaticSerializer.FullPath_ClientImage)) {
-                    btnConfigClientOverlay.IsEnabled = false;
-                }
+            if(e.CurrentState != LolClientState.NoClient || File.Exists(StaticSerializer.FullPath_ClientImage)) {
+                btnConfigClientOverlay.IsEnabled = true;
+            } else {
+                btnConfigClientOverlay.IsEnabled = false;
             }
         }
 
@@ -90,10 +90,13 @@ namespace EasyChampionSelection.Helper_Windows {
             showDownloadNewVersion();
         }
 
-        private async void showDownloadNewVersion() {
-            if(_s.Version < await _s.OnlineVersion()) {
+        /// <summary>
+        /// This makes a web call, so it's run from a diffrent thread to not slow down our main (UI) thread
+        /// </summary>
+        private void showDownloadNewVersion() {
+            if(_s.EcsVersion.isOnlineVersionNewer()) {
                 spVersion.Visibility = System.Windows.Visibility.Visible;
-                lblVersion.Content = "Your version: " + _s.Version + ", latest version: " + await _s.OnlineVersion();
+                lblVersion.Content = "Your version: " + _s.EcsVersion + ", latest version: " + _s.EcsVersion.VersionOnline;
             }
         }
 
@@ -120,7 +123,7 @@ namespace EasyChampionSelection.Helper_Windows {
         }
 
         private void txtApiKey_TextChanged(object sender, TextChangedEventArgs e) {
-            if(_s.UserApiKey != txtApiKey.Text) {
+            if(_s.UserApiKey != txtApiKey.Text && txtApiKey.Text.Length == 36) {
                 _s.UserApiKey = txtApiKey.Text;
                 _displayMessage("Loading champions with API");
             }
@@ -140,6 +143,10 @@ namespace EasyChampionSelection.Helper_Windows {
             }
             CheckBox tSender = (CheckBox)sender;
             _s.StartLeagueWithEcs = (bool)tSender.IsChecked;
+
+            if(_s.LeaguePath.Length < 1) {
+                txtLeaguePath_MouseDoubleClick(this, null);
+            }
         }
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e) {

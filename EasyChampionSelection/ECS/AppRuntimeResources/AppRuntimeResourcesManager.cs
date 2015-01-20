@@ -2,6 +2,7 @@
 using EasyChampionSelection.ECS.AppRuntimeResources.TrayIcon;
 using EasyChampionSelection.ECS.RiotGameData;
 using EasyChampionSelection.ECS.RiotGameData.GroupManager;
+using EasyChampionSelection.ECS.Serialization;
 using EasyChampionSelection.Helper_Windows;
 using RiotSharp;
 using System;
@@ -168,9 +169,11 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
                         AllChampions.AddChampion(ChampionName);
                     }
 
-                } catch(RiotSharpException) {
+                } catch(RiotSharpException ex) {
+                    StaticErrorLogger.WriteErrorReport(ex, "Handled; AppRuntimeResourcesManager/LoadAllChampionsRiotApi:RiotSharpException");
                     DisplayPopup("Trouble with loading champions trough the api");
-                } catch(NullReferenceException) {
+                } catch(NullReferenceException ex) {
+                    StaticErrorLogger.WriteErrorReport(ex, "Handled;  AppRuntimeResourcesManager/LoadAllChampionsRiotApi:NullReferenceException");
                     DisplayPopup("Internet problem while loading champions");
                 }
             } else {

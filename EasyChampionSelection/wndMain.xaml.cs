@@ -3,6 +3,7 @@ using EasyChampionSelection.ECS.AppRuntimeResources;
 using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
 using EasyChampionSelection.ECS.RiotGameData;
 using EasyChampionSelection.ECS.RiotGameData.GroupManager;
+using EasyChampionSelection.ECS.Serialization;
 using EasyChampionSelection.Helper_Windows;
 using System;
 using System.Diagnostics;

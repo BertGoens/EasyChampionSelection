@@ -1,29 +1,21 @@
 ﻿using System;
 using System.Drawing;
-using System.Net;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
-namespace EasyChampionSelection.ECS.AppRuntimeResources {
+namespace EasyChampionSelection.ECS.Serialization {
     /// <summary>
-    /// Settings class for Easy Champion Selection
+    /// Settings class
     /// </summary>
     [Serializable]
     public class EcsSettings {
-        //[OptionalField]
-        private const double basicVersion = 1.0;
-
         private Rectangle _rChampionSearchbarRelativePos = new Rectangle();
         private Rectangle _rTeamChatRelativePos = new Rectangle();
         private Rectangle _rClientOverlayRelativePos = new Rectangle();
 
-        private bool _startLeagueWithEcs = false;
-        private bool _showMainFormOnLaunch = true;
-        private string _userApiKey = "";
-        private string _LeaguePath = "";
-        private double _version = basicVersion;
-        private DateTime _lastVersionCheck = DateTime.Today;
-        private double _onlineVersion = basicVersion;
+        private bool _startLeagueWithEcs;
+        private bool _showMainFormOnLaunch;
+        private string _userApiKey;
+        private string _LeaguePath;
+        private EcsVersion _ecsVersion;
 
         #region events
         public delegate void ChangedEventHandler(EcsSettings sender, EventArgs e);
@@ -179,67 +171,28 @@ namespace EasyChampionSelection.ECS.AppRuntimeResources {
         }
 
         /// <summary>
-        /// Returns this version of Easy Champion Selection
+        /// Returns this <see cref="EcsVersion"/>version of Easy Champion Selection
         /// </summary>
-        public double Version {
-            get { return _version; }
+        public EcsVersion EcsVersion {
+            get { return _ecsVersion; }
             set {
-                if(value != _version) {
-                    _version = value;
+                if(value != _ecsVersion) {
+                    _ecsVersion = value;
                     if(SettingsChanged != null) {
                         SettingsChanged(this, EventArgs.Empty);
                     }
                 }
             }
         }
-
-        /// <summary>
-        /// Returns the last date we checked the version
-        /// </summary>
-        public DateTime LastVersionCheck {
-            get { return _lastVersionCheck; }
-            private set {
-                if(value != null && value != _lastVersionCheck) {
-                    _lastVersionCheck = value;
-                    if(SettingsChanged != null) {
-                        SettingsChanged(this, EventArgs.Empty);
-                    }
-                }
-            }
-        }
-
 
         #endregion Getters & Setters
 
-        public EcsSettings() { }
-
-        /// <summary>
-        /// Checks the lastest online version (refreshes once a day)
-        /// </summary>
-        public async Task<double> OnlineVersion() {
-            if(LastVersionCheck < DateTime.Today) {
-                _onlineVersion = await EcsVersion();
-            }
-            return _onlineVersion;
-        }
-
-        /// <summary>
-        /// Uses a webclient to ask the latest Version.txt from our master tree
-        /// </summary>
-        private async Task<double> EcsVersion() {
-            try {
-                double ver = basicVersion;
-                using(WebClient client = new WebClient()) {
-                    string reply = await client.DownloadStringTaskAsync(@"https://github.com/BertGoens/EasyChampionSelection/blob/master/Version.txt");
-                    if(double.TryParse(reply, out ver)) {
-                        LastVersionCheck = DateTime.Today;
-                        ver = double.Parse(reply);
-                    }
-                }
-                return ver;
-            } catch(Exception) {
-                return basicVersion;
-            }
+        public EcsSettings() {
+            _startLeagueWithEcs = false;
+            _showMainFormOnLaunch = true;
+            _userApiKey = "";
+            _LeaguePath = "";
+            _ecsVersion = new EcsVersion("1.0.0.0");
         }
     }
 }

@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace EasyChampionSelection.ECS {
+namespace EasyChampionSelection.ECS.Serialization {
 
     /// <summary>
     /// A basic (de)serialization class
@@ -19,7 +19,7 @@ namespace EasyChampionSelection.ECS {
         private static string _fullPath_GroupManager = userAppDataPath() + Folder_SaveData + Object_GroupManager;
 
         // @\Error\
-        private static string _fullPath_ErrorFile = userAppDataPath() + Folder_ErrorData + "\\" + DateTime.Today.ToString("d").Replace("/", "_") + ".txt";
+        private static string _fullPath_ErrorFile = getFullPathErrorFile();
 
         //Local folders
         private const string Folder_SaveData = @"\Save";
@@ -94,6 +94,15 @@ namespace EasyChampionSelection.ECS {
             return r;
         }
 
+        private static string getFullPathErrorFile() {
+            string result = userAppDataPath() + Folder_ErrorData + "\\";
+            result += DateTime.Today.ToString("d").Replace("/", "_") + "_";
+            result += DateTime.Today.TimeOfDay.TotalMilliseconds.ToString();
+            result += ".txt";
+
+            return result;
+        }
+
         /// <summary>
         /// Returns the absolute path of the Application Data Folder where all the data is stored
         /// </summary>
@@ -111,7 +120,7 @@ namespace EasyChampionSelection.ECS {
                 bFormatter.Serialize(stream, objectToSerialize);
                 stream.Close();
             } catch(Exception ex) {
-                ex.ToString();
+                StaticErrorLogger.WriteErrorReport(ex, "Handled! ECS/Serialization/StaticSerializer:SerializeObject;");
                 return false;
             }
             return true;
@@ -133,7 +142,8 @@ namespace EasyChampionSelection.ECS {
                     objectToDeSerialize = bFormatter.Deserialize(stream);
                     stream.Close();
                     return objectToDeSerialize;
-                } catch(SerializationException) {  //Attempting to deserialize an empty stream, just delete it as it is void
+                } catch(SerializationException ex) {  //Attempting to deserialize an empty stream, just delete it as it is void
+                    StaticErrorLogger.WriteErrorReport(ex, "Handled! ECS/Serialization/StaticSerializer:DeSerializeObject;");
                     stream.Close();
                     File.Delete(fileName);
                 }

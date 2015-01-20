@@ -106,17 +106,18 @@
     <Compile Include="ECS\AppRuntimeResources\LolClient\PinvokeLolClientEventArgs.cs" />
     <Compile Include="ECS\GenericEventArgs.cs" />
     <Compile Include="ECS\RiotGameData\ChampionList.cs" />
-    <Compile Include="ECS\AppRuntimeResources\EcsSettings.cs" />
+    <Compile Include="ECS\Serialization\EcsSettings.cs" />
     <Compile Include="ECS\RiotGameData\GroupManager\StaticGroupManager.cs" />
     <Compile Include="ECS\RiotGameData\GroupManager\GroupManagerEventArgs.cs" />
     <Compile Include="ECS\RiotGameData\GroupManager\GroupManagerEventOperation.cs" />
     <Compile Include="ECS\StaticErrorLogger.cs" />
     <Compile Include="ECS\StaticImageUtilities.cs" />
     <Compile Include="ECS\AppRuntimeResources\LolClient\StaticPinvokeLolClient.cs" />
-    <Compile Include="ECS\StaticSerializer.cs" />
+    <Compile Include="ECS\Serialization\StaticSerializer.cs" />
     <Compile Include="ECS\AppRuntimeResources\TrayIcon\StaticTaskbarManager.cs" />
     <Compile Include="ECS\SingleInstance.cs" />
     <Compile Include="ECS\StaticWindowUtilities.cs" />
+    <Compile Include="ECS\Serialization\EcsVersion.cs" />
     <Compile Include="Helper Windows\FancyBalloon.xaml.cs">
       <DependentUpon>FancyBalloon.xaml</DependentUpon>
     </Compile>

@@ -108,7 +108,7 @@ namespace EasyChampionSelection.ECS {
         }
 
         private string getSemaLockName() {
-            string semaLock = WindowsIdentity.GetCurrent().Name + StaticSerializer.AppName;
+            string semaLock = WindowsIdentity.GetCurrent().Name + EasyChampionSelection.ECS.Serialization.StaticSerializer.AppName;
             semaLock = semaLock.Replace("\\", ":");
             return semaLock;
         }

@@ -54,9 +54,10 @@
                     <TextBox DockPanel.Dock="Top" x:Name="txtFilterForAllChampions" Height="23" Margin="0,0,5,0" TextWrapping="Wrap" MinWidth="160" HorizontalContentAlignment="Stretch"
                              MouseEnter="txtFilterForAllChampions_MouseEnter" MouseLeave="txtFilterForAllChampions_MouseLeave" 
                              TextChanged="txtFilterForAllChampions_TextChanged" MaxLength="100" MaxLines="1" VerticalContentAlignment="Center"/>
-                    <Label DockPanel.Dock="Top" x:Name="lblFilterInfo" Content="Filter" Margin="0,-25,0,0"  Foreground="#FF686767" Cursor="IBeam" MouseEnter="lblFilterInfo_MouseEnter" MouseLeave="lblFilterInfo_MouseLeave" />
+                    <Label DockPanel.Dock="Top" x:Name="lblFilterInfo" Width="40" Height="25" Content="Filter" Margin="0,-25,0,0"  Foreground="#FF686767" Cursor="IBeam"
+                           HorizontalAlignment="Left" VerticalContentAlignment="Bottom" MouseEnter="lblFilterInfo_MouseEnter" MouseLeave="lblFilterInfo_MouseLeave" />
                     <Label DockPanel.Dock="Top" x:Name="lblAllChampionsInfo" Content="All champions:" />
-                    <ListBox DockPanel.Dock="Bottom" x:Name="lsbAllChampions" MinWidth="160" SelectionMode="Multiple" MinHeight="150" VerticalContentAlignment="Stretch"
+                    <ListBox DockPanel.Dock="Bottom" x:Name="lsbAllChampions" MinWidth="160" SelectionMode="Multiple" Margin="0,0,0,2" MinHeight="140" VerticalContentAlignment="Stretch"
                         PreviewMouseRightButtonDown="lsbAllChampions_PreviewMouseRightButtonDown" />
                 </DockPanel>
             </DockPanel>

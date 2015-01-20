@@ -1,6 +1,7 @@
 ﻿using EasyChampionSelection.ECS;
 using EasyChampionSelection.ECS.AppRuntimeResources;
 using EasyChampionSelection.ECS.AppRuntimeResources.LolClient;
+using EasyChampionSelection.ECS.Serialization;
 using System;
 using System.Drawing;
 using System.IO;
@@ -66,6 +67,7 @@ namespace EasyChampionSelection.Helper_Windows {
                 try {
                     _ClientBitmap.Save(StaticSerializer.FullPath_ClientImage);
                 } catch(Exception ex) {
+                    StaticErrorLogger.WriteErrorReport(ex, "Handled! Helper_Windows/wndConfigLolClientOverlay.xaml.cs:Window_Closing;");
                     _displayPopup(ex.ToString());
                 }
             }

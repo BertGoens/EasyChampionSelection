@@ -1,15 +1,14 @@
 ﻿using EasyChampionSelection.ECS;
 using EasyChampionSelection.ECS.AppRuntimeResources;
-using System.Security.Principal;
-using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace EasyChampionSelection {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
-        private static AppRuntimeResourcesManager arr;
+        private AppRuntimeResourcesManager arr;
         private static readonly SingleInstance SingleInstance = new SingleInstance();
 
         private void Application_Startup(object sender, StartupEventArgs e) {
@@ -41,14 +40,14 @@ namespace EasyChampionSelection {
         ///     Handles the DispatcherUnhandledException event of the App control. 
         ///     Makes sure that any unhandled exceptions produce an error report that includes a stack trace.
         /// </summary>
-        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e) {
+        private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
             arr.DisplayPopup("An unhandled exception occurred: " + e.Exception.Message);
             StaticErrorLogger.WriteErrorReport(e.Exception, "Unhandled!");
             e.Handled = true;   // Prevent default unhandled exception processing
         }
 
         //Used to be static
-        private static void SingleInstanceParameter(object sender, GenericEventArgs<string> e) {
+        private void SingleInstanceParameter(object sender, GenericEventArgs<string> e) {
                 arr.Window_Main.Show();
         }
     }
